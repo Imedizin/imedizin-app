@@ -1,0 +1,75 @@
+### Subscription API Testing
+### Base URL - Update this if your server runs on a different port
+@baseUrl = http://localhost:3000
+@subscriptionId = {{subscriptionId}}
+@mailboxId = support@imedizin.com
+
+### Get all subscriptions (from database/local)
+GET {{baseUrl}}/api/subscriptions
+Content-Type: application/json
+
+### Get all subscriptions from Microsoft Graph API
+GET {{baseUrl}}/api/subscriptions?source=graph
+Content-Type: application/json
+
+### Get all subscriptions from local database (explicit)
+GET {{baseUrl}}/api/subscriptions?source=local
+Content-Type: application/json
+
+### Get subscription by ID
+# Replace {{subscriptionId}} with an actual subscription ID from the list above
+GET {{baseUrl}}/api/subscriptions/{{subscriptionId}}
+Content-Type: application/json
+
+### Get all subscriptions for a mailbox (from database/local)
+GET {{baseUrl}}/api/subscriptions/mailbox/{{mailboxId}}
+Content-Type: application/json
+
+### Get all subscriptions for a mailbox from Microsoft Graph API
+GET {{baseUrl}}/api/subscriptions/mailbox/{{mailboxId}}?source=graph
+Content-Type: application/json
+
+### Get all subscriptions for a mailbox from local database (explicit)
+GET {{baseUrl}}/api/subscriptions/mailbox/{{mailboxId}}?source=local
+Content-Type: application/json
+
+### Create subscription for inbox (default)
+POST {{baseUrl}}/api/subscriptions
+Content-Type: application/json
+
+{
+  "mailboxId": "{{mailboxId}}",
+  "folder": "inbox"
+}
+
+### Create subscription for spam folder
+POST {{baseUrl}}/api/subscriptions
+Content-Type: application/json
+
+{
+  "mailboxId": "{{mailboxId}}",
+  "folder": "spam"
+}
+
+### Create subscription with custom resource
+POST {{baseUrl}}/api/subscriptions
+Content-Type: application/json
+
+{
+  "mailboxId": "{{mailboxId}}",
+  "folder": "custom",
+  "resource": "/users/{{mailboxId}}/mailFolders('inbox')/messages"
+}
+
+### Delete all subscriptions from Microsoft Graph
+DELETE {{baseUrl}}/api/subscriptions/graph/all
+Content-Type: application/json
+
+### Delete subscription
+# Replace {{subscriptionId}} with an actual subscription ID
+DELETE {{baseUrl}}/api/subscriptions/{{subscriptionId}}
+
+### Example: Get all subscriptions and extract an ID
+# Run this first to get subscription IDs, then use one in the delete request above
+GET {{baseUrl}}/api/subscriptions
+Content-Type: application/json
