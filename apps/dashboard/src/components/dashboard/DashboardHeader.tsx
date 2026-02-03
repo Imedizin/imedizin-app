@@ -1,0 +1,145 @@
+import React from "react";
+import { Layout, Avatar, Dropdown, Badge, Button } from "antd";
+import type { MenuProps } from "antd";
+import {
+  UserOutlined,
+  SettingOutlined,
+  BellOutlined,
+  MessageOutlined,
+  SunOutlined,
+  MoonOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  LogoutOutlined,
+} from "@ant-design/icons";
+import { useTheme } from "@/hooks/useTheme";
+import { primaryColor } from "@/theme/constants";
+import MailboxSwitcher from "@/components/dashboard/MailboxSwitcher";
+
+const { Header } = Layout;
+
+const userMenuItems: MenuProps["items"] = [
+  {
+    key: "profile",
+    label: "Profile",
+    icon: <UserOutlined />,
+  },
+  {
+    key: "settings",
+    label: "Settings",
+    icon: <SettingOutlined />,
+  },
+  {
+    type: "divider",
+  },
+  {
+    key: "logout",
+    label: "Logout",
+    icon: <LogoutOutlined />,
+    danger: true,
+  },
+];
+
+interface DashboardHeaderProps {
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
+}
+
+const DashboardHeader: React.FC<DashboardHeaderProps> = ({
+  collapsed,
+  onToggleCollapsed,
+}) => {
+  const { isDark, toggleTheme } = useTheme();
+
+  return (
+    <Header
+      style={{
+        padding: "0 24px",
+        background: isDark ? "#141414" : "#fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        borderBottom: `1px solid ${isDark ? "#303030" : "#e8e8e8"}`,
+        position: "sticky",
+        top: 0,
+        zIndex: 1,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <Button
+          type="text"
+          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          onClick={onToggleCollapsed}
+          style={{
+            fontSize: 16,
+            width: 40,
+            height: 40,
+          }}
+        />
+        <MailboxSwitcher />
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <Button
+          type="text"
+          icon={isDark ? <SunOutlined /> : <MoonOutlined />}
+          onClick={toggleTheme}
+          style={{ fontSize: 18 }}
+          title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+        />
+        <Badge count={5} size="small">
+          <Button
+            type="text"
+            icon={<BellOutlined />}
+            style={{ fontSize: 18 }}
+          />
+        </Badge>
+        <Badge count={3} size="small">
+          <Button
+            type="text"
+            icon={<MessageOutlined />}
+            style={{ fontSize: 18 }}
+          />
+        </Badge>
+        <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              cursor: "pointer",
+              padding: "4px 8px",
+              borderRadius: 8,
+            }}
+          >
+            <Avatar
+              size={36}
+              style={{ backgroundColor: primaryColor }}
+              icon={<UserOutlined />}
+            />
+            <div style={{ lineHeight: 1.3 }}>
+              <div
+                style={{
+                  fontWeight: 500,
+                  fontSize: 14,
+                  color: isDark ? "#fff" : undefined,
+                }}
+              >
+                John Doe
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: isDark ? "#8c8c8c" : "#8c8c8c",
+                }}
+              >
+                Admin
+              </div>
+            </div>
+          </div>
+        </Dropdown>
+      </div>
+    </Header>
+  );
+};
+
+export default DashboardHeader;
