@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").trim() || "";
 
 /**
  * Notification event types from backend
@@ -114,7 +113,7 @@ interface UseNotificationsReturn {
  * Hook to subscribe to real-time email notifications via SSE
  */
 export function useNotifications(
-  options: UseNotificationsOptions = {},
+  options: UseNotificationsOptions = {}
 ): UseNotificationsReturn {
   const {
     mailboxIds,
@@ -131,7 +130,7 @@ export function useNotifications(
   const isCleaningUpRef = useRef(false);
   const [isConnected, setIsConnected] = useState(false);
   const [lastNotification, setLastNotification] = useState<Notification | null>(
-    null,
+    null
   );
 
   // Store callbacks in refs to avoid re-triggering effect
@@ -194,7 +193,7 @@ export function useNotifications(
           case "connected":
             console.log(
               "[Notifications] Connected with client ID:",
-              (notification as ConnectedNotification).clientId,
+              (notification as ConnectedNotification).clientId
             );
             break;
 
@@ -212,7 +211,7 @@ export function useNotifications(
             if (opts.showToasts) {
               message.info(
                 `New email from ${fromName}: ${truncatedSubject}`,
-                5,
+                5
               );
             }
 
@@ -233,7 +232,7 @@ export function useNotifications(
 
             if (opts.showToasts && syncComplete.messagesCreated > 0) {
               message.success(
-                `Synced ${syncComplete.messagesCreated} new emails`,
+                `Synced ${syncComplete.messagesCreated} new emails`
               );
             }
 

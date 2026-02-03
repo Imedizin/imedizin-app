@@ -12,10 +12,10 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },
     proxy: {
+      // Forward /api/* to API as /api/* (NestJS controllers use @Controller('api/...'))
       "/api": {
         target: "http://localhost:3000",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
   },

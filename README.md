@@ -25,6 +25,18 @@ imedizin-app/
 pnpm install
 ```
 
+## Environment variables
+
+Use per-app `.env` files (git-ignored). Copy the examples:
+
+| App       | Copy to                                               |
+| --------- | ----------------------------------------------------- |
+| API       | `apps/api/.env.example` → `apps/api/.env`             |
+| Dashboard | `apps/dashboard/.env.example` → `apps/dashboard/.env` |
+
+- **API**: Loaded from `apps/api` when you run `pnpm --filter @imedizin/api dev`.
+- **Dashboard**: Leave `VITE_API_BASE_URL` empty in dev to use the Vite proxy (`/api` → API on port 3000).
+
 ## Scripts
 
 | Command      | Description              |
@@ -39,7 +51,7 @@ pnpm install
 # API (port 3000)
 pnpm --filter @imedizin/api dev
 
-# Dashboard (port 5173)
+# Dashboard (port 8080)
 pnpm --filter @imedizin/dashboard dev
 ```
 

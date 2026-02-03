@@ -1,19 +1,19 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { ScheduleModule } from '@nestjs/schedule';
-import { BullModule } from '@nestjs/bullmq';
-import { BullBoardModule } from '@bull-board/nestjs';
-import { ExpressAdapter } from '@bull-board/express';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { KernelModule } from './shared/kernel/kernel.module';
-import { DatabaseModule } from './shared/common/database/database.module';
-import { HttpModule } from './shared/common/http/http.module';
-import { MailboxModule } from './modules/mailbox/mailbox.module';
-import { AmbulanceTransportationModule } from './modules/operations/ambulance-transportation/ambulance-transportation.module';
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { EventEmitterModule } from "@nestjs/event-emitter";
+import { ScheduleModule } from "@nestjs/schedule";
+import { BullModule } from "@nestjs/bullmq";
+import { BullBoardModule } from "@bull-board/nestjs";
+import { ExpressAdapter } from "@bull-board/express";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { join } from "path";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { KernelModule } from "./shared/kernel/kernel.module";
+import { DatabaseModule } from "./shared/common/database/database.module";
+import { HttpModule } from "./shared/common/http/http.module";
+import { MailboxModule } from "./modules/mailbox/mailbox.module";
+import { AmbulanceTransportationModule } from "./modules/operations/ambulance-transportation/ambulance-transportation.module";
 
 /**
  * Root application module
@@ -31,7 +31,7 @@ import { AmbulanceTransportationModule } from './modules/operations/ambulance-tr
  */
 @Module({
   imports: [
-    // Global configuration
+    // Global configuration (loads .env from apps/api when run via pnpm --filter)
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -49,14 +49,14 @@ import { AmbulanceTransportationModule } from './modules/operations/ambulance-tr
     BullModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
         connection: {
-          host: config.get<string>('REDIS_HOST', 'localhost'),
-          port: config.get<number>('REDIS_PORT', 6379),
+          host: config.get<string>("REDIS_HOST", "localhost"),
+          port: config.get<number>("REDIS_PORT", 6379),
         },
       }),
       inject: [ConfigService],
     }),
     BullBoardModule.forRoot({
-      route: '/queues',
+      route: "/queues",
       adapter: ExpressAdapter,
     }),
     // Public attachments bucket (ATTACHMENTS_PATH served at /attachments)
@@ -66,9 +66,9 @@ import { AmbulanceTransportationModule } from './modules/operations/ambulance-tr
         {
           rootPath: join(
             process.cwd(),
-            config.get<string>('ATTACHMENTS_PATH', './data/attachments'),
+            config.get<string>("ATTACHMENTS_PATH", "./data/attachments")
           ),
-          serveRoot: '/attachments',
+          serveRoot: "/attachments",
         },
       ],
     }),

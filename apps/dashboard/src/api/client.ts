@@ -15,8 +15,8 @@
 
 import ky from "ky";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+/** Empty = use Vite proxy (/api). Set for direct API URL (e.g. production). */
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").trim() || "";
 
 /**
  * API Error class for handling HTTP errors
@@ -25,7 +25,7 @@ export class ApiError extends Error {
   constructor(
     message: string,
     public readonly status: number,
-    public readonly payload?: any,
+    public readonly payload?: any
   ) {
     super(message);
     this.name = "ApiError";
@@ -35,7 +35,7 @@ export class ApiError extends Error {
 /**
  * Pre-configured API client
  *
- * - Base URL: VITE_API_BASE_URL or http://localhost:3000
+ * - Base URL: VITE_API_BASE_URL (empty = same origin, use Vite proxy in dev)
  * - Prefix: /api
  * - Content-Type: application/json
  * - Automatically throws ApiError for non-ok responses
