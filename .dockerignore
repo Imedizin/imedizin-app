@@ -1,0 +1,34 @@
+# Dependencies and build artifacts
+node_modules
+.pnpm-store
+**/dist
+**/.next
+.turbo
+out
+coverage
+
+# Env (use build args / compose env instead)
+.env
+.env.*
+!.env.example
+
+# Git and IDE
+.git
+.gitignore
+.idea
+.vscode
+*.md
+!README.md
+
+# Docker (avoid nesting)
+**/Dockerfile*
+**/.dockerignore
+**/docker-compose*.yml
+
+# Test and misc
+**/*.spec.ts
+**/*.test.ts
+**/test
+**/__tests__
+*.log
+.DS_Store

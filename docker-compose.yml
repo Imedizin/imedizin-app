@@ -1,0 +1,90 @@
+# iMedizin – full stack (API + dashboard + Postgres + Redis)
+# Usage: docker compose up -d
+# Build:  docker compose build
+
+services:
+  postgres:
+    networks:
+      - app
+    image: postgres:18-alpine
+    container_name: imedizin-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: imedizin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d imedizin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    networks:
+      - app
+    image: redis:7-alpine
+    container_name: imedizin-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    networks:
+      - app
+    # Links ensure /etc/hosts entry for "postgres" (fixes ENOTFOUND on some Docker setups)
+    links:
+      - postgres
+      - redis
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: imedizin-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/imedizin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      FRONTEND_URL: http://localhost:8080
+      ATTACHMENTS_PATH: /app/data/attachments
+    ports:
+      - "3000:3000"
+    volumes:
+      - api_attachments:/app/data/attachments
+
+  dashboard:
+    networks:
+      - app
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+      args:
+        # Set at build time; use your API URL in production
+        VITE_API_BASE_URL: http://localhost:3000
+    container_name: imedizin-dashboard
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  api_attachments:

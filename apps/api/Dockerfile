@@ -1,34 +1,44 @@
-# Build stage
+# Build from monorepo root: docker build -f apps/api/Dockerfile .
+# Multi-stage: builder (pnpm + build) -> runner (node + migrations + app)
+
 FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+RUN corepack enable pnpm
 
+# Install deps (monorepo)
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api/package.json ./apps/api/
+COPY apps/dashboard/package.json ./apps/dashboard/
+RUN pnpm install --frozen-lockfile
+
+# Copy app and build
 COPY . .
-# Generate migration files (drizzle/ folder) so entrypoint can run migrate; dummy URL is enough for generate
-ENV DATABASE_URL=postgres://localhost:5432/dummy
-RUN npm run db:generate
-RUN npm run build
+ENV DATABASE_URL=postgresql://localhost:5432/dummy
+RUN pnpm --filter @imedizin/api build
 
-# Production stage
+# --- Production stage ---
 FROM node:24-alpine AS runner
 
 WORKDIR /app
 
 ENV NODE_ENV=production
-COPY --from=builder /app/package.json package-lock.json ./
-COPY --from=builder /app/node_modules node_modules
-COPY --from=builder /app/dist dist
-COPY --from=builder /app/drizzle drizzle
-COPY --from=builder /app/drizzle.config.ts drizzle.config.ts
 
-# Optional: run migrations on startup (comment out if you run migrations separately)
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+# Monorepo layout: node_modules at root, app in apps/api
+COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/api/package.json ./apps/api/
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/apps/api/drizzle ./apps/api/drizzle
+COPY --from=builder /app/apps/api/drizzle.config.ts ./apps/api/
+COPY --from=builder /app/apps/api/docker-entrypoint.sh ./apps/api/
+
+WORKDIR /app/apps/api
+
+RUN chmod +x docker-entrypoint.sh
 
 EXPOSE 3000
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["node", "dist/main.js"]
+ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["node", "dist/src/main.js"]
