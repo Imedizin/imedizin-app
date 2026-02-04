@@ -176,8 +176,6 @@ describe("WebhookController (e2e)", () => {
       );
       await subscriptionRepo.save(subscription);
 
-      const countsBefore = await queue.getJobCounts();
-
       const notification = {
         value: [
           notificationChange({
@@ -201,17 +199,7 @@ describe("WebhookController (e2e)", () => {
       const job = await pollForJob(queue, jobId, mailboxId, messageId, 20, 200);
 
       expect(job).toBeDefined();
-
-      const countsAfter = await queue.getJobCounts();
-      const totalBefore =
-        (countsBefore.waiting ?? 0) +
-        (countsBefore.completed ?? 0) +
-        (countsBefore.active ?? 0);
-      const totalAfter =
-        (countsAfter.waiting ?? 0) +
-        (countsAfter.completed ?? 0) +
-        (countsAfter.active ?? 0);
-      expect(totalAfter).toBeGreaterThanOrEqual(totalBefore + 1);
+      // Do not assert queue job counts: a worker may process and remove the job (removeOnComplete), so counts can be 0.
       expect(job?.id).toBe(jobId);
       expect(job?.data).toEqual({ mailboxId, messageId });
       expect(job?.name).toBe("process");
