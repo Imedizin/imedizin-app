@@ -15,7 +15,7 @@ CREATE TABLE "email_attachments" (
 	"filename" text NOT NULL,
 	"mime_type" text NOT NULL,
 	"size" integer NOT NULL,
-	"storage_location" text NOT NULL,
+	"file_url" text NOT NULL,
 	"is_inline" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -70,6 +70,18 @@ CREATE TABLE "mailboxes" (
 	CONSTRAINT "mailboxes_address_unique" UNIQUE("address")
 );
 --> statement-breakpoint
+CREATE TABLE "notifications" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"recipient_type" text NOT NULL,
+	"recipient_id" text NOT NULL,
+	"type" text NOT NULL,
+	"title" text NOT NULL,
+	"body" text,
+	"data" jsonb,
+	"read_at" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "transportation_requests" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"request_number" text NOT NULL,
@@ -87,7 +99,7 @@ ALTER TABLE "email_participants" ADD CONSTRAINT "email_participants_email_id_ema
 ALTER TABLE "emails" ADD CONSTRAINT "emails_mailbox_id_mailboxes_id_fk" FOREIGN KEY ("mailbox_id") REFERENCES "public"."mailboxes"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "idx_domains_domain" ON "domains" USING btree ("domain");--> statement-breakpoint
 CREATE INDEX "idx_email_attachments_email_id" ON "email_attachments" USING btree ("email_id");--> statement-breakpoint
-CREATE INDEX "idx_email_attachments_storage_location" ON "email_attachments" USING btree ("storage_location");--> statement-breakpoint
+CREATE INDEX "idx_email_attachments_file_url" ON "email_attachments" USING btree ("file_url");--> statement-breakpoint
 CREATE INDEX "idx_email_participants_email_id" ON "email_participants" USING btree ("email_id");--> statement-breakpoint
 CREATE INDEX "idx_email_participants_email_address" ON "email_participants" USING btree ("email_address");--> statement-breakpoint
 CREATE INDEX "idx_email_participants_type" ON "email_participants" USING btree ("type");--> statement-breakpoint
@@ -103,6 +115,8 @@ CREATE INDEX "idx_mailbox_subscriptions_mailbox_id" ON "mailbox_subscriptions" U
 CREATE INDEX "idx_mailbox_subscriptions_expiration" ON "mailbox_subscriptions" USING btree ("expiration_date_time");--> statement-breakpoint
 CREATE UNIQUE INDEX "uq_mailbox_subscriptions_mailbox_resource" ON "mailbox_subscriptions" USING btree ("mailbox_id","resource");--> statement-breakpoint
 CREATE INDEX "idx_mailboxes_address" ON "mailboxes" USING btree ("address");--> statement-breakpoint
+CREATE INDEX "idx_notifications_recipient" ON "notifications" USING btree ("recipient_type","recipient_id");--> statement-breakpoint
+CREATE INDEX "idx_notifications_created_at" ON "notifications" USING btree ("created_at");--> statement-breakpoint
 CREATE INDEX "idx_transportation_requests_request_number" ON "transportation_requests" USING btree ("request_number");--> statement-breakpoint
 CREATE INDEX "idx_transportation_requests_status" ON "transportation_requests" USING btree ("status");--> statement-breakpoint
 CREATE INDEX "idx_transportation_requests_created_at" ON "transportation_requests" USING btree ("created_at");--> statement-breakpoint

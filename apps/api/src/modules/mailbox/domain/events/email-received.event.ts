@@ -1,6 +1,6 @@
 /**
  * Domain event: an email was received and stored (webhook or sync).
- * Handlers may push to SSE, send push, log, etc.
+ * Handlers may push to realtime (Socket.IO), send push, log, etc.
  */
 export const EMAIL_RECEIVED_EVENT = 'email.received';
 

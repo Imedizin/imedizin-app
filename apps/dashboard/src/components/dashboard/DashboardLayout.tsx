@@ -3,6 +3,7 @@ import { Layout } from "antd";
 import { useTheme } from "@/hooks/useTheme";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import { RealtimeSocketProvider } from "@/components/realtime/RealtimeSocketProvider";
 
 const { Content } = Layout;
 
@@ -34,6 +35,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             minHeight: 280,
           }}
         >
+          <RealtimeSocketProvider />
           {children}
         </Content>
       </Layout>

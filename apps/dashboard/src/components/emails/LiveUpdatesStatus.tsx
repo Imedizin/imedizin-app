@@ -1,7 +1,7 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useTheme } from "@/hooks/useTheme";
-import { useNotifications } from "@/hooks/useNotifications";
 import { useMailboxStore } from "@/stores/mailbox.store";
+import { useRealtimeStore } from "@/stores/realtime.store";
 
 export interface LiveUpdatesStatusProps {
   /** "inline" for header/toolbar; "default" for sidebar */
@@ -12,16 +12,8 @@ const LiveUpdatesStatus: React.FC<LiveUpdatesStatusProps> = ({
   variant = "default",
 }) => {
   const { isDark } = useTheme();
-  const { selectedMailboxId, lastUpdateAt } = useMailboxStore();
-  const notificationMailboxIds = useMemo(
-    () => (selectedMailboxId ? [selectedMailboxId] : undefined),
-    [selectedMailboxId],
-  );
-  const { isConnected } = useNotifications({
-    mailboxIds: notificationMailboxIds,
-    showToasts: true,
-    autoRefresh: true,
-  });
+  const { lastUpdateAt } = useMailboxStore();
+  const isConnected = useRealtimeStore((s) => s.isConnected);
   const formatLastUpdated = () => {
     if (lastUpdateAt == null) return "";
     const date = new Date(lastUpdateAt);

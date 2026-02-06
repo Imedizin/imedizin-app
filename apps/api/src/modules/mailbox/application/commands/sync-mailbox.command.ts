@@ -125,7 +125,7 @@ export class SyncMailboxCommand {
           if (processResult.created) {
             result.messagesCreated++;
 
-            // Domain event: handlers (e.g. SSE notification) react to it
+            // Domain event: handlers (e.g. realtime notification) react to it
             if (processResult.emailId && processResult.from) {
               this.eventEmitter.emit(
                 EMAIL_RECEIVED_EVENT,

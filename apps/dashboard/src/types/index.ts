@@ -34,3 +34,6 @@ export type {
   EmailListResponse,
   SyncResult,
 } from "./email";
+
+// Notification types
+export type { ApiNotification } from "./notification";

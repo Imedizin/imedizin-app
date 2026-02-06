@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Layout, Avatar, Dropdown, Badge, Button } from "antd";
 import type { MenuProps } from "antd";
 import {
@@ -15,8 +15,19 @@ import {
 import { useTheme } from "@/hooks/useTheme";
 import { primaryColor } from "@/theme/constants";
 import MailboxSwitcher from "@/components/dashboard/MailboxSwitcher";
+import NotificationsSheet from "@/components/dashboard/NotificationsSheet";
+import { AllowNotificationsButton } from "@/components/dashboard/AllowNotificationsButton";
+import { useNotificationStore } from "@/stores/notification.store";
 
 const { Header } = Layout;
+
+const NOTIFICATION_SOUND_URL = "/sounds/notification.mp3";
+
+function playNotificationSound(): void {
+  const audio = new Audio(NOTIFICATION_SOUND_URL);
+  audio.volume = 0.7;
+  audio.play();
+}
 
 const userMenuItems: MenuProps["items"] = [
   {
@@ -50,6 +61,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onToggleCollapsed,
 }) => {
   const { isDark, toggleTheme } = useTheme();
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const notificationCount = useNotificationStore((s) => s.notifications.length);
 
   return (
     <Header
@@ -86,13 +99,39 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           style={{ fontSize: 18 }}
           title={isDark ? "Switch to light mode" : "Switch to dark mode"}
         />
-        <Badge count={5} size="small">
+        <AllowNotificationsButton />
+        {typeof Notification !== "undefined" &&
+          Notification.permission === "granted" &&
+          "serviceWorker" in navigator && (
+            <Button
+              type="text"
+              size="small"
+              onClick={() => {
+                playNotificationSound();
+                navigator.serviceWorker.ready.then((reg) => {
+                  const target =
+                    navigator.serviceWorker.controller ?? reg.active;
+                  target?.postMessage({ type: "SHOW_TEST_NOTIFICATION" });
+                });
+              }}
+              title="Send test notification to service worker"
+            >
+              Test notification
+            </Button>
+          )}
+        <Badge count={notificationCount} size="small">
           <Button
             type="text"
             icon={<BellOutlined />}
             style={{ fontSize: 18 }}
+            onClick={() => setNotificationsOpen(true)}
+            title="Notifications"
           />
         </Badge>
+        <NotificationsSheet
+          open={notificationsOpen}
+          onOpenChange={setNotificationsOpen}
+        />
         <Badge count={3} size="small">
           <Button
             type="text"

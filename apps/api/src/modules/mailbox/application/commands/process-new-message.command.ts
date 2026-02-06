@@ -146,7 +146,7 @@ export class ProcessNewMessageCommand {
       );
     }
 
-    // Domain event: handlers (e.g. SSE notification) react to it
+    // Domain event: handlers (e.g. realtime notification) react to it
     const from = message.from?.emailAddress
       ? {
           emailAddress: message.from.emailAddress.address,

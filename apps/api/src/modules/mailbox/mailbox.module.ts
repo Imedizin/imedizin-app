@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
+import { RealtimeModule } from '../realtime/realtime.module';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { MailboxSubscriptionRepository } from './infrastructure/repositories/mailbox-subscription.repository';
@@ -29,7 +30,6 @@ import { DomainController } from './api/controllers/domain.controller';
 import { EmailController } from './api/controllers/email.controller';
 import { NotificationController } from './api/controllers/notification.controller';
 import { GraphService } from './application/services/graph.service';
-import { NotificationService } from './application/services/notification.service';
 import { ThreadingService } from './application/services/threading.service';
 import { DomainRepository } from './infrastructure/repositories/domain.repository';
 import { CreateDomainCommand } from './application/commands/create-domain.command';
@@ -41,6 +41,7 @@ import { EmailReceivedNotificationHandler } from './application/handlers/email-r
 
 @Module({
   imports: [
+    RealtimeModule,
     BullModule.registerQueue({
       name: NEW_MESSAGE_QUEUE,
     }),
@@ -74,7 +75,6 @@ import { EmailReceivedNotificationHandler } from './application/handlers/email-r
     FindAllDomainsQuery,
     FindDomainByIdQuery,
     GraphService,
-    NotificationService,
     ThreadingService,
     MailboxCron,
     ProcessNewMessageCommand,
@@ -107,7 +107,6 @@ import { EmailReceivedNotificationHandler } from './application/handlers/email-r
     'IDomainRepository',
     'IEmailRepository',
     GraphService,
-    NotificationService,
   ],
 })
 export class MailboxModule {}

@@ -108,7 +108,7 @@ Production-ready error handling.
 Real-time notifications when new emails arrive.
 
 ### Tasks
-- [ ] WebSocket/SSE for real-time updates to frontend
+- [x] WebSocket (Socket.IO) for real-time updates to frontend
 - [ ] Browser push notifications for new emails
 - [ ] Email notification rules (filter by sender, subject, keywords)
 - [ ] Notification preferences per user/mailbox
@@ -116,13 +116,8 @@ Real-time notifications when new emails arrive.
 
 ### Architecture
 ```
-New Email → SyncMailboxCommand → NotificationService → WebSocket/Push
+New Email → domain event → EmailReceivedNotificationHandler → RealtimePublisher → Socket.IO → frontend
 ```
-
-### Implementation Options
-1. **Server-Sent Events (SSE)** - Simple, one-way, good browser support
-2. **WebSockets** - Bi-directional, more complex
-3. **Polling** - Simplest, less real-time
 
 ---
 

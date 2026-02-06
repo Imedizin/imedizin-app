@@ -12,7 +12,9 @@ import { AppService } from "./app.service";
 import { KernelModule } from "./shared/kernel/kernel.module";
 import { DatabaseModule } from "./shared/common/database/database.module";
 import { HttpModule } from "./shared/common/http/http.module";
+import { RealtimeModule } from "./modules/realtime/realtime.module";
 import { MailboxModule } from "./modules/mailbox/mailbox.module";
+import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { AmbulanceTransportationModule } from "./modules/operations/ambulance-transportation/ambulance-transportation.module";
 
 /**
@@ -35,7 +37,7 @@ import { AmbulanceTransportationModule } from "./modules/operations/ambulance-tr
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    // Domain events (global) - commands emit events; handlers push to SSE, etc.
+    // Domain events (global) - commands emit events; handlers push to realtime, etc.
     EventEmitterModule.forRoot(),
     // Schedule module (global) - enables cron jobs and scheduled tasks
     ScheduleModule.forRoot(),
@@ -73,6 +75,8 @@ import { AmbulanceTransportationModule } from "./modules/operations/ambulance-tr
       ],
     }),
     // Business modules
+    RealtimeModule,
+    NotificationsModule,
     MailboxModule,
     AmbulanceTransportationModule,
   ],
