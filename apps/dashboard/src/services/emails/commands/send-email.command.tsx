@@ -42,7 +42,9 @@ export const useSendEmailCommand = () => {
     },
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["emails"] });
+      void queryClient.invalidateQueries({ queryKey: ["emails"] });
+      void queryClient.invalidateQueries({ queryKey: ["threads"] });
+      void queryClient.invalidateQueries({ queryKey: ["threadDetails"] });
       message.success("Email sent successfully");
     },
 
