@@ -1,60 +1,69 @@
-import React, { useEffect } from 'react';
-import { Form, Input, Select, DatePicker, Rate, Typography } from 'antd';
-import dayjs from 'dayjs';
+import React, { useEffect } from "react";
+import { Form, Input, Select, DatePicker, Typography } from "antd";
+import dayjs from "dayjs";
+import { OPERATING_REGIONS } from "@/constants/operating-regions";
 
 const { Title } = Typography;
-const { TextArea } = Input;
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 
-interface CaseProviderFormData {
-  company_name: string;
-  provider_type: 'internal' | 'external' | 'TPA';
-  operating_regions: string[];
-  primary_email: string;
-  primary_phone: string;
-  status: 'active' | 'inactive';
-  supported_insurers?: string[];
-  supported_policy_types?: string[];
-  supported_languages?: string[];
-  case_types?: string[];
-  contract_start_date?: string;
-  contract_end_date?: string;
-  pricing_model?: string;
-  sla_tier?: string;
-  performance_rating?: number;
-  internal_notes?: string;
-  tags?: string[];
+import type {
+  CaseProvider,
+  CreateCaseProviderDto,
+} from "@/types/case-provider";
+
+/** Form values use camelCase to match API. Range picker uses contractDateRange. */
+export interface CaseProviderFormData extends CreateCaseProviderDto {
+  contractDateRange?: [dayjs.Dayjs, dayjs.Dayjs] | null;
 }
 
 interface CaseProviderFormProps {
   form: any;
-  initialValues?: CaseProviderFormData;
-  onSubmit: (values: any) => void;
+  initialValues?: Partial<CaseProvider>;
+  onSubmit: (values: CreateCaseProviderDto) => void;
 }
 
-const CaseProviderForm: React.FC<CaseProviderFormProps> = ({ form, initialValues, onSubmit }) => {
+const CaseProviderForm: React.FC<CaseProviderFormProps> = ({
+  form,
+  initialValues,
+  onSubmit,
+}) => {
   const handleFinish = (values: any) => {
-    const formData = {
-      ...values,
-      contract_start_date: values.contract_start_date ? values.contract_start_date.format('YYYY-MM-DD') : undefined,
-      contract_end_date: values.contract_end_date ? values.contract_end_date.format('YYYY-MM-DD') : undefined,
+    const range = values.contractDateRange;
+    const payload: CreateCaseProviderDto = {
+      companyName: values.companyName,
+      providerType: values.providerType,
+      operatingRegions: values.operatingRegions ?? [],
+      primaryEmail: values.primaryEmail,
+      primaryPhone: values.primaryPhone,
+      status: values.status,
+      contractStartDate: range?.[0]?.format?.("YYYY-MM-DD") ?? null,
+      contractEndDate: range?.[1]?.format?.("YYYY-MM-DD") ?? null,
+      pricingModel: values.pricingModel ?? null,
+      slaTier: values.slaTier ?? null,
+      tags: values.tags ?? [],
     };
-    onSubmit(formData);
+    onSubmit(payload);
   };
 
   // Update form values when initialValues change (for editing)
   useEffect(() => {
     if (initialValues) {
-      const processedValues = {
+      const start = initialValues.contractStartDate
+        ? dayjs(initialValues.contractStartDate)
+        : null;
+      const end = initialValues.contractEndDate
+        ? dayjs(initialValues.contractEndDate)
+        : null;
+      const contractDateRange =
+        start && end ? [start, end] : undefined;
+      form.setFieldsValue({
         ...initialValues,
-        contract_start_date: initialValues.contract_start_date ? dayjs(initialValues.contract_start_date) : undefined,
-        contract_end_date: initialValues.contract_end_date ? dayjs(initialValues.contract_end_date) : undefined,
-      };
-      form.setFieldsValue(processedValues);
+        contractDateRange,
+      });
     } else {
-      // Reset form when no initial values (for new entry)
       form.resetFields();
-      form.setFieldsValue({ status: 'active' });
+      form.setFieldsValue({ status: "active" });
     }
   }, [initialValues, form]);
 
@@ -64,22 +73,24 @@ const CaseProviderForm: React.FC<CaseProviderFormProps> = ({ form, initialValues
       layout="vertical"
       onFinish={handleFinish}
       initialValues={{
-        status: 'active',
+        status: "active",
       }}
     >
-      <Title level={5} style={{ marginTop: 0, marginBottom: 16 }}>Identity (Mandatory)</Title>
+      <Title level={5} style={{ marginTop: 0, marginBottom: 16 }}>
+        Identity (Mandatory)
+      </Title>
       <Form.Item
-        name="company_name"
+        name="companyName"
         label="Company Name"
-        rules={[{ required: true, message: 'Please enter company name' }]}
+        rules={[{ required: true, message: "Please enter company name" }]}
       >
         <Input placeholder="Enter company name" />
       </Form.Item>
 
       <Form.Item
-        name="provider_type"
+        name="providerType"
         label="Provider Type"
-        rules={[{ required: true, message: 'Please select provider type' }]}
+        rules={[{ required: true, message: "Please select provider type" }]}
       >
         <Select placeholder="Select provider type">
           <Option value="internal">Internal</Option>
@@ -89,43 +100,59 @@ const CaseProviderForm: React.FC<CaseProviderFormProps> = ({ form, initialValues
       </Form.Item>
 
       <Form.Item
-        name="operating_regions"
+        name="operatingRegions"
         label="Operating Regions"
-        rules={[{ required: true, message: 'Please enter at least one operating region' }]}
-        tooltip="Enter regions separated by commas"
+        rules={[
+          {
+            required: true,
+            message: "Please select at least one operating region",
+          },
+        ]}
+        tooltip="Select one or more regions"
       >
         <Select
-          mode="tags"
-          placeholder="Enter operating regions"
-          style={{ width: '100%' }}
+          mode="multiple"
+          placeholder="Select operating regions"
+          style={{ width: "100%" }}
+          allowClear
+          showSearch
+          optionFilterProp="label"
+          options={OPERATING_REGIONS.map((region) => ({
+            value: region,
+            label: region,
+          }))}
         />
       </Form.Item>
 
-      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>Contact (Mandatory)</Title>
+      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>
+        Contact (Mandatory)
+      </Title>
       <Form.Item
-        name="primary_email"
+        name="primaryEmail"
         label="Primary Email"
         rules={[
-          { required: true, message: 'Please enter email' },
-          { type: 'email', message: 'Please enter a valid email' },
+          { required: true, message: "Please enter email" },
+          { type: "email", message: "Please enter a valid email" },
         ]}
       >
         <Input placeholder="Enter email address" />
       </Form.Item>
 
       <Form.Item
-        name="primary_phone"
+        name="primaryPhone"
         label="Primary Phone"
-        rules={[{ required: true, message: 'Please enter phone number' }]}
+        rules={[{ required: true, message: "Please enter phone number" }]}
       >
         <Input placeholder="Enter phone number" />
       </Form.Item>
 
-      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>Status & Audit (Mandatory)</Title>
+      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>
+        Status & Audit (Mandatory)
+      </Title>
       <Form.Item
         name="status"
         label="Status"
-        rules={[{ required: true, message: 'Please select status' }]}
+        rules={[{ required: true, message: "Please select status" }]}
       >
         <Select placeholder="Select status">
           <Option value="active">Active</Option>
@@ -133,81 +160,26 @@ const CaseProviderForm: React.FC<CaseProviderFormProps> = ({ form, initialValues
         </Select>
       </Form.Item>
 
-      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>Capabilities (Optional)</Title>
+      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>
+        Commercial (Optional)
+      </Title>
       <Form.Item
-        name="supported_insurers"
-        label="Supported Insurers"
-        tooltip="Enter insurer names separated by commas"
+        name="contractDateRange"
+        label="Contract period"
+        tooltip="Start and end date of the contract"
       >
-        <Select
-          mode="tags"
-          placeholder="Enter supported insurers"
-          style={{ width: '100%' }}
+        <RangePicker
+          style={{ width: "100%" }}
+          format="YYYY-MM-DD"
+          placeholder={["Start date", "End date"]}
         />
       </Form.Item>
 
-      <Form.Item
-        name="supported_policy_types"
-        label="Supported Policy Types"
-        tooltip="Enter policy types separated by commas"
-      >
-        <Select
-          mode="tags"
-          placeholder="Enter policy types"
-          style={{ width: '100%' }}
-        />
-      </Form.Item>
-
-      <Form.Item
-        name="supported_languages"
-        label="Supported Languages"
-        tooltip="Enter languages separated by commas"
-      >
-        <Select
-          mode="tags"
-          placeholder="Enter supported languages"
-          style={{ width: '100%' }}
-        />
-      </Form.Item>
-
-      <Form.Item
-        name="case_types"
-        label="Case Types"
-        tooltip="Enter case types separated by commas"
-      >
-        <Select
-          mode="tags"
-          placeholder="Enter case types"
-          style={{ width: '100%' }}
-        />
-      </Form.Item>
-
-      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>Commercial (Optional)</Title>
-      <Form.Item
-        name="contract_start_date"
-        label="Contract Start Date"
-      >
-        <DatePicker style={{ width: '100%' }} />
-      </Form.Item>
-
-      <Form.Item
-        name="contract_end_date"
-        label="Contract End Date"
-      >
-        <DatePicker style={{ width: '100%' }} />
-      </Form.Item>
-
-      <Form.Item
-        name="pricing_model"
-        label="Pricing Model"
-      >
+      <Form.Item name="pricingModel" label="Pricing Model">
         <Input placeholder="e.g., Per Case, Monthly, Annual" />
       </Form.Item>
 
-      <Form.Item
-        name="sla_tier"
-        label="SLA Tier"
-      >
+      <Form.Item name="slaTier" label="SLA Tier">
         <Select placeholder="Select SLA tier">
           <Option value="Basic">Basic</Option>
           <Option value="Standard">Standard</Option>
@@ -216,22 +188,9 @@ const CaseProviderForm: React.FC<CaseProviderFormProps> = ({ form, initialValues
         </Select>
       </Form.Item>
 
-      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>Admin / Performance (Optional)</Title>
-      <Form.Item
-        name="performance_rating"
-        label="Performance Rating"
-        tooltip="Rate from 1 to 5"
-      >
-        <Rate />
-      </Form.Item>
-
-      <Form.Item
-        name="internal_notes"
-        label="Internal Notes"
-      >
-        <TextArea rows={4} placeholder="Enter internal notes" />
-      </Form.Item>
-
+      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>
+        Admin (Optional)
+      </Title>
       <Form.Item
         name="tags"
         label="Tags"
@@ -240,7 +199,7 @@ const CaseProviderForm: React.FC<CaseProviderFormProps> = ({ form, initialValues
         <Select
           mode="tags"
           placeholder="Enter tags"
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
         />
       </Form.Item>
     </Form>

@@ -6,12 +6,14 @@ import { drizzle, NodePgDatabase } from "drizzle-orm/node-postgres";
 import * as mailboxSchema from "../../../modules/mailbox/infrastructure/schema";
 import * as ambulanceTransportationSchema from "../../../modules/operations/ambulance-transportation/infrastructure/schema";
 import * as notificationsSchema from "../../../modules/notifications/infrastructure/schema";
+import * as networkSchema from "../../../modules/network/infrastructure/schema";
 
 // Combine all schemas into one object for Drizzle
 const schema = {
   ...mailboxSchema,
   ...ambulanceTransportationSchema,
   ...notificationsSchema,
+  ...networkSchema,
 };
 
 export const DRIZZLE = "DRIZZLE" as const;

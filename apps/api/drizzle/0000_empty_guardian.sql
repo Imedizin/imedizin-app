@@ -94,6 +94,41 @@ CREATE TABLE "transportation_requests" (
 	CONSTRAINT "transportation_requests_request_number_unique" UNIQUE("request_number")
 );
 --> statement-breakpoint
+CREATE TABLE "case_providers" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"company_name" text NOT NULL,
+	"provider_type" text NOT NULL,
+	"operating_regions" text[] DEFAULT '{}' NOT NULL,
+	"primary_email" text NOT NULL,
+	"primary_phone" text NOT NULL,
+	"status" text DEFAULT 'active' NOT NULL,
+	"contract_start_date" timestamp with time zone,
+	"contract_end_date" timestamp with time zone,
+	"pricing_model" text,
+	"sla_tier" text,
+	"tags" text[] DEFAULT '{}' NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "medical_providers" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"legal_name" text NOT NULL,
+	"provider_type" text NOT NULL,
+	"country" text NOT NULL,
+	"primary_email" text NOT NULL,
+	"primary_phone" text NOT NULL,
+	"status" text DEFAULT 'active' NOT NULL,
+	"specialties" text[] DEFAULT '{}' NOT NULL,
+	"services" text[] DEFAULT '{}' NOT NULL,
+	"business_hours" text,
+	"license_number" text,
+	"tags" text[] DEFAULT '{}' NOT NULL,
+	"onboarded_at" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 ALTER TABLE "email_attachments" ADD CONSTRAINT "email_attachments_email_id_emails_id_fk" FOREIGN KEY ("email_id") REFERENCES "public"."emails"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "email_participants" ADD CONSTRAINT "email_participants_email_id_emails_id_fk" FOREIGN KEY ("email_id") REFERENCES "public"."emails"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "emails" ADD CONSTRAINT "emails_mailbox_id_mailboxes_id_fk" FOREIGN KEY ("mailbox_id") REFERENCES "public"."mailboxes"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -120,4 +155,13 @@ CREATE INDEX "idx_notifications_created_at" ON "notifications" USING btree ("cre
 CREATE INDEX "idx_transportation_requests_request_number" ON "transportation_requests" USING btree ("request_number");--> statement-breakpoint
 CREATE INDEX "idx_transportation_requests_status" ON "transportation_requests" USING btree ("status");--> statement-breakpoint
 CREATE INDEX "idx_transportation_requests_created_at" ON "transportation_requests" USING btree ("created_at");--> statement-breakpoint
-CREATE INDEX "idx_transportation_requests_thread_id" ON "transportation_requests" USING btree ("thread_ids");
+CREATE INDEX "idx_transportation_requests_thread_id" ON "transportation_requests" USING btree ("thread_ids");--> statement-breakpoint
+CREATE INDEX "idx_case_providers_company_name" ON "case_providers" USING btree ("company_name");--> statement-breakpoint
+CREATE INDEX "idx_case_providers_provider_type" ON "case_providers" USING btree ("provider_type");--> statement-breakpoint
+CREATE INDEX "idx_case_providers_status" ON "case_providers" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "idx_case_providers_created_at" ON "case_providers" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX "idx_medical_providers_legal_name" ON "medical_providers" USING btree ("legal_name");--> statement-breakpoint
+CREATE INDEX "idx_medical_providers_provider_type" ON "medical_providers" USING btree ("provider_type");--> statement-breakpoint
+CREATE INDEX "idx_medical_providers_status" ON "medical_providers" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "idx_medical_providers_country" ON "medical_providers" USING btree ("country");--> statement-breakpoint
+CREATE INDEX "idx_medical_providers_created_at" ON "medical_providers" USING btree ("created_at");

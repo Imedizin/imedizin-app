@@ -6,6 +6,9 @@ import {
   GlobalOutlined,
   InboxOutlined,
   CarOutlined,
+  TeamOutlined,
+  MedicineBoxOutlined,
+  ApartmentOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "@/hooks/useTheme";
@@ -20,7 +23,7 @@ function getItem(
   key: React.Key,
   icon?: React.ReactNode,
   children?: MenuItem[],
-  path?: string,
+  path?: string
 ): MenuItem {
   const menuLabel = path ? (
     <Link to={path} style={{ textDecoration: "none", color: "inherit" }}>
@@ -40,20 +43,29 @@ function getItem(
 
 const menuItems: MenuItem[] = [
   getItem("Mails", "/mails", <InboxOutlined />, undefined, "/mails"),
-  // getItem(
-  //   "Mails (old architecture)",
-  //   "/mails-old-architecture",
-  //   <MailOutlined />,
-  //   undefined,
-  //   "/mails-old-architecture",
-  // ),
   getItem(
     "Transportation Requests",
     "/transportation-requests",
     <CarOutlined />,
     undefined,
-    "/transportation-requests",
+    "/transportation-requests"
   ),
+  getItem("Our Network", "our-network", <ApartmentOutlined />, [
+    getItem(
+      "Case Providers (Insurers)",
+      "/case-providers",
+      <TeamOutlined />,
+      undefined,
+      "/case-providers"
+    ),
+    getItem(
+      "Medical Providers",
+      "/medical-providers",
+      <MedicineBoxOutlined />,
+      undefined,
+      "/medical-providers"
+    ),
+  ]),
   getItem("Mailbox Management", "mailbox-management", <MailOutlined />, [
     getItem("Domains", "/domains", <GlobalOutlined />, undefined, "/domains"),
     getItem(
@@ -61,7 +73,7 @@ const menuItems: MenuItem[] = [
       "/mailboxes",
       <MailOutlined />,
       undefined,
-      "/mailboxes",
+      "/mailboxes"
     ),
   ]),
 ];
@@ -151,7 +163,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ collapsed }) => {
       <Menu
         mode="inline"
         selectedKeys={[selectedKey]}
-        defaultOpenKeys={["mailbox-management"]}
+        defaultOpenKeys={["our-network", "mailbox-management"]}
         style={{ border: "none", padding: "8px 0" }}
         items={menuItems}
       />

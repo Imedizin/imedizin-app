@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   Breadcrumb,
@@ -9,43 +9,58 @@ import {
   Space,
   Drawer,
   Form,
-  Rate,
+  Spin,
+  Input,
+  Select,
+  Row,
+  Col,
 } from "antd";
 import {
   HomeOutlined,
   TeamOutlined,
   PlusOutlined,
   EditOutlined,
-  DeleteOutlined,
+  EyeOutlined,
+  SearchOutlined,
+  ClearOutlined,
 } from "@ant-design/icons";
+import { Link } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
+import { useQueryStates, parseAsString } from "nuqs";
 import CaseProviderForm from "@/components/forms/CaseProviderForm";
 import { primaryColor } from "@/theme/constants";
+import type {
+  CaseProvider,
+  CreateCaseProviderDto,
+  CaseProviderListParams,
+} from "@/types/case-provider";
+import { OPERATING_REGIONS } from "@/constants/operating-regions";
+import {
+  useListCaseProvidersQuery,
+  useCreateCaseProviderCommand,
+  useUpdateCaseProviderCommand,
+} from "@/services/case-providers";
+import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
 
 const { Title, Text } = Typography;
 
-interface CaseProvider {
-  id: string;
-  company_name: string;
-  provider_type: "internal" | "external" | "TPA";
-  operating_regions: string[];
-  primary_email: string;
-  primary_phone: string;
-  status: "active" | "inactive";
-  supported_insurers?: string[];
-  supported_policy_types?: string[];
-  supported_languages?: string[];
-  case_types?: string[];
-  contract_start_date?: string;
-  contract_end_date?: string;
-  pricing_model?: string;
-  sla_tier?: string;
-  performance_rating?: number;
-  internal_notes?: string;
-  tags?: string[];
-  created_at: string;
-  updated_at: string;
-}
+const PROVIDER_TYPES = [
+  { value: "internal", label: "Internal" },
+  { value: "external", label: "External" },
+  { value: "TPA", label: "TPA" },
+];
+
+const STATUS_OPTIONS = [
+  { value: "active", label: "Active" },
+  { value: "inactive", label: "Inactive" },
+];
+
+const caseProviderParsers = {
+  search: parseAsString,
+  providerType: parseAsString,
+  operatingRegion: parseAsString,
+  status: parseAsString,
+};
 
 const CaseProviders: React.FC = () => {
   const [form] = Form.useForm();
@@ -54,29 +69,29 @@ const CaseProviders: React.FC = () => {
     null,
   );
 
-  // Mock data - replace with API call
-  const [providers, setProviders] = useState<CaseProvider[]>([
-    {
-      id: "1",
-      company_name: "Global Case Management Inc.",
-      provider_type: "external",
-      operating_regions: ["North America", "Europe"],
-      primary_email: "contact@globalcase.com",
-      primary_phone: "+1-555-0202",
-      status: "active",
-      supported_insurers: ["Blue Cross", "UnitedHealth"],
-      supported_policy_types: ["Health", "Dental"],
-      supported_languages: ["English", "Spanish"],
-      case_types: ["Medical", "Dental"],
-      contract_start_date: "2024-01-01",
-      contract_end_date: "2024-12-31",
-      pricing_model: "Per Case",
-      sla_tier: "Premium",
-      performance_rating: 4.5,
-      created_at: "2024-01-10",
-      updated_at: "2024-01-15",
-    },
-  ]);
+  const [filters, setFilters] = useQueryStates(caseProviderParsers);
+  const [searchInput, setSearchInput] = useState(filters.search ?? "");
+
+  const [debouncedSetSearch, cancelSearch] = useDebouncedCallback(
+    (value: string | null) => setFilters({ search: value || null }),
+    300,
+  );
+
+  useEffect(() => {
+    setSearchInput(filters.search ?? "");
+  }, [filters.search]);
+
+  const listParams: CaseProviderListParams = {
+    search: filters.search ?? undefined,
+    providerType: filters.providerType ?? undefined,
+    operatingRegion: filters.operatingRegion ?? undefined,
+    status: filters.status ?? undefined,
+  };
+
+  const { data: providers = [], isLoading } =
+    useListCaseProvidersQuery(listParams);
+  const { createMutation } = useCreateCaseProviderCommand();
+  const { updateMutation } = useUpdateCaseProviderCommand();
 
   const providerTypeColors: Record<string, string> = {
     internal: "blue",
@@ -92,14 +107,18 @@ const CaseProviders: React.FC = () => {
   const columns: ColumnsType<CaseProvider> = [
     {
       title: "Company Name",
-      dataIndex: "company_name",
-      key: "company_name",
-      render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
+      dataIndex: "companyName",
+      key: "companyName",
+      render: (text, record) => (
+        <Link to={`/case-providers/${record.id}`} style={{ fontWeight: 500 }}>
+          {text}
+        </Link>
+      ),
     },
     {
       title: "Type",
-      dataIndex: "provider_type",
-      key: "provider_type",
+      dataIndex: "providerType",
+      key: "providerType",
       render: (type) => (
         <Tag
           color={providerTypeColors[type]}
@@ -111,8 +130,8 @@ const CaseProviders: React.FC = () => {
     },
     {
       title: "Operating Regions",
-      dataIndex: "operating_regions",
-      key: "operating_regions",
+      dataIndex: "operatingRegions",
+      key: "operatingRegions",
       render: (regions) => (
         <Space wrap>
           {regions?.map((region: string) => (
@@ -123,13 +142,13 @@ const CaseProviders: React.FC = () => {
     },
     {
       title: "Email",
-      dataIndex: "primary_email",
-      key: "primary_email",
+      dataIndex: "primaryEmail",
+      key: "primaryEmail",
     },
     {
       title: "Phone",
-      dataIndex: "primary_phone",
-      key: "primary_phone",
+      dataIndex: "primaryPhone",
+      key: "primaryPhone",
     },
     {
       title: "Status",
@@ -145,22 +164,16 @@ const CaseProviders: React.FC = () => {
       ),
     },
     {
-      title: "Rating",
-      dataIndex: "performance_rating",
-      key: "performance_rating",
-      render: (rating) =>
-        rating ? (
-          <Rate disabled defaultValue={rating} style={{ fontSize: 14 }} />
-        ) : (
-          "-"
-        ),
-    },
-    {
       title: "Actions",
       key: "actions",
-      width: 120,
+      width: 140,
       render: (_, record) => (
         <Space>
+          <Link to={`/case-providers/${record.id}`}>
+            <Button type="link" icon={<EyeOutlined />} size="small">
+              View
+            </Button>
+          </Link>
           <Button
             type="link"
             icon={<EditOutlined />}
@@ -169,15 +182,6 @@ const CaseProviders: React.FC = () => {
           >
             Edit
           </Button>
-          <Button
-            type="link"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
-            size="small"
-          >
-            Delete
-          </Button>
         </Space>
       ),
     },
@@ -185,34 +189,35 @@ const CaseProviders: React.FC = () => {
 
   const handleEdit = (provider: CaseProvider) => {
     setEditingProvider(provider);
-    // Don't set form values here - let the form component handle it via initialValues
     setDrawerOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    setProviders(providers.filter((p) => p.id !== id));
-  };
-
-  const handleSubmit = (values: any) => {
-    const providerData = {
-      ...values,
-      id: editingProvider?.id || Date.now().toString(),
-      created_at:
-        editingProvider?.created_at || new Date().toISOString().split("T")[0],
-      updated_at: new Date().toISOString().split("T")[0],
-    };
+  const handleSubmit = (values: CreateCaseProviderDto) => {
+    const loading = editingProvider
+      ? updateMutation.isPending
+      : createMutation.isPending;
+    if (loading) return;
 
     if (editingProvider) {
-      setProviders(
-        providers.map((p) => (p.id === editingProvider.id ? providerData : p)),
+      updateMutation.mutate(
+        { id: editingProvider.id, ...values },
+        {
+          onSuccess: () => {
+            form.resetFields();
+            setDrawerOpen(false);
+            setEditingProvider(null);
+          },
+        },
       );
     } else {
-      setProviders([...providers, providerData]);
+      createMutation.mutate(values, {
+        onSuccess: () => {
+          form.resetFields();
+          setDrawerOpen(false);
+          setEditingProvider(null);
+        },
+      });
     }
-
-    form.resetFields();
-    setDrawerOpen(false);
-    setEditingProvider(null);
   };
 
   const handleClose = () => {
@@ -275,13 +280,84 @@ const CaseProviders: React.FC = () => {
           boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)",
         }}
       >
-        <Table
-          columns={columns}
-          dataSource={providers}
-          rowKey="id"
-          pagination={{ pageSize: 10 }}
+        <Space
+          direction="vertical"
           size="middle"
-        />
+          style={{ width: "100%", marginBottom: 16 }}
+        >
+          <Row gutter={[12, 12]} align="middle">
+            <Col xs={24} sm={12} md={6}>
+              <Input
+                placeholder="Search company, email, phone..."
+                prefix={<SearchOutlined style={{ color: "#bfbfbf" }} />}
+                value={searchInput}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setSearchInput(v);
+                  debouncedSetSearch(v || null);
+                }}
+                allowClear
+              />
+            </Col>
+            <Col xs={24} sm={12} md={5}>
+              <Select
+                placeholder="Type"
+                allowClear
+                style={{ width: "100%" }}
+                value={filters.providerType ?? undefined}
+                onChange={(value) =>
+                  setFilters({ providerType: value ?? null })
+                }
+                options={PROVIDER_TYPES}
+              />
+            </Col>
+            <Col xs={24} sm={12} md={5}>
+              <Select
+                placeholder="Operating region"
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                style={{ width: "100%" }}
+                value={filters.operatingRegion ?? undefined}
+                onChange={(value) =>
+                  setFilters({ operatingRegion: value ?? null })
+                }
+                options={OPERATING_REGIONS.map((r) => ({ value: r, label: r }))}
+              />
+            </Col>
+            <Col xs={24} sm={12} md={4}>
+              <Select
+                placeholder="Status"
+                allowClear
+                style={{ width: "100%" }}
+                value={filters.status ?? undefined}
+                onChange={(value) => setFilters({ status: value ?? null })}
+                options={STATUS_OPTIONS}
+              />
+            </Col>
+            <Col xs={24} sm={12} md={4}>
+              <Button
+                icon={<ClearOutlined />}
+                onClick={() => {
+                  cancelSearch();
+                  setFilters(null);
+                }}
+                style={{ width: "100%" }}
+              >
+                Clear
+              </Button>
+            </Col>
+          </Row>
+        </Space>
+        <Spin spinning={isLoading}>
+          <Table
+            columns={columns}
+            dataSource={providers}
+            rowKey="id"
+            pagination={{ pageSize: 10 }}
+            size="middle"
+          />
+        </Spin>
       </Card>
 
       <Drawer
@@ -293,7 +369,13 @@ const CaseProviders: React.FC = () => {
         extra={
           <Space>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button type="primary" onClick={() => form.submit()}>
+            <Button
+              type="primary"
+              onClick={() => form.submit()}
+              loading={
+                createMutation.isPending || updateMutation.isPending
+              }
+            >
               {editingProvider ? "Update" : "Create"}
             </Button>
           </Space>
@@ -301,7 +383,7 @@ const CaseProviders: React.FC = () => {
       >
         <CaseProviderForm
           form={form}
-          initialValues={editingProvider || undefined}
+          initialValues={editingProvider ?? undefined}
           onSubmit={handleSubmit}
         />
       </Drawer>

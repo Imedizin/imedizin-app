@@ -37,3 +37,15 @@ export type {
 
 // Notification types
 export type { ApiNotification } from "./notification";
+
+// Network / providers
+export type {
+  CaseProvider,
+  CreateCaseProviderDto,
+  UpdateCaseProviderDto,
+} from "./case-provider";
+export type {
+  MedicalProvider,
+  CreateMedicalProviderDto,
+  UpdateMedicalProviderDto,
+} from "./medical-provider";

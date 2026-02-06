@@ -6,6 +6,7 @@ export default {
     "./src/modules/mailbox/infrastructure/schema.ts",
     "./src/modules/notifications/infrastructure/schema.ts",
     "./src/modules/operations/ambulance-transportation/infrastructure/schema.ts",
+    "./src/modules/network/infrastructure/schema.ts",
   ],
   out: "./drizzle",
   dialect: "postgresql",

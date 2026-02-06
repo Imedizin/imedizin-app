@@ -16,6 +16,7 @@ import { RealtimeModule } from "./modules/realtime/realtime.module";
 import { MailboxModule } from "./modules/mailbox/mailbox.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { AmbulanceTransportationModule } from "./modules/operations/ambulance-transportation/ambulance-transportation.module";
+import { NetworkModule } from "./modules/network/network.module";
 
 /**
  * Root application module
@@ -79,6 +80,7 @@ import { AmbulanceTransportationModule } from "./modules/operations/ambulance-tr
     NotificationsModule,
     MailboxModule,
     AmbulanceTransportationModule,
+    NetworkModule,
   ],
   controllers: [AppController],
   providers: [AppService],
