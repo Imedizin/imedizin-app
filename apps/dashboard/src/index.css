@@ -2,6 +2,138 @@
 @tailwind components;
 @tailwind utilities;
 
+/* EmailEditor (TipTap) content */
+.email-editor-content.ProseMirror {
+  min-height: 120px;
+}
+.email-editor-content.ProseMirror p {
+  margin: 0 0 0.5em;
+}
+.email-editor-content.ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+.email-editor-content.ProseMirror ul,
+.email-editor-content.ProseMirror ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+.email-editor-content.ProseMirror blockquote {
+  border-left: 3px solid rgba(128, 128, 128, 0.5);
+  margin: 0.5em 0;
+  padding-left: 1em;
+  color: rgba(128, 128, 128, 0.95);
+}
+.email-editor-content.ProseMirror h1 {
+  font-size: 1.5em;
+  font-weight: 600;
+  margin: 0.5em 0;
+}
+.email-editor-content.ProseMirror h2 {
+  font-size: 1.25em;
+  font-weight: 600;
+  margin: 0.5em 0;
+}
+.email-editor-content.ProseMirror h3 {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin: 0.5em 0;
+}
+.email-editor-content.ProseMirror code {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+[data-dark="true"] .email-editor-content.ProseMirror code {
+  background: rgba(255, 255, 255, 0.1);
+}
+.email-editor-content.ProseMirror a {
+  color: #0d7377;
+  text-decoration: underline;
+}
+.email-editor-content.ProseMirror mark {
+  background: rgba(250, 204, 21, 0.5);
+  padding: 0.1em 0.2em;
+  border-radius: 2px;
+}
+.email-editor-content.ProseMirror ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+.email-editor-content.ProseMirror ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+  margin: 0.25em 0;
+}
+.email-editor-content.ProseMirror ul[data-type="taskList"] li > label {
+  flex-shrink: 0;
+  cursor: pointer;
+  margin-top: 0.2em;
+}
+.email-editor-content.ProseMirror ul[data-type="taskList"] li[data-checked="true"] > div {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+.email-editor-content.ProseMirror p.is-editor-empty:first-child::before {
+  color: rgba(128, 128, 128, 0.6);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+[data-dark="true"] .email-editor-content.ProseMirror p.is-editor-empty:first-child::before {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Preview modal email body (HTML) */
+.email-preview-body p {
+  margin: 0 0 0.5em;
+}
+.email-preview-body p:last-child {
+  margin-bottom: 0;
+}
+.email-preview-body ul,
+.email-preview-body ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+.email-preview-body blockquote {
+  border-left: 3px solid rgba(128, 128, 128, 0.4);
+  margin: 0.5em 0;
+  padding-left: 1em;
+  color: rgba(128, 128, 128, 0.9);
+}
+.email-preview-body h1 { font-size: 1.5em; font-weight: 600; margin: 0.5em 0; }
+.email-preview-body h2 { font-size: 1.25em; font-weight: 600; margin: 0.5em 0; }
+.email-preview-body h3 { font-size: 1.1em; font-weight: 600; margin: 0.5em 0; }
+.email-preview-body code {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.email-preview-body a { color: #0d7377; text-decoration: underline; }
+.email-preview-body mark {
+  background: rgba(250, 204, 21, 0.5);
+  padding: 0.1em 0.2em;
+  border-radius: 2px;
+}
+.email-preview-body ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+.email-preview-body ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+  margin: 0.25em 0;
+}
+.email-preview-body ul[data-type="taskList"] li[data-checked="true"] {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
 /* BIA Assistance Dashboard Theme - Teal & Gold */
 @layer base {
   :root {

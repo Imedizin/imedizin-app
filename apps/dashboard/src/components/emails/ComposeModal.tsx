@@ -17,18 +17,31 @@ import {
   PaperClipOutlined,
   ExpandOutlined,
   CompressOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import { useTheme } from "@/hooks/useTheme";
 import {
   useSendEmailCommand,
   type EmailRecipient,
 } from "@/services/emails/commands";
+import { useGetMailboxesQuery } from "@/services/mailboxes";
 import { useMailboxStore } from "@/stores/mailbox.store";
 import type { EmailDetail } from "@/types/email";
 import { EmailRecipientField, type RecipientItem } from "./EmailRecipientField";
+import { EmailEditor } from "./EmailEditor";
 
-const { TextArea } = Input;
 const { Text } = Typography;
+
+function stripHtml(html: string): string {
+  if (!html || !html.trim()) return "";
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return (div.textContent || div.innerText || "").trim();
+}
+
+function bodyIsEmpty(body: string): boolean {
+  return stripHtml(body).trim() === "";
+}
 
 interface ComposeModalProps {
   open: boolean;
@@ -54,6 +67,8 @@ const ComposeModal: React.FC<ComposeModalProps> = ({
   const { isDark } = useTheme();
   const { sendEmailMutation } = useSendEmailCommand();
   const { selectedMailboxId } = useMailboxStore();
+  const { data: mailboxes = [] } = useGetMailboxesQuery();
+  const selectedMailbox = mailboxes.find((m) => m.id === selectedMailboxId);
 
   const MINIMIZED_WIDTH = 320;
   const MINIMIZED_HEIGHT = 60;
@@ -91,6 +106,7 @@ const ComposeModal: React.FC<ComposeModalProps> = ({
   const [showBcc, setShowBcc] = useState(false);
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
+  const [showPreview, setShowPreview] = useState(false);
 
   const primaryColor = "#0d7377";
 
@@ -149,6 +165,7 @@ const ComposeModal: React.FC<ComposeModalProps> = ({
       setToInputValue("");
       setCcInputValue("");
       setBccInputValue("");
+      setShowPreview(false);
     }
   }, [
     open,
@@ -254,33 +271,26 @@ const ComposeModal: React.FC<ComposeModalProps> = ({
     }
   }, [isResizing, resizeStart, position, isMinimized, isMaximized]);
 
-  // Send email
-  const handleSend = () => {
-    if (!selectedMailboxId) {
-      message.error("Please select a mailbox");
-      return;
+  // Build the send payload (used for preview and actual send)
+  const buildSendPayload = (): {
+    mailboxId: string;
+    subject: string;
+    to: EmailRecipient[];
+    cc?: EmailRecipient[];
+    bcc?: EmailRecipient[];
+    bodyText: string;
+    bodyHtml?: string;
+    inReplyTo?: string;
+    references?: string;
+  } | null => {
+    const plainBody = stripHtml(body).trim();
+    if (!selectedMailboxId || toRecipients.length === 0 || !subject.trim() || !plainBody) {
+      return null;
     }
-
-    if (toRecipients.length === 0) {
-      message.error("Please enter at least one recipient");
-      return;
-    }
-
-    if (!subject.trim()) {
-      message.error("Please enter a subject");
-      return;
-    }
-
-    if (!body.trim()) {
-      message.error("Please enter a message");
-      return;
-    }
-
-    const recipients: EmailRecipient[] = toRecipients.map((r) => ({
+    const to: EmailRecipient[] = toRecipients.map((r) => ({
       emailAddress: r.email,
       displayName: r.name,
     }));
-
     const cc: EmailRecipient[] | undefined =
       ccRecipients.length > 0
         ? ccRecipients.map((r) => ({
@@ -288,7 +298,6 @@ const ComposeModal: React.FC<ComposeModalProps> = ({
             displayName: r.name,
           }))
         : undefined;
-
     const bcc: EmailRecipient[] | undefined =
       bccRecipients.length > 0
         ? bccRecipients.map((r) => ({
@@ -296,28 +305,55 @@ const ComposeModal: React.FC<ComposeModalProps> = ({
             displayName: r.name,
           }))
         : undefined;
+    return {
+      mailboxId: selectedMailboxId,
+      subject: subject.trim(),
+      to,
+      cc,
+      bcc,
+      bodyText: plainBody,
+      bodyHtml: body.trim() || undefined,
+      inReplyTo: replyTo?.messageId,
+      references: replyTo?.references || undefined,
+    };
+  };
 
-    sendEmailMutation.mutate(
-      {
-        mailboxId: selectedMailboxId,
-        subject: subject.trim(),
-        to: recipients,
-        cc,
-        bcc,
-        bodyText: body.trim(),
-        inReplyTo: replyTo?.messageId,
-        references: replyTo?.references || undefined,
+  // First "Send" click: validate and show preview (no API call)
+  const handleSend = () => {
+    if (!selectedMailboxId) {
+      message.error("Please select a mailbox");
+      return;
+    }
+    if (toRecipients.length === 0) {
+      message.error("Please enter at least one recipient");
+      return;
+    }
+    if (!subject.trim()) {
+      message.error("Please enter a subject");
+      return;
+    }
+    if (bodyIsEmpty(body)) {
+      message.error("Please enter a message");
+      return;
+    }
+    setShowPreview(true);
+  };
+
+  // Confirm send from preview: call API
+  const handleConfirmSend = () => {
+    const payload = buildSendPayload();
+    if (!payload) return;
+    sendEmailMutation.mutate(payload, {
+      onSuccess: () => {
+        setShowPreview(false);
+        handleClose();
       },
-      {
-        onSuccess: () => {
-          handleClose();
-        },
-      },
-    );
+    });
   };
 
   // Close and reset
   const handleClose = () => {
+    setShowPreview(false);
     setToRecipients([]);
     setCcRecipients([]);
     setBccRecipients([]);
@@ -502,7 +538,7 @@ const ComposeModal: React.FC<ComposeModalProps> = ({
             overflow: "hidden",
           }}
         >
-          {/* Content */}
+          {/* Content: compose form */}
           <div
             style={{
               flex: 1,
@@ -512,138 +548,130 @@ const ComposeModal: React.FC<ComposeModalProps> = ({
             }}
           >
             <EmailRecipientField
-              label="To"
-              placeholder="Recipients"
-              value={toInputValue}
-              onChange={setToInputValue}
-              recipients={toRecipients}
-              onRecipientsChange={setToRecipients}
-              borderColor={isDark ? "#303030" : "#e8e8e8"}
-            />
+                  label="To"
+                  placeholder="Recipients"
+                  value={toInputValue}
+                  onChange={setToInputValue}
+                  recipients={toRecipients}
+                  onRecipientsChange={setToRecipients}
+                  borderColor={isDark ? "#303030" : "#e8e8e8"}
+                />
 
-            {showCc && (
-              <EmailRecipientField
-                label="Cc"
-                placeholder="Cc"
-                value={ccInputValue}
-                onChange={setCcInputValue}
-                recipients={ccRecipients}
-                onRecipientsChange={setCcRecipients}
-                borderColor={isDark ? "#303030" : "#e8e8e8"}
-              />
-            )}
+                {showCc && (
+                  <EmailRecipientField
+                    label="Cc"
+                    placeholder="Cc"
+                    value={ccInputValue}
+                    onChange={setCcInputValue}
+                    recipients={ccRecipients}
+                    onRecipientsChange={setCcRecipients}
+                    borderColor={isDark ? "#303030" : "#e8e8e8"}
+                  />
+                )}
 
-            {showBcc && (
-              <EmailRecipientField
-                label="Bcc"
-                placeholder="Bcc"
-                value={bccInputValue}
-                onChange={setBccInputValue}
-                recipients={bccRecipients}
-                onRecipientsChange={setBccRecipients}
-                borderColor={isDark ? "#303030" : "#e8e8e8"}
-              />
-            )}
+                {showBcc && (
+                  <EmailRecipientField
+                    label="Bcc"
+                    placeholder="Bcc"
+                    value={bccInputValue}
+                    onChange={setBccInputValue}
+                    recipients={bccRecipients}
+                    onRecipientsChange={setBccRecipients}
+                    borderColor={isDark ? "#303030" : "#e8e8e8"}
+                  />
+                )}
 
-            {/* Cc/Bcc Toggle - only show when at least one link is visible */}
-            {(!showCc || !showBcc) && (
-              <div
-                style={{
-                  padding: "4px 12px",
-                  borderBottom: `1px solid ${isDark ? "#303030" : "#e8e8e8"}`,
-                }}
-              >
-                <Space size={8}>
-                  {!showCc && (
-                    <Button
-                      type="link"
-                      size="small"
-                      onClick={() => setShowCc(true)}
-                      style={{ padding: 0, height: "auto", fontSize: 12 }}
-                    >
-                      Cc
-                    </Button>
-                  )}
-                  {!showBcc && (
-                    <Button
-                      type="link"
-                      size="small"
-                      onClick={() => setShowBcc(true)}
-                      style={{ padding: 0, height: "auto", fontSize: 12 }}
-                    >
-                      Bcc
-                    </Button>
-                  )}
-                </Space>
-              </div>
-            )}
+                {(!showCc || !showBcc) && (
+                  <div
+                    style={{
+                      padding: "4px 12px",
+                      borderBottom: `1px solid ${isDark ? "#303030" : "#e8e8e8"}`,
+                    }}
+                  >
+                    <Space size={8}>
+                      {!showCc && (
+                        <Button
+                          type="link"
+                          size="small"
+                          onClick={() => setShowCc(true)}
+                          style={{ padding: 0, height: "auto", fontSize: 12 }}
+                        >
+                          Cc
+                        </Button>
+                      )}
+                      {!showBcc && (
+                        <Button
+                          type="link"
+                          size="small"
+                          onClick={() => setShowBcc(true)}
+                          style={{ padding: 0, height: "auto", fontSize: 12 }}
+                        >
+                          Bcc
+                        </Button>
+                      )}
+                    </Space>
+                  </div>
+                )}
 
-            {/* Subject */}
-            <div
-              style={{
-                padding: "8px 12px",
-                borderBottom: `1px solid ${isDark ? "#303030" : "#e8e8e8"}`,
-              }}
-            >
-              <Input
-                placeholder="Subject"
-                bordered={false}
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                style={{ padding: 0, background: "transparent" }}
-              />
-            </div>
-
-            {/* Body */}
-            <div
-              style={{
-                flex: 1,
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <TextArea
-                placeholder="Compose email..."
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
-                bordered={false}
-                autoSize={{ minRows: 8 }}
-                style={{
-                  flex: 1,
-                  resize: "none",
-                  padding: "12px",
-                  background: "transparent",
-                }}
-              />
-            </div>
-
-            {/* Footer */}
-            <div
-              style={{
-                padding: "8px 12px",
-                borderTop: `1px solid ${isDark ? "#303030" : "#e8e8e8"}`,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Space>
-                <Button
-                  type="primary"
-                  icon={<SendOutlined />}
-                  onClick={handleSend}
-                  loading={sendEmailMutation.isPending}
-                  style={{ backgroundColor: primaryColor }}
+                <div
+                  style={{
+                    padding: "8px 12px",
+                    borderBottom: `1px solid ${isDark ? "#303030" : "#e8e8e8"}`,
+                  }}
                 >
-                  Send
-                </Button>
-                <Button
-                  icon={<PaperClipOutlined />}
-                  onClick={() => message.info("Attachment feature coming soon")}
+                  <Input
+                    placeholder="Subject"
+                    bordered={false}
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    style={{ padding: 0, background: "transparent" }}
+                  />
+                </div>
+
+                <div
+                  style={{
+                    flex: 1,
+                    overflow: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
+                    minHeight: 0,
+                  }}
                 >
-                  Attach
-                </Button>
+                  <div style={{ flex: 1, minHeight: 140, display: "flex", flexDirection: "column" }}>
+                    <EmailEditor
+                      value={body}
+                      onChange={setBody}
+                      placeholder="Compose email..."
+                      minHeight={140}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    padding: "8px 12px",
+                    borderTop: `1px solid ${isDark ? "#303030" : "#e8e8e8"}`,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Space>
+                    <Button
+                      type="primary"
+                      icon={<SendOutlined />}
+                      onClick={handleSend}
+                      loading={sendEmailMutation.isPending}
+                      style={{ backgroundColor: primaryColor }}
+                    >
+                      Send
+                    </Button>
+                    <Button
+                      icon={<PaperClipOutlined />}
+                      onClick={() => message.info("Attachment feature coming soon")}
+                    >
+                      Attach
+                    </Button>
                 <Button
                   type="text"
                   danger
@@ -657,6 +685,114 @@ const ComposeModal: React.FC<ComposeModalProps> = ({
           </div>
         </div>
       )}
+
+      {/* Centered preview modal */}
+      <Modal
+        title="Preview before sending"
+        open={showPreview}
+        onCancel={() => setShowPreview(false)}
+        footer={null}
+        width={640}
+        centered
+        zIndex={1100}
+        styles={{
+          body: {
+            maxHeight: "70vh",
+            overflow: "auto",
+          },
+        }}
+      >
+        <div style={{ fontSize: 13 }}>
+          <div style={{ marginBottom: 12 }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              From
+            </Text>
+            <div>
+              {selectedMailbox
+                ? selectedMailbox.name
+                  ? `${selectedMailbox.name} <${selectedMailbox.address}>`
+                  : selectedMailbox.address
+                : selectedMailboxId ?? "—"}
+            </div>
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              To
+            </Text>
+            <div>
+              {toRecipients
+                .map((r) => (r.name ? `${r.name} <${r.email}>` : r.email))
+                .join(", ")}
+            </div>
+          </div>
+          {ccRecipients.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Cc
+              </Text>
+              <div>
+                {ccRecipients
+                  .map((r) => (r.name ? `${r.name} <${r.email}>` : r.email))
+                  .join(", ")}
+              </div>
+            </div>
+          )}
+          {bccRecipients.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Bcc
+              </Text>
+              <div>
+                {bccRecipients
+                  .map((r) => (r.name ? `${r.name} <${r.email}>` : r.email))
+                  .join(", ")}
+              </div>
+            </div>
+          )}
+          <div style={{ marginBottom: 12 }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Subject
+            </Text>
+            <div style={{ fontWeight: 500 }}>
+              {subject.trim() || "—"}
+            </div>
+          </div>
+          <Divider style={{ margin: "8px 0" }} />
+          <div
+            className="email-preview-body"
+            style={{
+              wordBreak: "break-word",
+              fontSize: 13,
+              lineHeight: 1.5,
+            }}
+            dangerouslySetInnerHTML={{
+              __html: body.trim() || "<p>—</p>",
+            }}
+          />
+        </div>
+        <div
+          style={{
+            marginTop: 24,
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 8,
+          }}
+        >
+          <Button icon={<EditOutlined />} onClick={() => setShowPreview(false)}>
+            Edit
+          </Button>
+          <Button
+            type="primary"
+            icon={<SendOutlined />}
+            onClick={handleConfirmSend}
+            loading={sendEmailMutation.isPending}
+            style={{ backgroundColor: primaryColor }}
+          >
+            Send
+          </Button>
+          <Button onClick={() => setShowPreview(false)}>Cancel</Button>
+        </div>
+      </Modal>
 
       {/* Resize handle */}
       {!isMinimized && !isMaximized && (
