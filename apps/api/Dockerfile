@@ -15,7 +15,7 @@ RUN pnpm install --frozen-lockfile
 
 # Copy app and build
 COPY . .
-ENV DATABASE_URL=postgresql://localhost:5432/dummy
+# ENV DATABASE_URL=postgresql://localhost:5432/dummy
 RUN pnpm --filter @imedizin/api build
 
 # --- Production stage ---
@@ -26,9 +26,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 # Monorepo layout: node_modules at root, app in apps/api
-COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/api/package.json ./apps/api/
+COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./apps/api/
+COPY --from=builder /app/node_modules ./apps/api/node_modules
+# COPY --from=builder /app/apps/api/package.json ./apps/api/
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/drizzle ./apps/api/drizzle
 COPY --from=builder /app/apps/api/drizzle.config.ts ./apps/api/
