@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
-import { Form, Input, Select, DatePicker, Typography } from "antd";
+import { Form, Input, Select, DatePicker, Row, Col } from "antd";
 import type { FormInstance } from "antd/es/form";
 import dayjs from "dayjs";
 import { OPERATING_REGIONS } from "@/constants/operating-regions";
 
-const { Title } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
@@ -77,132 +76,145 @@ const CaseProviderForm: React.FC<CaseProviderFormProps> = ({
         status: "active",
       }}
     >
-      <Title level={5} style={{ marginTop: 0, marginBottom: 16 }}>
-        Identity (Mandatory)
-      </Title>
-      <Form.Item
-        name="companyName"
-        label="Company Name"
-        rules={[{ required: true, message: "Please enter company name" }]}
-      >
-        <Input placeholder="Enter company name" />
-      </Form.Item>
+      <div className="form-section">
+        <div className="form-section-title">Identity (Mandatory)</div>
+        <Row gutter={16}>
+          <Col xs={24} md={14}>
+            <Form.Item
+              name="companyName"
+              label="Company Name"
+              rules={[{ required: true, message: "Please enter company name" }]}
+            >
+              <Input placeholder="Enter company name" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={10}>
+            <Form.Item
+              name="providerType"
+              label="Provider Type"
+              rules={[{ required: true, message: "Please select provider type" }]}
+            >
+              <Select placeholder="Select provider type">
+                <Option value="internal">Internal</Option>
+                <Option value="external">External</Option>
+                <Option value="TPA">TPA</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Form.Item
+          name="operatingRegions"
+          label="Operating Regions"
+          rules={[
+            {
+              required: true,
+              message: "Please select at least one operating region",
+            },
+          ]}
+          tooltip="Select one or more regions"
+        >
+          <Select
+            mode="multiple"
+            placeholder="Select operating regions"
+            style={{ width: "100%" }}
+            allowClear
+            showSearch
+            optionFilterProp="label"
+            options={OPERATING_REGIONS.map((region) => ({
+              value: region,
+              label: region,
+            }))}
+          />
+        </Form.Item>
+      </div>
 
-      <Form.Item
-        name="providerType"
-        label="Provider Type"
-        rules={[{ required: true, message: "Please select provider type" }]}
-      >
-        <Select placeholder="Select provider type">
-          <Option value="internal">Internal</Option>
-          <Option value="external">External</Option>
-          <Option value="TPA">TPA</Option>
-        </Select>
-      </Form.Item>
+      <div className="form-section">
+        <div className="form-section-title">Contact (Mandatory)</div>
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="primaryEmail"
+              label="Primary Email"
+              rules={[
+                { required: true, message: "Please enter email" },
+                { type: "email", message: "Please enter a valid email" },
+              ]}
+            >
+              <Input placeholder="Enter email address" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="primaryPhone"
+              label="Primary Phone"
+              rules={[{ required: true, message: "Please enter phone number" }]}
+            >
+              <Input placeholder="Enter phone number" />
+            </Form.Item>
+          </Col>
+        </Row>
+      </div>
 
-      <Form.Item
-        name="operatingRegions"
-        label="Operating Regions"
-        rules={[
-          {
-            required: true,
-            message: "Please select at least one operating region",
-          },
-        ]}
-        tooltip="Select one or more regions"
-      >
-        <Select
-          mode="multiple"
-          placeholder="Select operating regions"
-          style={{ width: "100%" }}
-          allowClear
-          showSearch
-          optionFilterProp="label"
-          options={OPERATING_REGIONS.map((region) => ({
-            value: region,
-            label: region,
-          }))}
-        />
-      </Form.Item>
+      <div className="form-section">
+        <div className="form-section-title">Status & Audit (Mandatory)</div>
+        <Form.Item
+          name="status"
+          label="Status"
+          rules={[{ required: true, message: "Please select status" }]}
+        >
+          <Select placeholder="Select status">
+            <Option value="active">Active</Option>
+            <Option value="inactive">Inactive</Option>
+          </Select>
+        </Form.Item>
+      </div>
 
-      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>
-        Contact (Mandatory)
-      </Title>
-      <Form.Item
-        name="primaryEmail"
-        label="Primary Email"
-        rules={[
-          { required: true, message: "Please enter email" },
-          { type: "email", message: "Please enter a valid email" },
-        ]}
-      >
-        <Input placeholder="Enter email address" />
-      </Form.Item>
+      <div className="form-section">
+        <div className="form-section-title">Commercial (Optional)</div>
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="contractDateRange"
+              label="Contract period"
+              tooltip="Start and end date of the contract"
+            >
+              <RangePicker
+                style={{ width: "100%" }}
+                format="YYYY-MM-DD"
+                placeholder={["Start date", "End date"]}
+              />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item name="pricingModel" label="Pricing Model">
+              <Input placeholder="e.g., Per Case, Monthly, Annual" />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Form.Item name="slaTier" label="SLA Tier">
+          <Select placeholder="Select SLA tier">
+            <Option value="Basic">Basic</Option>
+            <Option value="Standard">Standard</Option>
+            <Option value="Premium">Premium</Option>
+            <Option value="Enterprise">Enterprise</Option>
+          </Select>
+        </Form.Item>
+      </div>
 
-      <Form.Item
-        name="primaryPhone"
-        label="Primary Phone"
-        rules={[{ required: true, message: "Please enter phone number" }]}
-      >
-        <Input placeholder="Enter phone number" />
-      </Form.Item>
-
-      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>
-        Status & Audit (Mandatory)
-      </Title>
-      <Form.Item
-        name="status"
-        label="Status"
-        rules={[{ required: true, message: "Please select status" }]}
-      >
-        <Select placeholder="Select status">
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
-        </Select>
-      </Form.Item>
-
-      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>
-        Commercial (Optional)
-      </Title>
-      <Form.Item
-        name="contractDateRange"
-        label="Contract period"
-        tooltip="Start and end date of the contract"
-      >
-        <RangePicker
-          style={{ width: "100%" }}
-          format="YYYY-MM-DD"
-          placeholder={["Start date", "End date"]}
-        />
-      </Form.Item>
-
-      <Form.Item name="pricingModel" label="Pricing Model">
-        <Input placeholder="e.g., Per Case, Monthly, Annual" />
-      </Form.Item>
-
-      <Form.Item name="slaTier" label="SLA Tier">
-        <Select placeholder="Select SLA tier">
-          <Option value="Basic">Basic</Option>
-          <Option value="Standard">Standard</Option>
-          <Option value="Premium">Premium</Option>
-          <Option value="Enterprise">Enterprise</Option>
-        </Select>
-      </Form.Item>
-
-      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>
-        Admin (Optional)
-      </Title>
-      <Form.Item
-        name="tags"
-        label="Tags"
-        tooltip="Enter tags separated by commas"
-      >
-        <Select
-          mode="tags"
-          placeholder="Enter tags"
-          style={{ width: "100%" }}
-        />
-      </Form.Item>
+      <div className="form-section">
+        <div className="form-section-title">Admin (Optional)</div>
+        <Form.Item
+          name="tags"
+          label="Tags"
+          tooltip="Enter tags separated by commas"
+        >
+          <Select
+            mode="tags"
+            placeholder="Enter tags"
+            style={{ width: "100%" }}
+          />
+        </Form.Item>
+      </div>
     </Form>
   );
 };

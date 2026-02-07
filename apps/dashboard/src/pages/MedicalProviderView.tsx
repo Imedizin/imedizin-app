@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Typography,
   Breadcrumb,
@@ -8,8 +8,6 @@ import {
   Button,
   Spin,
   Space,
-  Drawer,
-  Form,
 } from "antd";
 import {
   HomeOutlined,
@@ -21,14 +19,9 @@ import {
   CalendarOutlined,
 } from "@ant-design/icons";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import {
-  useGetMedicalProviderQuery,
-  useUpdateMedicalProviderCommand,
-} from "@/services/medical-providers";
-import MedicalProviderForm from "@/components/forms/MedicalProviderForm";
+import { useGetMedicalProviderQuery } from "@/services/medical-providers";
 import { primaryColor } from "@/theme/constants";
 import type { MedicalProvider } from "@/types/medical-provider";
-import type { CreateMedicalProviderDto } from "@/types/medical-provider";
 
 const { Title, Text } = Typography;
 
@@ -57,13 +50,10 @@ const formatDate = (dateStr: string | null | undefined) => {
 const MedicalProviderView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [form] = Form.useForm();
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const { data: provider, isLoading, error } = useGetMedicalProviderQuery(
     id ?? "",
   );
-  const { updateMutation } = useUpdateMedicalProviderCommand();
 
   if (!id) {
     return (
@@ -107,24 +97,6 @@ const MedicalProviderView: React.FC = () => {
   }
 
   const p = provider as MedicalProvider;
-
-  const handleEdit = () => setDrawerOpen(true);
-
-  const handleClose = () => {
-    form.resetFields();
-    setDrawerOpen(false);
-  };
-
-  const handleSubmit = (values: CreateMedicalProviderDto) => {
-    updateMutation.mutate(
-      { id: p.id, ...values },
-      {
-        onSuccess: () => {
-          handleClose();
-        },
-      },
-    );
-  };
 
   return (
     <>
@@ -175,7 +147,7 @@ const MedicalProviderView: React.FC = () => {
           <Button
             type="primary"
             icon={<EditOutlined />}
-            onClick={handleEdit}
+            onClick={() => navigate(`/medical-providers/${id}/edit`)}
             style={{ backgroundColor: primaryColor }}
           >
             Edit
@@ -305,33 +277,6 @@ const MedicalProviderView: React.FC = () => {
           </Descriptions>
         </Card>
       </Space>
-
-      <Drawer
-        title="Edit Medical Provider"
-        width={720}
-        onClose={handleClose}
-        open={drawerOpen}
-        bodyStyle={{ paddingBottom: 80 }}
-        extra={
-          <Space>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button
-              type="primary"
-              onClick={() => form.submit()}
-              loading={updateMutation.isPending}
-              style={{ backgroundColor: primaryColor }}
-            >
-              Save Changes
-            </Button>
-          </Space>
-        }
-      >
-        <MedicalProviderForm
-          form={form}
-          initialValues={p}
-          onSubmit={handleSubmit}
-        />
-      </Drawer>
     </>
   );
 };

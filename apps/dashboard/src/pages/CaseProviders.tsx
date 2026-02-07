@@ -7,8 +7,6 @@ import {
   Tag,
   Button,
   Space,
-  Drawer,
-  Form,
   Spin,
   Input,
   Select,
@@ -24,22 +22,16 @@ import {
   SearchOutlined,
   ClearOutlined,
 } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import { useQueryStates, parseAsString } from "nuqs";
-import CaseProviderForm from "@/components/forms/CaseProviderForm";
 import { primaryColor } from "@/theme/constants";
 import type {
   CaseProvider,
-  CreateCaseProviderDto,
   CaseProviderListParams,
 } from "@/types/case-provider";
 import { OPERATING_REGIONS } from "@/constants/operating-regions";
-import {
-  useListCaseProvidersQuery,
-  useCreateCaseProviderCommand,
-  useUpdateCaseProviderCommand,
-} from "@/services/case-providers";
+import { useListCaseProvidersQuery } from "@/services/case-providers";
 import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
 
 const { Title, Text } = Typography;
@@ -63,12 +55,7 @@ const caseProviderParsers = {
 };
 
 const CaseProviders: React.FC = () => {
-  const [form] = Form.useForm();
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [editingProvider, setEditingProvider] = useState<CaseProvider | null>(
-    null,
-  );
-
+  const navigate = useNavigate();
   const [filters, setFilters] = useQueryStates(caseProviderParsers);
   const [searchInput, setSearchInput] = useState(filters.search ?? "");
 
@@ -90,8 +77,6 @@ const CaseProviders: React.FC = () => {
 
   const { data: providers = [], isLoading } =
     useListCaseProvidersQuery(listParams);
-  const { createMutation } = useCreateCaseProviderCommand();
-  const { updateMutation } = useUpdateCaseProviderCommand();
 
   const providerTypeColors: Record<string, string> = {
     internal: "blue",
@@ -188,42 +173,7 @@ const CaseProviders: React.FC = () => {
   ];
 
   const handleEdit = (provider: CaseProvider) => {
-    setEditingProvider(provider);
-    setDrawerOpen(true);
-  };
-
-  const handleSubmit = (values: CreateCaseProviderDto) => {
-    const loading = editingProvider
-      ? updateMutation.isPending
-      : createMutation.isPending;
-    if (loading) return;
-
-    if (editingProvider) {
-      updateMutation.mutate(
-        { id: editingProvider.id, ...values },
-        {
-          onSuccess: () => {
-            form.resetFields();
-            setDrawerOpen(false);
-            setEditingProvider(null);
-          },
-        },
-      );
-    } else {
-      createMutation.mutate(values, {
-        onSuccess: () => {
-          form.resetFields();
-          setDrawerOpen(false);
-          setEditingProvider(null);
-        },
-      });
-    }
-  };
-
-  const handleClose = () => {
-    form.resetFields();
-    setDrawerOpen(false);
-    setEditingProvider(null);
+    navigate(`/case-providers/${provider.id}/edit`);
   };
 
   return (
@@ -261,11 +211,7 @@ const CaseProviders: React.FC = () => {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => {
-              setEditingProvider(null);
-              form.resetFields();
-              setDrawerOpen(true);
-            }}
+            onClick={() => navigate("/case-providers/new")}
             style={{ backgroundColor: primaryColor }}
           >
             Add Provider
@@ -359,34 +305,6 @@ const CaseProviders: React.FC = () => {
           />
         </Spin>
       </Card>
-
-      <Drawer
-        title={editingProvider ? "Edit Case Provider" : "Add Case Provider"}
-        width={720}
-        onClose={handleClose}
-        open={drawerOpen}
-        bodyStyle={{ paddingBottom: 80 }}
-        extra={
-          <Space>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button
-              type="primary"
-              onClick={() => form.submit()}
-              loading={
-                createMutation.isPending || updateMutation.isPending
-              }
-            >
-              {editingProvider ? "Update" : "Create"}
-            </Button>
-          </Space>
-        }
-      >
-        <CaseProviderForm
-          form={form}
-          initialValues={editingProvider ?? undefined}
-          onSubmit={handleSubmit}
-        />
-      </Drawer>
     </>
   );
 };

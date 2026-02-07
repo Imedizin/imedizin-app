@@ -7,8 +7,6 @@ import {
   Tag,
   Button,
   Space,
-  Drawer,
-  Form,
   Spin,
   Input,
   Select,
@@ -24,22 +22,16 @@ import {
   SearchOutlined,
   ClearOutlined,
 } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import { useQueryStates, parseAsString } from "nuqs";
-import MedicalProviderForm from "@/components/forms/MedicalProviderForm";
 import { primaryColor } from "@/theme/constants";
 import type {
   MedicalProvider,
-  CreateMedicalProviderDto,
   MedicalProviderListParams,
 } from "@/types/medical-provider";
 import { ALL_MEDICAL_SPECIALTIES } from "@/constants/medical-specialties";
-import {
-  useListMedicalProvidersQuery,
-  useCreateMedicalProviderCommand,
-  useUpdateMedicalProviderCommand,
-} from "@/services/medical-providers";
+import { useListMedicalProvidersQuery } from "@/services/medical-providers";
 import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
 
 const { Title, Text } = Typography;
@@ -66,11 +58,7 @@ const medicalProviderParsers = {
 };
 
 const MedicalProviders: React.FC = () => {
-  const [form] = Form.useForm();
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [editingProvider, setEditingProvider] =
-    useState<MedicalProvider | null>(null);
-
+  const navigate = useNavigate();
   const [filters, setFilters] = useQueryStates(medicalProviderParsers);
   const [searchInput, setSearchInput] = useState(filters.search ?? "");
 
@@ -93,8 +81,6 @@ const MedicalProviders: React.FC = () => {
 
   const { data: providers = [], isLoading } =
     useListMedicalProvidersQuery(listParams);
-  const { createMutation } = useCreateMedicalProviderCommand();
-  const { updateMutation } = useUpdateMedicalProviderCommand();
 
   const providerTypeColors: Record<string, string> = {
     hospital: "blue",
@@ -186,42 +172,7 @@ const MedicalProviders: React.FC = () => {
   ];
 
   const handleEdit = (provider: MedicalProvider) => {
-    setEditingProvider(provider);
-    setDrawerOpen(true);
-  };
-
-  const handleSubmit = (values: CreateMedicalProviderDto) => {
-    const loading = editingProvider
-      ? updateMutation.isPending
-      : createMutation.isPending;
-    if (loading) return;
-
-    if (editingProvider) {
-      updateMutation.mutate(
-        { id: editingProvider.id, ...values },
-        {
-          onSuccess: () => {
-            form.resetFields();
-            setDrawerOpen(false);
-            setEditingProvider(null);
-          },
-        },
-      );
-    } else {
-      createMutation.mutate(values, {
-        onSuccess: () => {
-          form.resetFields();
-          setDrawerOpen(false);
-          setEditingProvider(null);
-        },
-      });
-    }
-  };
-
-  const handleClose = () => {
-    form.resetFields();
-    setDrawerOpen(false);
-    setEditingProvider(null);
+    navigate(`/medical-providers/${provider.id}/edit`);
   };
 
   return (
@@ -259,11 +210,7 @@ const MedicalProviders: React.FC = () => {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => {
-              setEditingProvider(null);
-              form.resetFields();
-              setDrawerOpen(true);
-            }}
+            onClick={() => navigate("/medical-providers/new")}
             style={{ backgroundColor: primaryColor }}
           >
             Add Provider
@@ -370,36 +317,6 @@ const MedicalProviders: React.FC = () => {
           />
         </Spin>
       </Card>
-
-      <Drawer
-        title={
-          editingProvider ? "Edit Medical Provider" : "Add Medical Provider"
-        }
-        width={720}
-        onClose={handleClose}
-        open={drawerOpen}
-        bodyStyle={{ paddingBottom: 80 }}
-        extra={
-          <Space>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button
-              type="primary"
-              onClick={() => form.submit()}
-              loading={
-                createMutation.isPending || updateMutation.isPending
-              }
-            >
-              {editingProvider ? "Update" : "Create"}
-            </Button>
-          </Space>
-        }
-      >
-        <MedicalProviderForm
-          form={form}
-          initialValues={editingProvider ?? undefined}
-          onSubmit={handleSubmit}
-        />
-      </Drawer>
     </>
   );
 };

@@ -21,6 +21,8 @@ import MedicalCaseDetailPage from "./pages/MedicalCaseDetailPage";
 import TransportAssistanceDetailPage from "./pages/TransportAssistanceDetailPage";
 import MedicalProviderView from "./pages/MedicalProviderView";
 import CaseProviderView from "./pages/CaseProviderView";
+import CaseProviderFormPage from "./pages/CaseProviderFormPage";
+import MedicalProviderFormPage from "./pages/MedicalProviderFormPage";
 
 const queryClient = new QueryClient();
 
@@ -45,10 +47,26 @@ const App = () => (
                   element={<MedicalProviders />}
                 />
                 <Route
+                  path="/medical-providers/new"
+                  element={<MedicalProviderFormPage />}
+                />
+                <Route
+                  path="/medical-providers/:id/edit"
+                  element={<MedicalProviderFormPage />}
+                />
+                <Route
                   path="/medical-providers/:id"
                   element={<MedicalProviderView />}
                 />
                 <Route path="/case-providers" element={<CaseProviders />} />
+                <Route
+                  path="/case-providers/new"
+                  element={<CaseProviderFormPage />}
+                />
+                <Route
+                  path="/case-providers/:id/edit"
+                  element={<CaseProviderFormPage />}
+                />
                 <Route
                   path="/case-providers/:id"
                   element={<CaseProviderView />}

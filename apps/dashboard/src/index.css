@@ -281,3 +281,39 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
+
+/* Form page layout and section grouping */
+.form-page-container {
+  max-width: 840px;
+  margin: 0 auto;
+}
+.form-section {
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  background: hsl(var(--muted) / 0.5);
+  border-radius: 10px;
+  border: 1px solid hsl(var(--border));
+}
+.form-section:last-of-type {
+  margin-bottom: 0;
+}
+.form-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: hsl(var(--foreground) / 0.85);
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid hsl(var(--border));
+}
+.form-actions-bar {
+  position: sticky;
+  bottom: 0;
+  margin: 0 -24px -24px -24px;
+  padding: 16px 24px;
+  background: hsl(var(--card));
+  border-top: 1px solid hsl(var(--border));
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 -2px 8px hsl(var(--foreground) / 0.04);
+}

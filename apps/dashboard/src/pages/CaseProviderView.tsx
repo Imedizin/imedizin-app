@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Typography,
   Breadcrumb,
@@ -8,8 +8,6 @@ import {
   Button,
   Spin,
   Space,
-  Drawer,
-  Form,
 } from "antd";
 import {
   HomeOutlined,
@@ -21,14 +19,9 @@ import {
   CalendarOutlined,
 } from "@ant-design/icons";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import {
-  useGetCaseProviderQuery,
-  useUpdateCaseProviderCommand,
-} from "@/services/case-providers";
-import CaseProviderForm from "@/components/forms/CaseProviderForm";
+import { useGetCaseProviderQuery } from "@/services/case-providers";
 import { primaryColor } from "@/theme/constants";
 import type { CaseProvider } from "@/types/case-provider";
-import type { CreateCaseProviderDto } from "@/types/case-provider";
 
 const { Title, Text } = Typography;
 
@@ -55,11 +48,8 @@ const formatDate = (dateStr: string | null | undefined) => {
 const CaseProviderView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [form] = Form.useForm();
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const { data: provider, isLoading, error } = useGetCaseProviderQuery(id ?? "");
-  const { updateMutation } = useUpdateCaseProviderCommand();
 
   if (!id) {
     return (
@@ -103,24 +93,6 @@ const CaseProviderView: React.FC = () => {
   }
 
   const p = provider as CaseProvider;
-
-  const handleEdit = () => setDrawerOpen(true);
-
-  const handleClose = () => {
-    form.resetFields();
-    setDrawerOpen(false);
-  };
-
-  const handleSubmit = (values: CreateCaseProviderDto) => {
-    updateMutation.mutate(
-      { id: p.id, ...values },
-      {
-        onSuccess: () => {
-          handleClose();
-        },
-      },
-    );
-  };
 
   return (
     <>
@@ -171,7 +143,7 @@ const CaseProviderView: React.FC = () => {
           <Button
             type="primary"
             icon={<EditOutlined />}
-            onClick={handleEdit}
+            onClick={() => navigate(`/case-providers/${id}/edit`)}
             style={{ backgroundColor: primaryColor }}
           >
             Edit
@@ -295,33 +267,6 @@ const CaseProviderView: React.FC = () => {
           </Descriptions>
         </Card>
       </Space>
-
-      <Drawer
-        title="Edit Case Provider"
-        width={720}
-        onClose={handleClose}
-        open={drawerOpen}
-        bodyStyle={{ paddingBottom: 80 }}
-        extra={
-          <Space>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button
-              type="primary"
-              onClick={() => form.submit()}
-              loading={updateMutation.isPending}
-              style={{ backgroundColor: primaryColor }}
-            >
-              Save Changes
-            </Button>
-          </Space>
-        }
-      >
-        <CaseProviderForm
-          form={form}
-          initialValues={p}
-          onSubmit={handleSubmit}
-        />
-      </Drawer>
     </>
   );
 };

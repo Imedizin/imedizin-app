@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Form, Input, Select, DatePicker, Typography } from "antd";
+import { Form, Input, Select, DatePicker, Row, Col } from "antd";
 import type { FormInstance } from "antd/es/form";
 import dayjs from "dayjs";
 import { MEDICAL_SPECIALTY_GROUPS } from "@/constants/medical-specialties";
@@ -8,7 +8,6 @@ import type {
   CreateMedicalProviderDto,
 } from "@/types/medical-provider";
 
-const { Title } = Typography;
 const { Option, OptGroup } = Select;
 
 interface MedicalProviderFormProps {
@@ -69,145 +68,158 @@ const MedicalProviderForm: React.FC<MedicalProviderFormProps> = ({
           : undefined,
       }}
     >
-      <Title level={5} style={{ marginTop: 0, marginBottom: 16 }}>
-        Identity (Mandatory)
-      </Title>
-      <Form.Item
-        name="legalName"
-        label="Legal Name"
-        rules={[{ required: true, message: "Please enter legal name" }]}
-      >
-        <Input placeholder="Enter legal name" />
-      </Form.Item>
-
-      <Form.Item
-        name="providerType"
-        label="Provider Type"
-        rules={[{ required: true, message: "Please select provider type" }]}
-      >
-        <Select placeholder="Select provider type">
-          <Option value="hospital">Hospital</Option>
-          <Option value="clinic">Clinic</Option>
-          <Option value="lab">Lab</Option>
-          <Option value="pharmacy">Pharmacy</Option>
-          <Option value="doctor">Doctor</Option>
-        </Select>
-      </Form.Item>
-
-      <Form.Item
-        name="country"
-        label="Country"
-        rules={[{ required: true, message: "Please enter country" }]}
-      >
-        <Input placeholder="Enter country" />
-      </Form.Item>
-
-      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>
-        Contact (Mandatory)
-      </Title>
-      <Form.Item
-        name="primaryEmail"
-        label="Primary Email"
-        rules={[
-          { required: true, message: "Please enter email" },
-          { type: "email", message: "Please enter a valid email" },
-        ]}
-      >
-        <Input placeholder="Enter email address" />
-      </Form.Item>
-
-      <Form.Item
-        name="primaryPhone"
-        label="Primary Phone"
-        rules={[{ required: true, message: "Please enter phone number" }]}
-      >
-        <Input placeholder="Enter phone number" />
-      </Form.Item>
-
-      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>
-        Status & Audit (Mandatory)
-      </Title>
-      <Form.Item
-        name="status"
-        label="Status"
-        rules={[{ required: true, message: "Please select status" }]}
-      >
-        <Select placeholder="Select status">
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
-        </Select>
-      </Form.Item>
-
-      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>
-        Operational (Optional)
-      </Title>
-      <Form.Item
-        name="specialties"
-        label="Specialties"
-        tooltip="Select one or more specialties"
-      >
-        <Select
-          mode="multiple"
-          placeholder="Select specialties"
-          style={{ width: "100%" }}
-          allowClear
-          showSearch
-          optionFilterProp="label"
+      <div className="form-section">
+        <div className="form-section-title">Identity (Mandatory)</div>
+        <Row gutter={16}>
+          <Col xs={24} md={14}>
+            <Form.Item
+              name="legalName"
+              label="Legal Name"
+              rules={[{ required: true, message: "Please enter legal name" }]}
+            >
+              <Input placeholder="Enter legal name" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={10}>
+            <Form.Item
+              name="providerType"
+              label="Provider Type"
+              rules={[{ required: true, message: "Please select provider type" }]}
+            >
+              <Select placeholder="Select provider type">
+                <Option value="hospital">Hospital</Option>
+                <Option value="clinic">Clinic</Option>
+                <Option value="lab">Lab</Option>
+                <Option value="pharmacy">Pharmacy</Option>
+                <Option value="doctor">Doctor</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Form.Item
+          name="country"
+          label="Country"
+          rules={[{ required: true, message: "Please enter country" }]}
         >
-          {MEDICAL_SPECIALTY_GROUPS.map((group) => (
-            <OptGroup key={group.label} label={group.label}>
-              {group.options.map((value) => (
-                <Option
-                  key={`${group.label}-${value}`}
-                  value={value}
-                  label={value}
-                >
-                  {value}
-                </Option>
-              ))}
-            </OptGroup>
-          ))}
-        </Select>
-      </Form.Item>
+          <Input placeholder="Enter country" />
+        </Form.Item>
+      </div>
 
-      <Form.Item
-        name="services"
-        label="Services"
-        tooltip="Enter services separated by commas"
-      >
-        <Select
-          mode="tags"
-          placeholder="Enter services"
-          style={{ width: "100%" }}
-        />
-      </Form.Item>
+      <div className="form-section">
+        <div className="form-section-title">Contact (Mandatory)</div>
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="primaryEmail"
+              label="Primary Email"
+              rules={[
+                { required: true, message: "Please enter email" },
+                { type: "email", message: "Please enter a valid email" },
+              ]}
+            >
+              <Input placeholder="Enter email address" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="primaryPhone"
+              label="Primary Phone"
+              rules={[{ required: true, message: "Please enter phone number" }]}
+            >
+              <Input placeholder="Enter phone number" />
+            </Form.Item>
+          </Col>
+        </Row>
+      </div>
 
-      <Form.Item name="businessHours" label="Business Hours">
-        <Input placeholder="e.g., Mon-Fri 9AM-5PM" />
-      </Form.Item>
+      <div className="form-section">
+        <div className="form-section-title">Status & Audit (Mandatory)</div>
+        <Form.Item
+          name="status"
+          label="Status"
+          rules={[{ required: true, message: "Please select status" }]}
+        >
+          <Select placeholder="Select status">
+            <Option value="active">Active</Option>
+            <Option value="inactive">Inactive</Option>
+          </Select>
+        </Form.Item>
+      </div>
 
-      <Title level={5} style={{ marginTop: 24, marginBottom: 16 }}>
-        Admin (Optional)
-      </Title>
-      <Form.Item name="licenseNumber" label="License Number">
-        <Input placeholder="Enter license number" />
-      </Form.Item>
+      <div className="form-section">
+        <div className="form-section-title">Operational (Optional)</div>
+        <Form.Item
+          name="specialties"
+          label="Specialties"
+          tooltip="Select one or more specialties"
+        >
+          <Select
+            mode="multiple"
+            placeholder="Select specialties"
+            style={{ width: "100%" }}
+            allowClear
+            showSearch
+            optionFilterProp="label"
+          >
+            {MEDICAL_SPECIALTY_GROUPS.map((group) => (
+              <OptGroup key={group.label} label={group.label}>
+                {group.options.map((value) => (
+                  <Option
+                    key={`${group.label}-${value}`}
+                    value={value}
+                    label={value}
+                  >
+                    {value}
+                  </Option>
+                ))}
+              </OptGroup>
+            ))}
+          </Select>
+        </Form.Item>
 
-      <Form.Item
-        name="tags"
-        label="Tags"
-        tooltip="Enter tags separated by commas"
-      >
-        <Select
-          mode="tags"
-          placeholder="Enter tags"
-          style={{ width: "100%" }}
-        />
-      </Form.Item>
+        <Form.Item
+          name="services"
+          label="Services"
+          tooltip="Enter services separated by commas"
+        >
+          <Select
+            mode="tags"
+            placeholder="Enter services"
+            style={{ width: "100%" }}
+          />
+        </Form.Item>
 
-      <Form.Item name="onboardedAt" label="Onboarded At">
-        <DatePicker style={{ width: "100%" }} />
-      </Form.Item>
+        <Form.Item name="businessHours" label="Business Hours">
+          <Input placeholder="e.g., Mon-Fri 9AM-5PM" />
+        </Form.Item>
+      </div>
+
+      <div className="form-section">
+        <div className="form-section-title">Admin (Optional)</div>
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item name="licenseNumber" label="License Number">
+              <Input placeholder="Enter license number" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item name="onboardedAt" label="Onboarded At">
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Form.Item
+          name="tags"
+          label="Tags"
+          tooltip="Enter tags separated by commas"
+        >
+          <Select
+            mode="tags"
+            placeholder="Enter tags"
+            style={{ width: "100%" }}
+          />
+        </Form.Item>
+      </div>
     </Form>
   );
 };
