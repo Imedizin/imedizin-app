@@ -47,7 +47,7 @@ export const LinkedThreadsCard: React.FC<LinkedThreadsCardProps> = ({
   return (
     <>
       <Card
-        title="Linked mail threads"
+        title="Mails"
         bordered={false}
         style={{
           borderRadius: 12,
@@ -62,26 +62,28 @@ export const LinkedThreadsCard: React.FC<LinkedThreadsCardProps> = ({
               <div
                 key={item.threadId}
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
                   padding: "8px 12px",
                   background: threadRowBg,
                   borderRadius: 8,
                 }}
               >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <Text strong style={{ display: "block" }} ellipsis>
-                    {threadDisplayLabel(item)}
+                <Text strong style={{ display: "block" }} ellipsis>
+                  {threadDisplayLabel(item)}
+                </Text>
+                {item.latestDate && (
+                  <Text
+                    type="secondary"
+                    style={{ fontSize: 12, display: "block" }}
+                  >
+                    {new Date(item.latestDate).toLocaleString()}
                   </Text>
-                  {item.latestDate && (
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {new Date(item.latestDate).toLocaleString()}
-                    </Text>
-                  )}
-                </div>
-                <Space>
-                  <Link to={`/mails/${encodeURIComponent(item.threadId)}`} target="_blank" rel="noopener noreferrer">
+                )}
+                <Space style={{ marginTop: 8 }}>
+                  <Link
+                    to={`/mails/${encodeURIComponent(item.threadId)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Button type="link" size="small" icon={<MailOutlined />}>
                       Open in Mails
                     </Button>
@@ -126,7 +128,8 @@ export const LinkedThreadsCard: React.FC<LinkedThreadsCardProps> = ({
       >
         <p style={{ marginBottom: 8 }}>
           <Text type="secondary">
-            Paste the thread ID (e.g. from the Mails page URL or copy from a thread).
+            Paste the thread ID (e.g. from the Mails page URL or copy from a
+            thread).
           </Text>
         </p>
         <Input

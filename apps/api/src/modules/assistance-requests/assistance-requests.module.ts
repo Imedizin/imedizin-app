@@ -4,6 +4,8 @@ import { AssistanceRequestController } from './api/controllers/assistance-reques
 import { AssistanceRequestRepository } from './infrastructure/repositories/assistance-request.repository';
 import { CreateTransportRequestCommand } from './application/commands/create-transport-request.command';
 import { CreateMedicalRequestCommand } from './application/commands/create-medical-request.command';
+import { UpdateTransportRequestCommand } from './application/commands/update-transport-request.command';
+import { UpdateMedicalRequestCommand } from './application/commands/update-medical-request.command';
 import { LinkThreadCommand } from './application/commands/link-thread.command';
 import { UnlinkThreadCommand } from './application/commands/unlink-thread.command';
 import { FindAllAssistanceRequestsQuery } from './application/queries/find-all-assistance-requests.query';
@@ -15,6 +17,8 @@ import { FindAssistanceRequestByIdQuery } from './application/queries/find-assis
   providers: [
     CreateTransportRequestCommand,
     CreateMedicalRequestCommand,
+    UpdateTransportRequestCommand,
+    UpdateMedicalRequestCommand,
     LinkThreadCommand,
     UnlinkThreadCommand,
     FindAllAssistanceRequestsQuery,

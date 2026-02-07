@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { DRIZZLE } from "../../../../shared/common/database/database.module";
 import type { Database } from "../../../../shared/common/database/database.module";
@@ -18,6 +18,8 @@ import type {
   CreateMedicalPayload,
   CreateTransportPayload,
   FindAllAssistanceRequestsFilters,
+  UpdateMedicalPayload,
+  UpdateTransportPayload,
 } from "../../domain/interfaces/assistance-request.repository.interface";
 
 type AssistanceRequestRow = typeof assistanceRequests.$inferSelect;
@@ -225,6 +227,116 @@ export class AssistanceRequestRepository implements IAssistanceRequestRepository
     const created = await this.findById(parent.id);
     if (!created) throw new Error("Failed to load created medical request");
     return created;
+  }
+
+  async updateTransport(
+    id: string,
+    data: UpdateTransportPayload
+  ): Promise<AssistanceRequest> {
+    const existing = await this.findById(id);
+    if (!existing || existing.serviceType !== "TRANSPORT")
+      throw new NotFoundException("Transport request not found");
+    const now = new Date();
+    const parentPayload: Record<string, unknown> = {
+      updatedAt: now,
+    };
+    if (data.requestNumber !== undefined) parentPayload.requestNumber = data.requestNumber;
+    if (data.status !== undefined) parentPayload.status = data.status;
+    if (data.priority !== undefined) parentPayload.priority = data.priority;
+    if (data.providerReferenceNumber !== undefined)
+      parentPayload.providerReferenceNumber = data.providerReferenceNumber;
+    if (data.receivedAt !== undefined) parentPayload.receivedAt = data.receivedAt;
+    if (data.caseProviderId !== undefined) parentPayload.caseProviderId = data.caseProviderId;
+    if (data.patientFullName !== undefined) parentPayload.patientFullName = data.patientFullName;
+    if (data.patientBirthDate !== undefined) parentPayload.patientBirthDate = data.patientBirthDate;
+    if (data.patientNationalityCode !== undefined)
+      parentPayload.patientNationalityCode = data.patientNationalityCode;
+
+    if (Object.keys(parentPayload).length > 1) {
+      await this.db
+        .update(assistanceRequests)
+        .set(parentPayload as Record<string, unknown>)
+        .where(eq(assistanceRequests.id, id));
+    }
+
+    const transportPayload: Record<string, unknown> = {};
+    if (data.pickupPoint !== undefined) transportPayload.pickupPoint = data.pickupPoint;
+    if (data.dropoffPoint !== undefined) transportPayload.dropoffPoint = data.dropoffPoint;
+    if (data.requestedTransportAt !== undefined)
+      transportPayload.requestedTransportAt = data.requestedTransportAt;
+    if (data.modeOfTransport !== undefined) transportPayload.modeOfTransport = data.modeOfTransport;
+    if (data.medicalCrewRequired !== undefined)
+      transportPayload.medicalCrewRequired = data.medicalCrewRequired;
+    if (data.hasCompanion !== undefined) transportPayload.hasCompanion = data.hasCompanion;
+    if (data.estimatedPickupTime !== undefined)
+      transportPayload.estimatedPickupTime = data.estimatedPickupTime;
+    if (data.estimatedDropoffTime !== undefined)
+      transportPayload.estimatedDropoffTime = data.estimatedDropoffTime;
+    if (data.diagnosis !== undefined) transportPayload.diagnosis = data.diagnosis;
+
+    if (Object.keys(transportPayload).length > 0) {
+      await this.db
+        .update(transportRequests)
+        .set(transportPayload as Record<string, unknown>)
+        .where(eq(transportRequests.requestId, id));
+    }
+
+    const updated = await this.findById(id);
+    if (!updated) throw new Error("Failed to load updated transport request");
+    return updated;
+  }
+
+  async updateMedical(
+    id: string,
+    data: UpdateMedicalPayload
+  ): Promise<AssistanceRequest> {
+    const existing = await this.findById(id);
+    if (!existing || existing.serviceType !== "MEDICAL")
+      throw new NotFoundException("Medical request not found");
+    const now = new Date();
+    const parentPayload: Record<string, unknown> = {
+      updatedAt: now,
+    };
+    if (data.requestNumber !== undefined) parentPayload.requestNumber = data.requestNumber;
+    if (data.status !== undefined) parentPayload.status = data.status;
+    if (data.priority !== undefined) parentPayload.priority = data.priority;
+    if (data.providerReferenceNumber !== undefined)
+      parentPayload.providerReferenceNumber = data.providerReferenceNumber;
+    if (data.receivedAt !== undefined) parentPayload.receivedAt = data.receivedAt;
+    if (data.caseProviderId !== undefined) parentPayload.caseProviderId = data.caseProviderId;
+    if (data.patientFullName !== undefined) parentPayload.patientFullName = data.patientFullName;
+    if (data.patientBirthDate !== undefined) parentPayload.patientBirthDate = data.patientBirthDate;
+    if (data.patientNationalityCode !== undefined)
+      parentPayload.patientNationalityCode = data.patientNationalityCode;
+
+    if (Object.keys(parentPayload).length > 1) {
+      await this.db
+        .update(assistanceRequests)
+        .set(parentPayload as Record<string, unknown>)
+        .where(eq(assistanceRequests.id, id));
+    }
+
+    const medicalPayload: Record<string, unknown> = {};
+    if (data.caseProviderReferenceNumber !== undefined)
+      medicalPayload.caseProviderReferenceNumber = data.caseProviderReferenceNumber;
+    if (data.admissionDate !== undefined) medicalPayload.admissionDate = data.admissionDate;
+    if (data.dischargeDate !== undefined) medicalPayload.dischargeDate = data.dischargeDate;
+    if (data.country !== undefined) medicalPayload.country = data.country;
+    if (data.city !== undefined) medicalPayload.city = data.city;
+    if (data.medicalProviderId !== undefined)
+      medicalPayload.medicalProviderId = data.medicalProviderId;
+    if (data.diagnosis !== undefined) medicalPayload.diagnosis = data.diagnosis;
+
+    if (Object.keys(medicalPayload).length > 0) {
+      await this.db
+        .update(medicalRequests)
+        .set(medicalPayload as Record<string, unknown>)
+        .where(eq(medicalRequests.requestId, id));
+    }
+
+    const updated = await this.findById(id);
+    if (!updated) throw new Error("Failed to load updated medical request");
+    return updated;
   }
 
   private toDomain(

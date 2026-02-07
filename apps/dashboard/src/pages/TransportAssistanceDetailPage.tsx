@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Typography,
   Breadcrumb,
@@ -7,20 +7,27 @@ import {
   Tag,
   Button,
   Spin,
-  Space,
+  Row,
+  Col,
+  Modal,
+  Form,
 } from "antd";
 import {
   HomeOutlined,
   SolutionOutlined,
   CarOutlined,
   ArrowLeftOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
+import dayjs from "dayjs";
 import {
   useAssistanceRequestsQuery,
   useAssistanceRequestByIdQuery,
+  useUpdateTransportRequestCommand,
 } from "@/services/assistance-requests";
 import { LinkedThreadsCard } from "@/components/assistance-requests/LinkedThreadsCard";
+import TransportAssistanceRequestForm from "@/components/forms/TransportAssistanceRequestForm";
 import {
   isTransportRequest,
   type TransportAssistanceRequest,
@@ -55,8 +62,11 @@ const TransportAssistanceDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [form] = Form.useForm();
   const { data: requests = [], isLoading: listLoading } = useAssistanceRequestsQuery();
   const { data: byIdRequest, isLoading: byIdLoading } = useAssistanceRequestByIdQuery(id);
+  const { updateMutation } = useUpdateTransportRequestCommand(id ?? "");
 
   const requestFromState = location.state?.request as
     | TransportAssistanceRequest
@@ -157,132 +167,222 @@ const TransportAssistanceDetailPage: React.FC = () => {
               {r.status.replace("_", " ").toUpperCase()}
             </Tag>
           </div>
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={() => {
+              form.setFieldsValue({
+                requestNumber: r.requestNumber,
+                status: r.status,
+                receivedAt: r.receivedAt ? dayjs(r.receivedAt) : undefined,
+                pickupPoint: r.pickupPoint,
+                dropOffPoint: r.dropOffPoint,
+                dateOfRequestedTransportation: r.dateOfRequestedTransportation
+                  ? dayjs(r.dateOfRequestedTransportation)
+                  : undefined,
+                estimatedPickupTime: r.estimatedPickupTime
+                  ? dayjs(r.estimatedPickupTime)
+                  : undefined,
+                estimatedDropOffTime: r.estimatedDropOffTime
+                  ? dayjs(r.estimatedDropOffTime)
+                  : undefined,
+                patientName: r.patient.patientName,
+                patientBirthdate: r.patient.patientBirthdate
+                  ? dayjs(r.patient.patientBirthdate)
+                  : undefined,
+                patientNationality: r.patient.patientNationality,
+                insuranceCompanyReferenceNumber: r.insuranceCompanyReferenceNumber,
+                diagnosis: r.diagnosis ?? undefined,
+                modeOfTransportation: r.modeOfTransportation ?? undefined,
+                withEscortingMedicalCrew: r.withEscortingMedicalCrew,
+                hasCompanion: r.hasCompanion,
+              });
+              setEditModalOpen(true);
+            }}
+          >
+            Edit
+          </Button>
         </div>
       </div>
 
-      <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-        <LinkedThreadsCard requestId={r.id} linkedThreads={r.linkedThreads ?? []} />
-
-        <Card
-          title="Request & timing"
-          bordered={false}
-          style={{ borderRadius: 12, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)" }}
-        >
-          <Descriptions column={{ xs: 1, sm: 1, md: 2 }} bordered size="middle">
-            <Descriptions.Item label="Request number">
-              <Text strong>{r.requestNumber}</Text>
-            </Descriptions.Item>
-            <Descriptions.Item label="Status">
-              <Tag color={transportStatusColors[r.status] ?? "default"}>
-                {r.status.replace("_", " ").toUpperCase()}
-              </Tag>
-            </Descriptions.Item>
-            <Descriptions.Item label="Received at">
-              {formatDateTime(r.receivedAt)}
-            </Descriptions.Item>
-            <Descriptions.Item label="Date of requested transportation">
-              {formatDate(r.dateOfRequestedTransportation)}
-            </Descriptions.Item>
-            <Descriptions.Item label="Estimated pickup time">
-              {formatDateTime(r.estimatedPickupTime)}
-            </Descriptions.Item>
-            <Descriptions.Item label="Estimated drop-off time">
-              {formatDateTime(r.estimatedDropOffTime)}
-            </Descriptions.Item>
-            <Descriptions.Item label="Insurance company reference">
-              {r.insuranceCompanyReferenceNumber ?? "—"}
-            </Descriptions.Item>
-            <Descriptions.Item label="Created">
-              {formatDateTime(r.createdAt)}
-            </Descriptions.Item>
-            <Descriptions.Item label="Last updated">
-              {formatDateTime(r.updatedAt)}
-            </Descriptions.Item>
-          </Descriptions>
-        </Card>
-
-        <Card
-          title="Pickup & drop-off"
-          bordered={false}
-          style={{ borderRadius: 12, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)" }}
-        >
-          <Descriptions column={1} bordered size="middle">
-            <Descriptions.Item label="Pickup point">
-              <Text strong>{r.pickupPoint}</Text>
-            </Descriptions.Item>
-            <Descriptions.Item label="Drop-off point">
-              <Text strong>{r.dropOffPoint}</Text>
-            </Descriptions.Item>
-          </Descriptions>
-        </Card>
-
-        <Card
-          title="Patient"
-          bordered={false}
-          style={{ borderRadius: 12, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)" }}
-        >
-          <Descriptions column={{ xs: 1, sm: 1, md: 2 }} bordered size="middle">
-            <Descriptions.Item label="Patient name">
-              <Text strong>{r.patient.patientName || "—"}</Text>
-            </Descriptions.Item>
-            <Descriptions.Item label="Birthdate">
-              {formatDate(r.patient.patientBirthdate) || "—"}
-            </Descriptions.Item>
-            <Descriptions.Item label="Nationality">
-              {r.patient.patientNationality || "—"}
-            </Descriptions.Item>
-          </Descriptions>
-        </Card>
-
-        <Card
-          title="Transport & crew"
-          bordered={false}
-          style={{ borderRadius: 12, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)" }}
-        >
-          <Descriptions column={{ xs: 1, sm: 1, md: 2 }} bordered size="middle">
-            <Descriptions.Item label="Mode of transportation">
-              {r.modeOfTransportation ? (
-                <Tag>{String(r.modeOfTransportation).toUpperCase()}</Tag>
-              ) : (
-                "—"
-              )}
-            </Descriptions.Item>
-            <Descriptions.Item label="With escorting medical crew">
-              {r.withEscortingMedicalCrew ? (
-                <Tag color="green">Yes</Tag>
-              ) : (
-                <Tag color="default">No</Tag>
-              )}
-            </Descriptions.Item>
-            <Descriptions.Item label="Companion">
-              {r.hasCompanion ? (
-                <Tag color="blue">Yes</Tag>
-              ) : (
-                <Tag color="default">No</Tag>
-              )}
-            </Descriptions.Item>
-          </Descriptions>
-        </Card>
-
-        {(r.diagnosis || r.notes) ? (
-          <Card
-            title="Clinical & notes"
-            bordered={false}
-            style={{ borderRadius: 12, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)" }}
+      <Modal
+        title="Edit transportation request"
+        open={editModalOpen}
+        onCancel={() => setEditModalOpen(false)}
+        footer={null}
+        width={640}
+        destroyOnClose
+      >
+        <TransportAssistanceRequestForm
+          form={form}
+          initialValues={{
+            requestNumber: r.requestNumber,
+            status: r.status,
+            receivedAt: r.receivedAt,
+            pickupPoint: r.pickupPoint,
+            dropOffPoint: r.dropOffPoint,
+            dateOfRequestedTransportation: r.dateOfRequestedTransportation,
+            estimatedPickupTime: r.estimatedPickupTime,
+            estimatedDropOffTime: r.estimatedDropOffTime,
+            patientName: r.patient.patientName,
+            patientBirthdate: r.patient.patientBirthdate,
+            patientNationality: r.patient.patientNationality,
+            insuranceCompanyReferenceNumber: r.insuranceCompanyReferenceNumber,
+            diagnosis: r.diagnosis ?? undefined,
+            modeOfTransportation: r.modeOfTransportation ?? undefined,
+            withEscortingMedicalCrew: r.withEscortingMedicalCrew,
+            hasCompanion: r.hasCompanion,
+          }}
+          onSubmit={(values) => {
+            updateMutation.mutate(values, {
+              onSuccess: () => setEditModalOpen(false),
+            });
+          }}
+        />
+        <div style={{ marginTop: 16, textAlign: "right" }}>
+          <Button onClick={() => setEditModalOpen(false)} style={{ marginRight: 8 }}>
+            Cancel
+          </Button>
+          <Button
+            type="primary"
+            loading={updateMutation.isPending}
+            onClick={() => form.submit()}
           >
-            <Descriptions column={1} bordered size="middle">
-              {r.diagnosis ? (
-                <Descriptions.Item label="Diagnosis">
-                  {r.diagnosis}
+            Save
+          </Button>
+        </div>
+      </Modal>
+
+      <Row gutter={[24, 24]} wrap>
+        <Col xs={24} lg={16}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <Card
+              title="Request & timing"
+              bordered={false}
+              style={{ borderRadius: 12, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)" }}
+            >
+              <Descriptions column={1} bordered size="middle">
+                <Descriptions.Item label="Request number">
+                  <Text strong>{r.requestNumber}</Text>
                 </Descriptions.Item>
-              ) : null}
-              {r.notes ? (
-                <Descriptions.Item label="Notes">{r.notes}</Descriptions.Item>
-              ) : null}
-            </Descriptions>
-          </Card>
-        ) : null}
-      </Space>
+                <Descriptions.Item label="Status">
+                  <Tag color={transportStatusColors[r.status] ?? "default"}>
+                    {r.status.replace("_", " ").toUpperCase()}
+                  </Tag>
+                </Descriptions.Item>
+                <Descriptions.Item label="Received at">
+                  {formatDateTime(r.receivedAt)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Date of requested transportation">
+                  {formatDate(r.dateOfRequestedTransportation)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Estimated pickup time">
+                  {formatDateTime(r.estimatedPickupTime)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Estimated drop-off time">
+                  {formatDateTime(r.estimatedDropOffTime)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Insurance company reference">
+                  {r.insuranceCompanyReferenceNumber ?? "—"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Created">
+                  {formatDateTime(r.createdAt)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Last updated">
+                  {formatDateTime(r.updatedAt)}
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
+
+            <Card
+              title="Pickup & drop-off"
+              bordered={false}
+              style={{ borderRadius: 12, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)" }}
+            >
+              <Descriptions column={1} bordered size="middle">
+                <Descriptions.Item label="Pickup point">
+                  <Text strong>{r.pickupPoint}</Text>
+                </Descriptions.Item>
+                <Descriptions.Item label="Drop-off point">
+                  <Text strong>{r.dropOffPoint}</Text>
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
+
+            <Card
+              title="Patient"
+              bordered={false}
+              style={{ borderRadius: 12, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)" }}
+            >
+              <Descriptions column={1} bordered size="middle">
+                <Descriptions.Item label="Patient name">
+                  <Text strong>{r.patient.patientName || "—"}</Text>
+                </Descriptions.Item>
+                <Descriptions.Item label="Birthdate">
+                  {formatDate(r.patient.patientBirthdate) || "—"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Nationality">
+                  {r.patient.patientNationality || "—"}
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
+
+            <Card
+              title="Transport & crew"
+              bordered={false}
+              style={{ borderRadius: 12, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)" }}
+            >
+              <Descriptions column={1} bordered size="middle">
+                <Descriptions.Item label="Mode of transportation">
+                  {r.modeOfTransportation ? (
+                    <Tag>{String(r.modeOfTransportation).toUpperCase()}</Tag>
+                  ) : (
+                    "—"
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item label="With escorting medical crew">
+                  {r.withEscortingMedicalCrew ? (
+                    <Tag color="green">Yes</Tag>
+                  ) : (
+                    <Tag color="default">No</Tag>
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item label="Companion">
+                  {r.hasCompanion ? (
+                    <Tag color="blue">Yes</Tag>
+                  ) : (
+                    <Tag color="default">No</Tag>
+                  )}
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
+
+            {(r.diagnosis || r.notes) ? (
+              <Card
+                title="Clinical & notes"
+                bordered={false}
+                style={{ borderRadius: 12, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)" }}
+              >
+                <Descriptions column={1} bordered size="middle">
+                  {r.diagnosis ? (
+                    <Descriptions.Item label="Diagnosis">
+                      {r.diagnosis}
+                    </Descriptions.Item>
+                  ) : null}
+                  {r.notes ? (
+                    <Descriptions.Item label="Notes">{r.notes}</Descriptions.Item>
+                  ) : null}
+                </Descriptions>
+              </Card>
+            ) : null}
+          </div>
+        </Col>
+        <Col xs={24} lg={8}>
+          <div style={{ position: "sticky", top: 88 }}>
+            <LinkedThreadsCard requestId={r.id} linkedThreads={r.linkedThreads ?? []} />
+          </div>
+        </Col>
+      </Row>
     </>
   );
 };

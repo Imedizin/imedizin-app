@@ -49,11 +49,16 @@ export interface CreateMedicalPayload {
   diagnosis?: string | null;
 }
 
+export type UpdateTransportPayload = Partial<CreateTransportPayload>;
+export type UpdateMedicalPayload = Partial<CreateMedicalPayload>;
+
 export interface IAssistanceRequestRepository {
   findAll(filters?: FindAllAssistanceRequestsFilters): Promise<AssistanceRequest[]>;
   findById(id: string): Promise<AssistanceRequest | null>;
   createTransport(data: CreateTransportPayload): Promise<AssistanceRequest>;
   createMedical(data: CreateMedicalPayload): Promise<AssistanceRequest>;
+  updateTransport(id: string, data: UpdateTransportPayload): Promise<AssistanceRequest>;
+  updateMedical(id: string, data: UpdateMedicalPayload): Promise<AssistanceRequest>;
   getThreadIdsForRequest(requestId: string): Promise<string[]>;
   addThread(requestId: string, threadId: string): Promise<void>;
   removeThread(requestId: string, threadId: string): Promise<void>;
