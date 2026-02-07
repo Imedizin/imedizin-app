@@ -1,5 +1,6 @@
 import React from "react";
 import { Form, Input } from "antd";
+import type { FormInstance } from "antd/es/form";
 
 export interface MailboxFormData {
   address: string;
@@ -7,7 +8,7 @@ export interface MailboxFormData {
 }
 
 interface MailboxFormProps {
-  form: any;
+  form: FormInstance;
   initialValues?: MailboxFormData;
   onSubmit: (values: MailboxFormData) => void;
 }

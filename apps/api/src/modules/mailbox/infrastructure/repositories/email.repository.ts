@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { DRIZZLE } from '../../../../shared/common/database/database.module';
-import type { Database } from '../../../../shared/common/database/database.module';
-import { emails, emailParticipants, emailAttachments } from '../schema';
-import { Email, EmailParticipant } from '../../domain/entities/email.entity';
+import { Inject, Injectable } from "@nestjs/common";
+import { DRIZZLE } from "../../../../shared/common/database/database.module";
+import type { Database } from "../../../../shared/common/database/database.module";
+import { emails, emailParticipants, emailAttachments } from "../schema";
+import { Email, EmailParticipant } from "../../domain/entities/email.entity";
 import type {
   IEmailRepository,
   CreateEmailData,
@@ -12,8 +12,8 @@ import type {
   ThreadSummary,
   ThreadSummaryByIdsItem,
   ThreadSearchOptions,
-} from '../../domain/interfaces/email.repository.interface';
-import type { EmailAttachmentRecord } from '../../domain/interfaces/email-attachment.repository.interface';
+} from "../../domain/interfaces/email.repository.interface";
+import type { EmailAttachmentRecord } from "../../domain/interfaces/email-attachment.repository.interface";
 import {
   eq,
   desc,
@@ -24,7 +24,7 @@ import {
   sql,
   asc,
   inArray,
-} from 'drizzle-orm';
+} from "drizzle-orm";
 
 /**
  * Email repository implementation
@@ -281,7 +281,7 @@ export class EmailRepository implements IEmailRepository {
     return result.map((row) => ({
       emailAddress: row.emailAddress,
       displayName: row.displayName,
-      type: row.type as EmailParticipant['type'],
+      type: row.type,
     }));
   }
 
@@ -336,7 +336,7 @@ export class EmailRepository implements IEmailRepository {
             ) FILTER (WHERE ${emailAttachments.id} IS NOT NULL),
             '[]'::json
           )
-        `.as('attachments'),
+        `.as("attachments"),
       })
       .from(emails)
       .leftJoin(emailAttachments, eq(emailAttachments.emailId, emails.id))
@@ -361,10 +361,10 @@ export class EmailRepository implements IEmailRepository {
   }
 
   private parseAttachmentsJson(
-    attachmentsValue: string | unknown,
+    attachmentsValue: unknown,
   ): EmailAttachmentRecord[] {
     const parsed: unknown =
-      typeof attachmentsValue === 'string'
+      typeof attachmentsValue === "string"
         ? JSON.parse(attachmentsValue)
         : attachmentsValue;
     if (!Array.isArray(parsed)) return [];
@@ -446,7 +446,7 @@ export class EmailRepository implements IEmailRepository {
       .select({
         threadId: emails.threadId,
         messageCount: count(emails.id),
-        latestDate: sql<Date>`MAX(${emails.receivedAt})`.as('latest_date'),
+        latestDate: sql<Date>`MAX(${emails.receivedAt})`.as("latest_date"),
       })
       .from(emails)
       .where(whereCondition)
@@ -461,7 +461,7 @@ export class EmailRepository implements IEmailRepository {
     const totalQuery = this.db
       .select({
         count: sql<number>`COUNT(DISTINCT ${emails.threadId})`.as(
-          'thread_count',
+          "thread_count",
         ),
       })
       .from(emails)

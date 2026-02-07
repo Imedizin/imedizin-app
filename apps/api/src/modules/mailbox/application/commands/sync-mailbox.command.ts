@@ -1,15 +1,15 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { GraphService, GraphMessage } from '../services/graph.service';
-import { ThreadingService } from '../services/threading.service';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { GraphService, GraphMessage } from "../services/graph.service";
+import { ThreadingService } from "../services/threading.service";
 import {
   EMAIL_RECEIVED_EVENT,
   EmailReceivedEvent,
-} from '../../domain/events/email-received.event';
-import type { IMailboxRepository } from '../../domain/interfaces/mailbox.repository.interface';
-import type { IEmailRepository } from '../../domain/interfaces/email.repository.interface';
-import type { EmailParticipant } from '../../domain/entities/email.entity';
-import { Mailbox } from '../../domain/entities/mailbox.entity';
+} from "../../domain/events/email-received.event";
+import type { IMailboxRepository } from "../../domain/interfaces/mailbox.repository.interface";
+import type { IEmailRepository } from "../../domain/interfaces/email.repository.interface";
+import type { EmailParticipant } from "../../domain/entities/email.entity";
+import { Mailbox } from "../../domain/entities/mailbox.entity";
 
 /**
  * Result of a mailbox sync operation
@@ -29,6 +29,7 @@ export interface SyncResult {
 interface ProcessMessageResult {
   created: boolean;
   emailId?: string;
+  threadId?: string | null;
   subject?: string;
   from?: { emailAddress: string; displayName: string | null };
   receivedAt?: string | null;
@@ -42,9 +43,9 @@ export class SyncMailboxCommand {
     private readonly graphService: GraphService,
     private readonly threadingService: ThreadingService,
     private readonly eventEmitter: EventEmitter2,
-    @Inject('IMailboxRepository')
+    @Inject("IMailboxRepository")
     private readonly mailboxRepository: IMailboxRepository,
-    @Inject('IEmailRepository')
+    @Inject("IEmailRepository")
     private readonly emailRepository: IEmailRepository,
   ) {}
 
@@ -90,7 +91,7 @@ export class SyncMailboxCommand {
       messagesProcessed: 0,
       messagesCreated: 0,
       messagesSkipped: 0,
-      deltaLink: '',
+      deltaLink: "",
     };
 
     try {
@@ -132,7 +133,7 @@ export class SyncMailboxCommand {
                 new EmailReceivedEvent(
                   mailbox.id,
                   processResult.emailId,
-                  processResult.subject || '(No Subject)',
+                  processResult.subject || "(No Subject)",
                   processResult.from,
                   processResult.receivedAt || null,
                   mailbox.address,
@@ -143,10 +144,9 @@ export class SyncMailboxCommand {
           } else {
             result.messagesSkipped++;
           }
-        } catch (error: any) {
-          this.logger.error(
-            `Failed to process message ${message.id}: ${error.message}`,
-          );
+        } catch (error: unknown) {
+          const msg = error instanceof Error ? error.message : String(error);
+          this.logger.error(`Failed to process message ${message.id}: ${msg}`);
           result.messagesSkipped++;
         }
       }
@@ -161,10 +161,9 @@ export class SyncMailboxCommand {
       );
 
       return result;
-    } catch (error: any) {
-      this.logger.error(
-        `Delta sync failed for ${mailbox.address}: ${error.message}`,
-      );
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Delta sync failed for ${mailbox.address}: ${msg}`);
       throw error;
     }
   }
@@ -197,10 +196,9 @@ export class SyncMailboxCommand {
             messageIdForStorage = fullMessage.internetMessageId;
           }
         }
-      } catch (error: any) {
-        this.logger.debug(
-          `Could not fetch full message ${message.id}: ${error.message}`,
-        );
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : String(error);
+        this.logger.debug(`Could not fetch full message ${message.id}: ${msg}`);
       }
       if (messageIdForStorage === `graph:${message.id}`) {
         this.logger.debug(
@@ -220,15 +218,16 @@ export class SyncMailboxCommand {
     }
 
     // Fetch raw MIME content
-    let rawSource = '';
+    let rawSource = "";
     try {
       rawSource = await this.graphService.getMessageRawContent(
         mailbox.address,
         message.id,
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
       this.logger.warn(
-        `Could not fetch raw content for message ${message.id}: ${error.message}`,
+        `Could not fetch raw content for message ${message.id}: ${msg}`,
       );
       // Continue without raw source
     }
@@ -247,7 +246,7 @@ export class SyncMailboxCommand {
       };
       participants.push({
         ...fromParticipant,
-        type: 'from',
+        type: "from",
       });
     }
 
@@ -256,7 +255,7 @@ export class SyncMailboxCommand {
       participants.push({
         emailAddress: recipient.emailAddress.address,
         displayName: recipient.emailAddress.name || null,
-        type: 'to',
+        type: "to",
       });
     }
 
@@ -265,7 +264,7 @@ export class SyncMailboxCommand {
       participants.push({
         emailAddress: recipient.emailAddress.address,
         displayName: recipient.emailAddress.name || null,
-        type: 'cc',
+        type: "cc",
       });
     }
 
@@ -274,7 +273,7 @@ export class SyncMailboxCommand {
       participants.push({
         emailAddress: recipient.emailAddress.address,
         displayName: recipient.emailAddress.name || null,
-        type: 'bcc',
+        type: "bcc",
       });
     }
 
@@ -283,7 +282,7 @@ export class SyncMailboxCommand {
       participants.push({
         emailAddress: recipient.emailAddress.address,
         displayName: recipient.emailAddress.name || null,
-        type: 'reply_to',
+        type: "reply_to",
       });
     }
 
@@ -305,17 +304,17 @@ export class SyncMailboxCommand {
       threadId: threadingResult.threadId,
       inReplyTo: threadingResult.inReplyTo,
       references: threadingResult.references,
-      subject: messageForContent.subject || '(No Subject)',
+      subject: messageForContent.subject || "(No Subject)",
       bodyText:
-        messageForContent.body?.contentType === 'text'
+        messageForContent.body?.contentType === "text"
           ? messageForContent.body.content
           : null,
       bodyHtml:
-        messageForContent.body?.contentType === 'html'
+        messageForContent.body?.contentType === "html"
           ? messageForContent.body.content
           : null,
       rawSource: rawSource,
-      direction: 'incoming' as const,
+      direction: "incoming" as const,
       sentAt: messageForContent.sentDateTime
         ? new Date(messageForContent.sentDateTime)
         : null,

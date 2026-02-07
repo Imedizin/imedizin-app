@@ -12,26 +12,26 @@ import {
   NotFoundException,
   BadRequestException,
   Inject,
-} from '@nestjs/common';
-import type { IMailboxSubscriptionRepository } from '../../domain/interfaces/mailbox-subscription.repository.interface';
-import type { IMailboxRepository } from '../../domain/interfaces/mailbox.repository.interface';
-import { GraphService } from '../../application/services/graph.service';
-import { SubscriptionResponseDto } from '../dto/subscription-response.dto';
-import { CreateSubscriptionDto } from '../dto/create-subscription.dto';
-import { MailboxSubscription } from '../../domain/entities/mailbox-subscription.entity';
+} from "@nestjs/common";
+import type { IMailboxSubscriptionRepository } from "../../domain/interfaces/mailbox-subscription.repository.interface";
+import type { IMailboxRepository } from "../../domain/interfaces/mailbox.repository.interface";
+import { GraphService } from "../../application/services/graph.service";
+import { SubscriptionResponseDto } from "../dto/subscription-response.dto";
+import { CreateSubscriptionDto } from "../dto/create-subscription.dto";
+import { MailboxSubscription } from "../../domain/entities/mailbox-subscription.entity";
 
 /**
  * Subscription controller
  * Handles HTTP requests for subscription management
  */
-@Controller('api/subscriptions')
+@Controller("api/subscriptions")
 export class SubscriptionController {
   private readonly logger = new Logger(SubscriptionController.name);
 
   constructor(
-    @Inject('IMailboxSubscriptionRepository')
+    @Inject("IMailboxSubscriptionRepository")
     private readonly subscriptionRepository: IMailboxSubscriptionRepository,
-    @Inject('IMailboxRepository')
+    @Inject("IMailboxRepository")
     private readonly mailboxRepository: IMailboxRepository,
     private readonly graphService: GraphService,
   ) {}
@@ -43,14 +43,14 @@ export class SubscriptionController {
    */
   @Get()
   async findAll(
-    @Query('source') source?: string,
+    @Query("source") source?: string,
   ): Promise<{ data: SubscriptionResponseDto[] }> {
     this.logger.log(
-      `Fetching all subscriptions (source: ${source || 'local'})`,
+      `Fetching all subscriptions (source: ${source || "local"})`,
     );
 
     // If source is 'graph', fetch from Microsoft Graph API
-    if (source === 'graph') {
+    if (source === "graph") {
       try {
         const graphSubscriptions = await this.graphService.listSubscriptions();
 
@@ -77,7 +77,7 @@ export class SubscriptionController {
         };
       } catch (error) {
         const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error';
+          error instanceof Error ? error.message : "Unknown error";
         this.logger.error(
           `Failed to fetch subscriptions from Graph: ${errorMessage}`,
         );
@@ -109,21 +109,21 @@ export class SubscriptionController {
    */
   private extractMailboxIdFromResource(resource: string): string {
     const match = resource.match(/\/users\/([^/]+)/);
-    return match ? match[1] : 'unknown';
+    return match ? match[1] : "unknown";
   }
 
   /**
    * Delete all subscriptions from Microsoft Graph
    * DELETE /api/subscriptions/graph/all
    */
-  @Delete('graph/all')
+  @Delete("graph/all")
   @HttpCode(HttpStatus.OK)
   async deleteAllFromGraph(): Promise<{
     deleted: number;
     failed: number;
     errors: string[];
   }> {
-    this.logger.log('Deleting all subscriptions from Microsoft Graph');
+    this.logger.log("Deleting all subscriptions from Microsoft Graph");
 
     try {
       // Fetch all subscriptions from Graph
@@ -149,7 +149,7 @@ export class SubscriptionController {
         } catch (error) {
           results.failed++;
           const errorMessage =
-            error instanceof Error ? error.message : 'Unknown error';
+            error instanceof Error ? error.message : "Unknown error";
           results.errors.push(
             `Failed to delete subscription ${subscription.id}: ${errorMessage}`,
           );
@@ -166,7 +166,7 @@ export class SubscriptionController {
       return results;
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+        error instanceof Error ? error.message : "Unknown error";
       this.logger.error(
         `Failed to fetch subscriptions from Graph: ${errorMessage}`,
       );
@@ -180,9 +180,9 @@ export class SubscriptionController {
    * Get subscription by subscription ID
    * GET /api/subscriptions/:subscriptionId
    */
-  @Get(':subscriptionId')
+  @Get(":subscriptionId")
   async findOne(
-    @Param('subscriptionId') subscriptionId: string,
+    @Param("subscriptionId") subscriptionId: string,
   ): Promise<{ data: SubscriptionResponseDto }> {
     this.logger.log(`Fetching subscription with id: ${subscriptionId}`);
     const subscription =
@@ -204,17 +204,17 @@ export class SubscriptionController {
    * GET /api/subscriptions/mailbox/:mailboxId?source=graph|local
    * @param source - 'graph' to fetch from Microsoft Graph API, 'local' or undefined to fetch from database
    */
-  @Get('mailbox/:mailboxId')
+  @Get("mailbox/:mailboxId")
   async findByMailboxId(
-    @Param('mailboxId') mailboxId: string,
-    @Query('source') source?: string,
+    @Param("mailboxId") mailboxId: string,
+    @Query("source") source?: string,
   ): Promise<{ data: SubscriptionResponseDto[] }> {
     this.logger.log(
-      `Fetching subscriptions for mailbox: ${mailboxId} (source: ${source || 'local'})`,
+      `Fetching subscriptions for mailbox: ${mailboxId} (source: ${source || "local"})`,
     );
 
     // If source is 'graph', fetch from Microsoft Graph API and filter by mailbox
-    if (source === 'graph') {
+    if (source === "graph") {
       try {
         const graphSubscriptions = await this.graphService.listSubscriptions();
 
@@ -246,7 +246,7 @@ export class SubscriptionController {
         };
       } catch (error) {
         const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error';
+          error instanceof Error ? error.message : "Unknown error";
         this.logger.error(
           `Failed to fetch subscriptions from Graph: ${errorMessage}`,
         );
@@ -290,9 +290,9 @@ export class SubscriptionController {
 
     // Determine resource path
     let resource: string;
-    if (createSubscriptionDto.folder === 'spam') {
+    if (createSubscriptionDto.folder === "spam") {
       resource = `/users/${createSubscriptionDto.mailboxId}/mailFolders('junkemail')/messages`;
-    } else if (createSubscriptionDto.folder === 'custom') {
+    } else if (createSubscriptionDto.folder === "custom") {
       if (!createSubscriptionDto.resource) {
         throw new BadRequestException(
           'Resource is required when folder is set to "custom"',
@@ -317,15 +317,21 @@ export class SubscriptionController {
     }
 
     // Create subscription in Microsoft Graph
-    let subscriptionResponse;
+    let subscriptionResponse: {
+      id: string;
+      notificationUrl: string;
+      expirationDateTime: string;
+      clientState?: string;
+      changeType: string;
+    };
     try {
-      if (createSubscriptionDto.folder === 'spam') {
+      if (createSubscriptionDto.folder === "spam") {
         subscriptionResponse = await this.graphService.subscribeToSpamMessages(
           undefined,
           createSubscriptionDto.mailboxId,
         );
       } else if (
-        createSubscriptionDto.folder === 'custom' &&
+        createSubscriptionDto.folder === "custom" &&
         createSubscriptionDto.resource
       ) {
         subscriptionResponse = await this.graphService.createSubscription(
@@ -342,7 +348,7 @@ export class SubscriptionController {
       }
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+        error instanceof Error ? error.message : "Unknown error";
       this.logger.error(
         `Failed to create subscription for mailbox ${createSubscriptionDto.mailboxId}: ${errorMessage}`,
       );
@@ -353,7 +359,7 @@ export class SubscriptionController {
 
     // Save subscription to database
     const subscription = new MailboxSubscription(
-      '', // Will be generated by database
+      "", // Will be generated by database
       subscriptionResponse.id,
       createSubscriptionDto.mailboxId,
       resource,
@@ -368,7 +374,7 @@ export class SubscriptionController {
 
     // Bootstrap delta link for inbox so first webhook/sync is already incremental (no history)
     const isInbox =
-      resource.includes('inbox') && !resource.includes('junkemail');
+      resource.includes("inbox") && !resource.includes("junkemail");
     if (isInbox && mailbox.id) {
       try {
         const { deltaLink } = await this.graphService.bootstrapDeltaLink(
@@ -382,7 +388,7 @@ export class SubscriptionController {
         const msg =
           bootstrapError instanceof Error
             ? bootstrapError.message
-            : 'Unknown error';
+            : "Unknown error";
         this.logger.warn(
           `Could not bootstrap delta link for ${mailbox.address}: ${msg}. First sync will bootstrap.`,
         );
@@ -402,9 +408,9 @@ export class SubscriptionController {
    * Delete a subscription
    * DELETE /api/subscriptions/:subscriptionId
    */
-  @Delete(':subscriptionId')
+  @Delete(":subscriptionId")
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('subscriptionId') subscriptionId: string): Promise<void> {
+  async remove(@Param("subscriptionId") subscriptionId: string): Promise<void> {
     this.logger.log(`Deleting subscription with id: ${subscriptionId}`);
 
     // Check if subscription exists
@@ -425,7 +431,7 @@ export class SubscriptionController {
     } catch (error) {
       // Log error but continue with database deletion
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+        error instanceof Error ? error.message : "Unknown error";
       this.logger.warn(
         `Failed to delete subscription ${subscriptionId} from Microsoft Graph: ${errorMessage}. Continuing with database deletion.`,
       );

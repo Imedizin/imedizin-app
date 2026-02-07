@@ -4,13 +4,13 @@ import {
   Logger,
   NotFoundException,
   BadRequestException,
-} from '@nestjs/common';
-import type { IMailboxRepository } from '../../domain/interfaces/mailbox.repository.interface';
-import type { IEmailRepository } from '../../domain/interfaces/email.repository.interface';
-import { GraphService, type GraphMessage } from '../services/graph.service';
-import { ThreadingService } from '../services/threading.service';
-import { Email, EmailParticipant } from '../../domain/entities/email.entity';
-import type { SendEmailRequestDto } from '../../api/dto/send-email.dto';
+} from "@nestjs/common";
+import type { IMailboxRepository } from "../../domain/interfaces/mailbox.repository.interface";
+import type { IEmailRepository } from "../../domain/interfaces/email.repository.interface";
+import { GraphService, type GraphMessage } from "../services/graph.service";
+import { ThreadingService } from "../services/threading.service";
+import { Email, EmailParticipant } from "../../domain/entities/email.entity";
+import type { SendEmailRequestDto } from "../../api/dto/send-email.dto";
 
 /**
  * Result of sending an email
@@ -29,9 +29,9 @@ export class SendEmailCommand {
   private readonly logger = new Logger(SendEmailCommand.name);
 
   constructor(
-    @Inject('IMailboxRepository')
+    @Inject("IMailboxRepository")
     private readonly mailboxRepository: IMailboxRepository,
-    @Inject('IEmailRepository')
+    @Inject("IEmailRepository")
     private readonly emailRepository: IEmailRepository,
     private readonly graphService: GraphService,
     private readonly threadingService: ThreadingService,
@@ -56,13 +56,13 @@ export class SendEmailCommand {
     // Validate that we have either bodyText or bodyHtml
     if (!request.bodyText && !request.bodyHtml) {
       throw new BadRequestException(
-        'Either bodyText or bodyHtml must be provided',
+        "Either bodyText or bodyHtml must be provided",
       );
     }
 
     // Validate that we have at least one recipient
     if (!request.to || request.to.length === 0) {
-      throw new BadRequestException('At least one recipient (to) is required');
+      throw new BadRequestException("At least one recipient (to) is required");
     }
 
     // Step 1: Send email via Microsoft Graph API
@@ -89,7 +89,7 @@ export class SendEmailCommand {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // If we have a valid internetMessageId, try to find by it
-      if (internetMessageId !== 'pending') {
+      if (internetMessageId !== "pending") {
         sentMessage = await this.graphService.getSentMessageByInternetMessageId(
           mailbox.address,
           internetMessageId,
@@ -107,7 +107,7 @@ export class SendEmailCommand {
           // If we have internetMessageId, also match that; otherwise just match subject
           const matchingMessage = recentMessages.find((msg) => {
             const subjectMatch = msg.subject === request.subject;
-            if (internetMessageId !== 'pending') {
+            if (internetMessageId !== "pending") {
               return (
                 subjectMatch && msg.internetMessageId === internetMessageId
               );
@@ -125,8 +125,9 @@ export class SendEmailCommand {
             sentMessage = matchingMessage;
             break;
           }
-        } catch (error: any) {
-          this.logger.warn(`Fallback search failed: ${error.message}`);
+        } catch (error: unknown) {
+          const msg = error instanceof Error ? error.message : String(error);
+          this.logger.warn(`Fallback search failed: ${msg}`);
         }
       } else {
         // Found the message, break out of loop
@@ -147,16 +148,17 @@ export class SendEmailCommand {
     );
 
     // Step 3: Get raw RFC email source
-    let rawSource = '';
+    let rawSource = "";
     try {
       rawSource = await this.graphService.getMessageRawContent(
         mailbox.address,
         sentMessage.id,
       );
       this.logger.log(`Retrieved raw email source (${rawSource.length} bytes)`);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
       this.logger.warn(
-        `Could not fetch raw content for sent message ${sentMessage.id}: ${error.message}`,
+        `Could not fetch raw content for sent message ${sentMessage.id}: ${msg}`,
       );
       // Continue without raw source - we'll create a minimal one
       rawSource = this.createMinimalRawSource(sentMessage, request);
@@ -169,7 +171,7 @@ export class SendEmailCommand {
     participants.push({
       emailAddress: mailbox.address,
       displayName: mailbox.name || null,
-      type: 'from',
+      type: "from",
     });
 
     // To recipients
@@ -177,7 +179,7 @@ export class SendEmailCommand {
       participants.push({
         emailAddress: recipient.emailAddress,
         displayName: recipient.displayName || null,
-        type: 'to',
+        type: "to",
       });
     }
 
@@ -187,7 +189,7 @@ export class SendEmailCommand {
         participants.push({
           emailAddress: recipient.emailAddress,
           displayName: recipient.displayName || null,
-          type: 'cc',
+          type: "cc",
         });
       }
     }
@@ -198,7 +200,7 @@ export class SendEmailCommand {
         participants.push({
           emailAddress: recipient.emailAddress,
           displayName: recipient.displayName || null,
-          type: 'bcc',
+          type: "bcc",
         });
       }
     }
@@ -256,17 +258,17 @@ export class SendEmailCommand {
       threadId: threadingResult.threadId,
       inReplyTo: threadingResult.inReplyTo,
       references: threadingResult.references,
-      subject: sentMessage.subject || request.subject || '(No Subject)',
+      subject: sentMessage.subject || request.subject || "(No Subject)",
       bodyText:
-        sentMessage.body?.contentType === 'text'
+        sentMessage.body?.contentType === "text"
           ? sentMessage.body.content
           : request.bodyText || null,
       bodyHtml:
-        sentMessage.body?.contentType === 'html'
+        sentMessage.body?.contentType === "html"
           ? sentMessage.body.content
           : request.bodyHtml || null,
       rawSource: rawSource,
-      direction: 'outgoing' as const,
+      direction: "outgoing" as const,
       sentAt: sentMessage.sentDateTime
         ? new Date(sentMessage.sentDateTime)
         : new Date(),
@@ -293,15 +295,15 @@ export class SendEmailCommand {
    * This is a fallback to ensure we always have rawSource stored
    */
   private createMinimalRawSource(
-    message: any,
+    message: { internetMessageId?: string; id: string },
     request: SendEmailRequestDto,
   ): string {
     const lines: string[] = [];
-    lines.push(`Message-ID: <${message.internetMessageId || message.id}>`);
-    lines.push(`From: ${request.to[0]?.emailAddress || 'unknown'}`);
-    lines.push(`To: ${request.to.map((r) => r.emailAddress).join(', ')}`);
+    lines.push(`Message-ID: <${message.internetMessageId ?? message.id}>`);
+    lines.push(`From: ${request.to[0]?.emailAddress || "unknown"}`);
+    lines.push(`To: ${request.to.map((r) => r.emailAddress).join(", ")}`);
     if (request.cc && request.cc.length > 0) {
-      lines.push(`Cc: ${request.cc.map((r) => r.emailAddress).join(', ')}`);
+      lines.push(`Cc: ${request.cc.map((r) => r.emailAddress).join(", ")}`);
     }
     lines.push(`Subject: ${request.subject}`);
     if (request.inReplyTo) {
@@ -312,10 +314,10 @@ export class SendEmailCommand {
     }
     lines.push(`Date: ${new Date().toUTCString()}`);
     lines.push(
-      `Content-Type: ${request.bodyHtml ? 'text/html' : 'text/plain'}`,
+      `Content-Type: ${request.bodyHtml ? "text/html" : "text/plain"}`,
     );
-    lines.push('');
-    lines.push(request.bodyHtml || request.bodyText || '');
-    return lines.join('\r\n');
+    lines.push("");
+    lines.push(request.bodyHtml || request.bodyText || "");
+    return lines.join("\r\n");
   }
 }

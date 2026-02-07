@@ -1,23 +1,23 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { promises as fs } from 'fs';
-import * as path from 'path';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { promises as fs } from "fs";
+import * as path from "path";
 import {
   GraphService,
   GraphMessage,
   GraphAttachmentMeta,
-} from '../services/graph.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ThreadingService } from '../services/threading.service';
+} from "../services/graph.service";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { ThreadingService } from "../services/threading.service";
 import {
   EMAIL_RECEIVED_EVENT,
   EmailReceivedEvent,
-} from '../../domain/events/email-received.event';
-import type { IMailboxRepository } from '../../domain/interfaces/mailbox.repository.interface';
-import type { IEmailRepository } from '../../domain/interfaces/email.repository.interface';
-import type { IEmailAttachmentRepository } from '../../domain/interfaces/email-attachment.repository.interface';
-import type { EmailParticipant } from '../../domain/entities/email.entity';
-import type { Mailbox } from '../../domain/entities/mailbox.entity';
+} from "../../domain/events/email-received.event";
+import type { IMailboxRepository } from "../../domain/interfaces/mailbox.repository.interface";
+import type { IEmailRepository } from "../../domain/interfaces/email.repository.interface";
+import type { IEmailAttachmentRepository } from "../../domain/interfaces/email-attachment.repository.interface";
+import type { EmailParticipant } from "../../domain/entities/email.entity";
+import type { Mailbox } from "../../domain/entities/mailbox.entity";
 
 /**
  * Payload for a single new-message job (Stage 1: one job per messageId).
@@ -36,11 +36,11 @@ export class ProcessNewMessageCommand {
     private readonly graphService: GraphService,
     private readonly threadingService: ThreadingService,
     private readonly eventEmitter: EventEmitter2,
-    @Inject('IMailboxRepository')
+    @Inject("IMailboxRepository")
     private readonly mailboxRepository: IMailboxRepository,
-    @Inject('IEmailRepository')
+    @Inject("IEmailRepository")
     private readonly emailRepository: IEmailRepository,
-    @Inject('IEmailAttachmentRepository')
+    @Inject("IEmailAttachmentRepository")
     private readonly attachmentRepository: IEmailAttachmentRepository,
   ) {}
 
@@ -50,7 +50,7 @@ export class ProcessNewMessageCommand {
    * it looks like an email to avoid passing a non-UUID to findById (Postgres throws).
    */
   private async resolveMailbox(mailboxId: string): Promise<Mailbox | null> {
-    if (mailboxId.includes('@')) {
+    if (mailboxId.includes("@")) {
       const byAddress = await this.mailboxRepository.findByAddress(mailboxId);
       if (byAddress) return byAddress;
     }
@@ -89,7 +89,7 @@ export class ProcessNewMessageCommand {
       return;
     }
 
-    let rawSource = '';
+    let rawSource = "";
     try {
       rawSource = await this.graphService.getMessageRawContent(
         mailbox.address,
@@ -115,13 +115,13 @@ export class ProcessNewMessageCommand {
       threadId: threadingResult.threadId,
       inReplyTo: threadingResult.inReplyTo,
       references: threadingResult.references,
-      subject: message.subject ?? '(No Subject)',
+      subject: message.subject ?? "(No Subject)",
       bodyText:
-        message.body?.contentType === 'text' ? message.body.content : null,
+        message.body?.contentType === "text" ? message.body.content : null,
       bodyHtml:
-        message.body?.contentType === 'html' ? message.body.content : null,
+        message.body?.contentType === "html" ? message.body.content : null,
       rawSource,
-      direction: 'incoming' as const,
+      direction: "incoming" as const,
       sentAt: message.sentDateTime ? new Date(message.sentDateTime) : null,
       receivedAt: message.receivedDateTime
         ? new Date(message.receivedDateTime)
@@ -152,7 +152,7 @@ export class ProcessNewMessageCommand {
           emailAddress: message.from.emailAddress.address,
           displayName: message.from.emailAddress.name ?? null,
         }
-      : { emailAddress: '', displayName: null };
+      : { emailAddress: "", displayName: null };
     this.eventEmitter.emit(
       EMAIL_RECEIVED_EVENT,
       new EmailReceivedEvent(
@@ -178,8 +178,8 @@ export class ProcessNewMessageCommand {
     emailId: string,
   ): Promise<void> {
     const basePath = this.configService.get<string>(
-      'ATTACHMENTS_PATH',
-      './data/attachments',
+      "ATTACHMENTS_PATH",
+      "./data/attachments",
     );
 
     let list: GraphAttachmentMeta[];
@@ -196,7 +196,7 @@ export class ProcessNewMessageCommand {
     }
 
     const fileAttachments = list.filter((a) =>
-      (a['@odata.type'] ?? '').toLowerCase().endsWith('fileattachment'),
+      (a["@odata.type"] ?? "").toLowerCase().endsWith("fileattachment"),
     );
 
     for (const att of fileAttachments) {
@@ -214,14 +214,14 @@ export class ProcessNewMessageCommand {
 
         const baseUrl =
           this.configService
-            .get<string>('APP_PUBLIC_URL', '')
-            .replace(/\/$/, '') || 'http://localhost:3000';
+            .get<string>("APP_PUBLIC_URL", "")
+            .replace(/\/$/, "") || "http://localhost:3000";
         const fileUrl = `${baseUrl}/attachments/${relativePath}`;
 
         await this.attachmentRepository.create({
           emailId,
           filename: att.name || att.id,
-          mimeType: att.contentType || 'application/octet-stream',
+          mimeType: att.contentType || "application/octet-stream",
           size: att.size,
           fileUrl,
           isInline: att.isInline ?? false,
@@ -232,9 +232,23 @@ export class ProcessNewMessageCommand {
         );
       } catch (err) {
         const e = err as Error & { cause?: unknown; code?: string };
+        const stringifyCause = (x: unknown): string => {
+          if (x == null) return "null";
+          if (typeof x === "object" && "message" in x)
+            return String((x as Error).message);
+          if (typeof x === "object") return JSON.stringify(x);
+          return typeof x === "string" ||
+            typeof x === "number" ||
+            typeof x === "boolean" ||
+            typeof x === "symbol" ||
+            typeof x === "bigint"
+            ? String(x)
+            : JSON.stringify(x);
+        };
+        const causeStr = e.cause == null ? null : stringifyCause(e.cause);
         const detail =
-          e.cause != null
-            ? String(e.cause)
+          causeStr != null
+            ? causeStr
             : e.code != null
               ? `${e.message} (code: ${e.code})`
               : e.message;
@@ -246,7 +260,7 @@ export class ProcessNewMessageCommand {
   }
 
   private sanitizeFilename(name: string): string {
-    const safe = name.replace(/[/\\:*?"<>|]/g, '_');
+    const safe = name.replace(/[/\\:*?"<>|]/g, "_");
     return safe.length > 200 ? safe.slice(0, 200) : safe;
   }
 
@@ -257,7 +271,7 @@ export class ProcessNewMessageCommand {
       participants.push({
         emailAddress: message.from.emailAddress.address,
         displayName: message.from.emailAddress.name ?? null,
-        type: 'from',
+        type: "from",
       });
     }
 
@@ -265,28 +279,28 @@ export class ProcessNewMessageCommand {
       participants.push({
         emailAddress: r.emailAddress.address,
         displayName: r.emailAddress.name ?? null,
-        type: 'to',
+        type: "to",
       });
     }
     for (const r of message.ccRecipients ?? []) {
       participants.push({
         emailAddress: r.emailAddress.address,
         displayName: r.emailAddress.name ?? null,
-        type: 'cc',
+        type: "cc",
       });
     }
     for (const r of message.bccRecipients ?? []) {
       participants.push({
         emailAddress: r.emailAddress.address,
         displayName: r.emailAddress.name ?? null,
-        type: 'bcc',
+        type: "bcc",
       });
     }
     for (const r of message.replyTo ?? []) {
       participants.push({
         emailAddress: r.emailAddress.address,
         displayName: r.emailAddress.name ?? null,
-        type: 'reply_to',
+        type: "reply_to",
       });
     }
 

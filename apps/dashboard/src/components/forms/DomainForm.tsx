@@ -1,5 +1,6 @@
 import React from "react";
 import { Form, Input } from "antd";
+import type { FormInstance } from "antd/es/form";
 
 export interface DomainFormData {
   domain: string;
@@ -7,7 +8,7 @@ export interface DomainFormData {
 }
 
 interface DomainFormProps {
-  form: any;
+  form: FormInstance;
   initialValues?: DomainFormData;
   onSubmit: (values: DomainFormData) => void;
 }
@@ -35,7 +36,7 @@ const DomainForm: React.FC<DomainFormProps> = ({
           { required: true, message: "Please enter domain name" },
           {
             pattern:
-              /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/,
+              /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/,
             message: "Please enter a valid domain name (e.g., example.com)",
           },
         ]}

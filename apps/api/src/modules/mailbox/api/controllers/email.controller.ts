@@ -11,13 +11,13 @@ import {
   Inject,
   ParseIntPipe,
   DefaultValuePipe,
-} from '@nestjs/common';
-import type { IEmailRepository } from '../../domain/interfaces/email.repository.interface';
-import type { IMailboxRepository } from '../../domain/interfaces/mailbox.repository.interface';
-import type { IEmailAttachmentRepository } from '../../domain/interfaces/email-attachment.repository.interface';
-import type { EmailAttachmentRecord } from '../../domain/interfaces/email-attachment.repository.interface';
-import { SyncMailboxCommand } from '../../application/commands/sync-mailbox.command';
-import { SendEmailCommand } from '../../application/commands/send-email.command';
+} from "@nestjs/common";
+import type { IEmailRepository } from "../../domain/interfaces/email.repository.interface";
+import type { IMailboxRepository } from "../../domain/interfaces/mailbox.repository.interface";
+import type { IEmailAttachmentRepository } from "../../domain/interfaces/email-attachment.repository.interface";
+import type { EmailAttachmentRecord } from "../../domain/interfaces/email-attachment.repository.interface";
+import { SyncMailboxCommand } from "../../application/commands/sync-mailbox.command";
+import { SendEmailCommand } from "../../application/commands/send-email.command";
 import {
   EmailListItemDto,
   EmailDetailDto,
@@ -28,23 +28,23 @@ import {
   ThreadSummaryDto,
   ThreadListResponseDto,
   ThreadDetailDto,
-} from '../dto/email-response.dto';
+} from "../dto/email-response.dto";
 import {
   SendEmailRequestDto,
   SendEmailResponseDto,
-} from '../dto/send-email.dto';
-import { Email } from '../../domain/entities/email.entity';
+} from "../dto/send-email.dto";
+import { Email } from "../../domain/entities/email.entity";
 
-@Controller('api/emails')
+@Controller("api/emails")
 export class EmailController {
   private readonly logger = new Logger(EmailController.name);
 
   constructor(
-    @Inject('IEmailRepository')
+    @Inject("IEmailRepository")
     private readonly emailRepository: IEmailRepository,
-    @Inject('IMailboxRepository')
+    @Inject("IMailboxRepository")
     private readonly mailboxRepository: IMailboxRepository,
-    @Inject('IEmailAttachmentRepository')
+    @Inject("IEmailAttachmentRepository")
     private readonly attachmentRepository: IEmailAttachmentRepository,
     private readonly syncMailboxCommand: SyncMailboxCommand,
     private readonly sendEmailCommand: SendEmailCommand,
@@ -56,8 +56,8 @@ export class EmailController {
    */
   @Get()
   async listEmails(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query("limit", new DefaultValuePipe(20), ParseIntPipe) limit: number,
   ): Promise<EmailListResponseDto> {
     this.logger.log(`Listing emails: page=${page}, limit=${limit}`);
 
@@ -76,15 +76,15 @@ export class EmailController {
    * List threads with pagination
    * GET /api/emails/threads?mailboxId=xxx&page=1&limit=20&q=search
    */
-  @Get('threads')
+  @Get("threads")
   async listThreads(
-    @Query('mailboxId') mailboxId?: string,
-    @Query('q') query?: string,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
-    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit?: number,
+    @Query("mailboxId") mailboxId?: string,
+    @Query("q") query?: string,
+    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page?: number,
+    @Query("limit", new DefaultValuePipe(20), ParseIntPipe) limit?: number,
   ): Promise<ThreadListResponseDto> {
     this.logger.log(
-      `Listing threads: mailboxId=${mailboxId}, q=${query ?? ''}, page=${page}, limit=${limit}`,
+      `Listing threads: mailboxId=${mailboxId}, q=${query ?? ""}, page=${page}, limit=${limit}`,
     );
 
     const result = await this.emailRepository.getThreads({
@@ -117,9 +117,9 @@ export class EmailController {
    * Get all emails in a thread
    * GET /api/emails/thread/:threadId
    */
-  @Get('thread/:threadId')
+  @Get("thread/:threadId")
   async getThread(
-    @Param('threadId') threadId: string,
+    @Param("threadId") threadId: string,
   ): Promise<ThreadDetailDto> {
     this.logger.log(`Getting thread: ${threadId}`);
 
@@ -145,12 +145,12 @@ export class EmailController {
    * Search emails
    * GET /api/emails/search?q=query&mailboxId=xxx&page=1&limit=20
    */
-  @Get('search')
+  @Get("search")
   async searchEmails(
-    @Query('q') query: string,
-    @Query('mailboxId') mailboxId?: string,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
-    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit?: number,
+    @Query("q") query: string,
+    @Query("mailboxId") mailboxId?: string,
+    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page?: number,
+    @Query("limit", new DefaultValuePipe(20), ParseIntPipe) limit?: number,
   ): Promise<EmailListResponseDto> {
     if (!query || query.trim().length === 0) {
       return {
@@ -186,8 +186,8 @@ export class EmailController {
    * Get single email by ID
    * GET /api/emails/:id
    */
-  @Get(':id')
-  async getEmail(@Param('id') id: string): Promise<EmailDetailDto> {
+  @Get(":id")
+  async getEmail(@Param("id") id: string): Promise<EmailDetailDto> {
     this.logger.log(`Getting email: ${id}`);
 
     const email = await this.emailRepository.findById(id);
@@ -204,11 +204,11 @@ export class EmailController {
    * List emails for a specific mailbox
    * GET /api/mailboxes/:mailboxId/emails?page=1&limit=20
    */
-  @Get('/mailbox/:mailboxId')
+  @Get("/mailbox/:mailboxId")
   async listMailboxEmails(
-    @Param('mailboxId') mailboxId: string,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+    @Param("mailboxId") mailboxId: string,
+    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query("limit", new DefaultValuePipe(20), ParseIntPipe) limit: number,
   ): Promise<EmailListResponseDto> {
     this.logger.log(
       `Listing emails for mailbox ${mailboxId}: page=${page}, limit=${limit}`,
@@ -238,9 +238,9 @@ export class EmailController {
    * Manually trigger sync for a mailbox
    * POST /api/mailboxes/:mailboxId/sync
    */
-  @Post('/mailbox/:mailboxId/sync')
+  @Post("/mailbox/:mailboxId/sync")
   async syncMailbox(
-    @Param('mailboxId') mailboxId: string,
+    @Param("mailboxId") mailboxId: string,
   ): Promise<SyncResultDto> {
     this.logger.log(`Manual sync triggered for mailbox ${mailboxId}`);
 
@@ -266,7 +266,7 @@ export class EmailController {
    * Send an email
    * POST /api/emails/send
    */
-  @Post('send')
+  @Post("send")
   async sendEmail(
     @Body() request: SendEmailRequestDto,
   ): Promise<SendEmailResponseDto> {
@@ -284,22 +284,29 @@ export class EmailController {
         threadId: result.email.threadId,
         subject: result.email.subject,
         sentAt: result.email.sentAt || new Date(),
-        direction: 'outgoing',
+        direction: "outgoing",
       };
-    } catch (error: any) {
-      this.logger.error(`Failed to send email: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const err = error as Record<string, unknown>;
+      const message =
+        (typeof err?.message === "string" ? err.message : null) ||
+        "Failed to send email";
+      const stack = typeof err?.stack === "string" ? err.stack : undefined;
+      this.logger.error(`Failed to send email: ${message}`, stack);
 
-      // Return a more descriptive error response
-      const statusCode = error.statusCode || error.status || 500;
-      const message = error.message || 'Failed to send email';
+      const statusCode =
+        (typeof err?.statusCode === "number" ? err.statusCode : null) ||
+        (typeof err?.status === "number" ? err.status : null) ||
+        500;
+      const errorPayload =
+        err?.originalError ??
+        (err?.response as Record<string, unknown> | undefined)?.data ??
+        "Internal server error";
 
       throw new BadRequestException({
         statusCode,
         message,
-        error:
-          error.originalError ||
-          error.response?.data ||
-          'Internal server error',
+        error: errorPayload,
       });
     }
   }

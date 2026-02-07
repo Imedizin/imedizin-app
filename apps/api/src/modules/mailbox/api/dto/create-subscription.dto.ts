@@ -4,7 +4,7 @@ import {
   IsOptional,
   IsIn,
   ValidateIf,
-} from 'class-validator';
+} from "class-validator";
 
 /**
  * DTO for creating a subscription
@@ -15,10 +15,10 @@ export class CreateSubscriptionDto {
 
   @IsString()
   @IsOptional()
-  @IsIn(['inbox', 'spam', 'custom'])
+  @IsIn(["inbox", "spam", "custom"])
   folder?: string; // 'inbox', 'spam', or 'custom'
 
   @IsString()
-  @ValidateIf((o) => o.folder === 'custom')
+  @ValidateIf((o: CreateSubscriptionDto) => o.folder === "custom")
   resource?: string; // Custom resource path (required if folder is 'custom')
 }

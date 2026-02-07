@@ -1,13 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, ilike, or, sql } from 'drizzle-orm';
-import { DRIZZLE } from '../../../../shared/common/database/database.module';
-import type { Database } from '../../../../shared/common/database/database.module';
-import { medicalProviders } from '../schema';
-import { MedicalProvider } from '../../domain/entities/medical-provider.entity';
+import { Inject, Injectable } from "@nestjs/common";
+import { and, eq, ilike, or, sql } from "drizzle-orm";
+import { DRIZZLE } from "../../../../shared/common/database/database.module";
+import type { Database } from "../../../../shared/common/database/database.module";
+import { medicalProviders } from "../schema";
+import {
+  MedicalProvider,
+  type MedicalProviderType,
+  type ProviderStatus,
+} from "../../domain/entities/medical-provider.entity";
 import type {
   IMedicalProviderRepository,
   FindAllMedicalProvidersFilters,
-} from '../../domain/interfaces/medical-provider.repository.interface';
+} from "../../domain/interfaces/medical-provider.repository.interface";
 
 @Injectable()
 export class MedicalProviderRepository implements IMedicalProviderRepository {
@@ -33,7 +37,9 @@ export class MedicalProviderRepository implements IMedicalProviderRepository {
       );
     }
     if (filters?.providerType?.trim()) {
-      conditions.push(eq(medicalProviders.providerType, filters.providerType.trim()));
+      conditions.push(
+        eq(medicalProviders.providerType, filters.providerType.trim()),
+      );
     }
     if (filters?.country?.trim()) {
       conditions.push(eq(medicalProviders.country, filters.country.trim()));
@@ -47,8 +53,7 @@ export class MedicalProviderRepository implements IMedicalProviderRepository {
       );
     }
 
-    const whereClause =
-      conditions.length > 0 ? and(...conditions) : undefined;
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
     const rows = await this.db
       .select()
       .from(medicalProviders)
@@ -87,7 +92,7 @@ export class MedicalProviderRepository implements IMedicalProviderRepository {
         country: data.country,
         primaryEmail: data.primaryEmail,
         primaryPhone: data.primaryPhone,
-        status: data.status ?? 'active',
+        status: data.status ?? "active",
         specialties: data.specialties ?? [],
         services: data.services ?? [],
         businessHours: data.businessHours ?? null,
@@ -118,24 +123,31 @@ export class MedicalProviderRepository implements IMedicalProviderRepository {
       onboardedAt: Date | null;
     }>,
   ): Promise<MedicalProvider> {
-    const updateData: Partial<(typeof medicalProviders)['$inferInsert']> & {
+    const updateData: Partial<(typeof medicalProviders)["$inferInsert"]> & {
       updatedAt: Date;
     } = {
       updatedAt: new Date(),
     };
 
     if (data.legalName !== undefined) updateData.legalName = data.legalName;
-    if (data.providerType !== undefined) updateData.providerType = data.providerType;
+    if (data.providerType !== undefined)
+      updateData.providerType = data.providerType;
     if (data.country !== undefined) updateData.country = data.country;
-    if (data.primaryEmail !== undefined) updateData.primaryEmail = data.primaryEmail;
-    if (data.primaryPhone !== undefined) updateData.primaryPhone = data.primaryPhone;
+    if (data.primaryEmail !== undefined)
+      updateData.primaryEmail = data.primaryEmail;
+    if (data.primaryPhone !== undefined)
+      updateData.primaryPhone = data.primaryPhone;
     if (data.status !== undefined) updateData.status = data.status;
-    if (data.specialties !== undefined) updateData.specialties = data.specialties;
+    if (data.specialties !== undefined)
+      updateData.specialties = data.specialties;
     if (data.services !== undefined) updateData.services = data.services;
-    if (data.businessHours !== undefined) updateData.businessHours = data.businessHours;
-    if (data.licenseNumber !== undefined) updateData.licenseNumber = data.licenseNumber;
+    if (data.businessHours !== undefined)
+      updateData.businessHours = data.businessHours;
+    if (data.licenseNumber !== undefined)
+      updateData.licenseNumber = data.licenseNumber;
     if (data.tags !== undefined) updateData.tags = data.tags;
-    if (data.onboardedAt !== undefined) updateData.onboardedAt = data.onboardedAt;
+    if (data.onboardedAt !== undefined)
+      updateData.onboardedAt = data.onboardedAt;
 
     const result = await this.db
       .update(medicalProviders)
@@ -155,16 +167,16 @@ export class MedicalProviderRepository implements IMedicalProviderRepository {
   }
 
   private toDomainEntity(
-    row: (typeof medicalProviders)['$inferSelect'],
+    row: (typeof medicalProviders)["$inferSelect"],
   ): MedicalProvider {
     return new MedicalProvider(
       row.id,
       row.legalName,
-      row.providerType as any,
+      row.providerType as MedicalProviderType,
       row.country,
       row.primaryEmail,
       row.primaryPhone,
-      row.status as any,
+      row.status as ProviderStatus,
       row.specialties ?? [],
       row.services ?? [],
       row.businessHours ?? null,
@@ -176,4 +188,3 @@ export class MedicalProviderRepository implements IMedicalProviderRepository {
     );
   }
 }
-

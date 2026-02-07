@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Form, Input, Select, DatePicker, Typography } from "antd";
+import type { FormInstance } from "antd/es/form";
 import dayjs from "dayjs";
 import { OPERATING_REGIONS } from "@/constants/operating-regions";
 
@@ -18,7 +19,7 @@ export interface CaseProviderFormData extends CreateCaseProviderDto {
 }
 
 interface CaseProviderFormProps {
-  form: any;
+  form: FormInstance;
   initialValues?: Partial<CaseProvider>;
   onSubmit: (values: CreateCaseProviderDto) => void;
 }
@@ -28,7 +29,7 @@ const CaseProviderForm: React.FC<CaseProviderFormProps> = ({
   initialValues,
   onSubmit,
 }) => {
-  const handleFinish = (values: any) => {
+  const handleFinish = (values: CaseProviderFormData) => {
     const range = values.contractDateRange;
     const payload: CreateCaseProviderDto = {
       companyName: values.companyName,

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Form, Input, Select, DatePicker, Typography } from "antd";
+import type { FormInstance } from "antd/es/form";
 import dayjs from "dayjs";
 import { MEDICAL_SPECIALTY_GROUPS } from "@/constants/medical-specialties";
 import type {
@@ -11,7 +12,7 @@ const { Title } = Typography;
 const { Option, OptGroup } = Select;
 
 interface MedicalProviderFormProps {
-  form: any;
+  form: FormInstance;
   initialValues?: Partial<MedicalProvider>;
   onSubmit: (values: CreateMedicalProviderDto) => void;
 }
@@ -35,7 +36,7 @@ const MedicalProviderForm: React.FC<MedicalProviderFormProps> = ({
     }
   }, [initialValues, form]);
 
-  const handleFinish = (values: any) => {
+  const handleFinish = (values: CreateMedicalProviderDto & { onboardedAt?: dayjs.Dayjs }) => {
     const payload: CreateMedicalProviderDto = {
       legalName: values.legalName,
       providerType: values.providerType,

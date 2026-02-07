@@ -1,8 +1,8 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { SyncMailboxCommand } from './sync-mailbox.command';
-import type { IMailboxSubscriptionRepository } from '../../domain/interfaces/mailbox-subscription.repository.interface';
-import type { IMailboxRepository } from '../../domain/interfaces/mailbox.repository.interface';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { SyncMailboxCommand } from "./sync-mailbox.command";
+import type { IMailboxSubscriptionRepository } from "../../domain/interfaces/mailbox-subscription.repository.interface";
+import type { IMailboxRepository } from "../../domain/interfaces/mailbox.repository.interface";
 
 /**
  * Notification change from Microsoft Graph webhook
@@ -10,12 +10,12 @@ import type { IMailboxRepository } from '../../domain/interfaces/mailbox.reposit
 export interface NotificationChange {
   subscriptionId: string;
   subscriptionExpirationDateTime: string;
-  changeType: 'created' | 'updated' | 'deleted';
+  changeType: "created" | "updated" | "deleted";
   resource: string;
   resourceData?: {
-    '@odata.type': string;
-    '@odata.id': string;
-    '@odata.etag'?: string;
+    "@odata.type": string;
+    "@odata.id": string;
+    "@odata.etag"?: string;
     id: string;
   };
   clientState?: string;
@@ -39,9 +39,9 @@ export class ProcessNotificationCommand {
   constructor(
     private readonly configService: ConfigService,
     private readonly syncMailboxCommand: SyncMailboxCommand,
-    @Inject('IMailboxSubscriptionRepository')
+    @Inject("IMailboxSubscriptionRepository")
     private readonly subscriptionRepository: IMailboxSubscriptionRepository,
-    @Inject('IMailboxRepository')
+    @Inject("IMailboxRepository")
     private readonly mailboxRepository: IMailboxRepository,
   ) {}
 
@@ -55,7 +55,7 @@ export class ProcessNotificationCommand {
     );
 
     if (!notification.value || notification.value.length === 0) {
-      this.logger.warn('Received empty notification');
+      this.logger.warn("Received empty notification");
       return;
     }
 
@@ -68,9 +68,10 @@ export class ProcessNotificationCommand {
         if (mailboxInfo) {
           mailboxesToSync.set(mailboxInfo.id, mailboxInfo.address);
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : String(error);
         this.logger.error(
-          `Failed to get mailbox for subscription ${change.subscriptionId}: ${error.message}`,
+          `Failed to get mailbox for subscription ${change.subscriptionId}: ${msg}`,
         );
       }
     }
@@ -89,8 +90,8 @@ export class ProcessNotificationCommand {
   ): Promise<{ id: string; address: string } | null> {
     // Validate client state
     const expectedClientState = this.configService.get<string>(
-      'WEBHOOK_CLIENT_STATE',
-      'my-super-secret',
+      "WEBHOOK_CLIENT_STATE",
+      "my-super-secret",
     );
     if (change.clientState !== expectedClientState) {
       this.logger.warn(
@@ -152,10 +153,9 @@ export class ProcessNotificationCommand {
         `Delta sync complete for ${mailboxAddress}: ` +
           `${result.messagesCreated} created, ${result.messagesSkipped} skipped`,
       );
-    } catch (error: any) {
-      this.logger.error(
-        `Delta sync failed for ${mailboxAddress}: ${error.message}`,
-      );
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Delta sync failed for ${mailboxAddress}: ${msg}`);
     } finally {
       // Remove from syncing set
       this.syncingMailboxes.delete(mailboxId);

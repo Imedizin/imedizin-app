@@ -25,7 +25,7 @@ export class ApiError extends Error {
   constructor(
     message: string,
     public readonly status: number,
-    public readonly payload?: any
+    public readonly payload?: unknown
   ) {
     super(message);
     this.name = "ApiError";
@@ -50,14 +50,15 @@ export const apiClient = ky.create({
       async (_request, _options, response) => {
         if (!response.ok) {
           let message = response.statusText;
-          let payload: any;
+          let payload: unknown;
 
           try {
             payload = await response.clone().json();
+            const p = payload as { message?: string; error?: string };
             message =
-              typeof payload?.message === "string"
-                ? payload.message
-                : (payload?.error ?? message);
+              typeof p?.message === "string"
+                ? p.message
+                : (p?.error ?? message);
           } catch {
             // ignore parse errors
           }

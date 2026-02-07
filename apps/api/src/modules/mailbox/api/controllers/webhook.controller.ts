@@ -7,17 +7,17 @@ import {
   Res,
   Logger,
   Inject,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { InjectQueue } from '@nestjs/bullmq';
-import type { Response } from 'express';
-import type { Queue } from 'bullmq';
-import { NEW_MESSAGE_QUEUE } from '../../application/processors/new-message.processor';
-import type { NewMessageJobPayload } from '../../application/commands/process-new-message.command';
-import type { WebhookNotification } from '../../application/commands/process-notification.command';
-import type { IMailboxSubscriptionRepository } from '../../domain/interfaces/mailbox-subscription.repository.interface';
+} from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { InjectQueue } from "@nestjs/bullmq";
+import type { Response } from "express";
+import type { Queue } from "bullmq";
+import { NEW_MESSAGE_QUEUE } from "../../application/processors/new-message.processor";
+import type { NewMessageJobPayload } from "../../application/commands/process-new-message.command";
+import type { WebhookNotification } from "../../application/commands/process-notification.command";
+import type { IMailboxSubscriptionRepository } from "../../domain/interfaces/mailbox-subscription.repository.interface";
 
-@Controller('mailbox/webhooks')
+@Controller("mailbox/webhooks")
 export class WebhookController {
   private readonly logger = new Logger(WebhookController.name);
 
@@ -25,7 +25,7 @@ export class WebhookController {
     private readonly configService: ConfigService,
     @InjectQueue(NEW_MESSAGE_QUEUE)
     private readonly newMessageQueue: Queue,
-    @Inject('IMailboxSubscriptionRepository')
+    @Inject("IMailboxSubscriptionRepository")
     private readonly subscriptionRepository: IMailboxSubscriptionRepository,
   ) {}
 
@@ -33,9 +33,9 @@ export class WebhookController {
    * Handle webhook validation request (GET)
    * Microsoft Graph sends GET request with validationToken query parameter
    */
-  @Get('graph')
+  @Get("graph")
   handleValidation(
-    @Query('validationToken') validationToken: string,
+    @Query("validationToken") validationToken: string,
     @Res() res: Response,
   ): void {
     this.logger.log(
@@ -44,13 +44,13 @@ export class WebhookController {
     this.logger.log(`Request headers: ${JSON.stringify(res.req.headers)}`);
 
     if (validationToken) {
-      this.handleValidationToken(validationToken, res, 'GET');
+      this.handleValidationToken(validationToken, res, "GET");
       return;
     }
 
-    this.logger.warn('Webhook validation failed: Missing validationToken');
+    this.logger.warn("Webhook validation failed: Missing validationToken");
     res.status(400).json({
-      error: 'Missing validationToken query parameter',
+      error: "Missing validationToken query parameter",
     });
   }
 
@@ -60,9 +60,9 @@ export class WebhookController {
    * Note: Using 'any' type bypasses class-validator to allow validation requests
    * with empty/minimal body
    */
-  @Post('graph')
+  @Post("graph")
   handleNotification(
-    @Query('validationToken') validationToken: string,
+    @Query("validationToken") validationToken: string,
     @Body() notification: any,
     @Res() res: Response,
   ): void {
@@ -71,17 +71,17 @@ export class WebhookController {
       this.logger.log(
         `Webhook validation request received via POST. Token present: ${!!validationToken}`,
       );
-      this.handleValidationToken(validationToken, res, 'POST');
+      this.handleValidationToken(validationToken, res, "POST");
       return;
     }
 
     // Stage 1: return 202 immediately, enqueue one job per messageId
     res.status(202).json({
       success: true,
-      message: 'Notification received and queued for processing',
+      message: "Notification received and queued for processing",
     });
 
-    this.enqueueNewMessageJobs(notification as WebhookNotification);
+    void this.enqueueNewMessageJobs(notification as WebhookNotification);
   }
 
   /**
@@ -91,13 +91,13 @@ export class WebhookController {
     notification: WebhookNotification,
   ): Promise<void> {
     const expectedClientState = this.configService.get<string>(
-      'WEBHOOK_CLIENT_STATE',
-      'my-super-secret',
+      "WEBHOOK_CLIENT_STATE",
+      "my-super-secret",
     );
 
     const value = notification?.value;
     if (!Array.isArray(value) || value.length === 0) {
-      this.logger.debug('Empty notification value, nothing to enqueue');
+      this.logger.debug("Empty notification value, nothing to enqueue");
       return;
     }
 
@@ -135,7 +135,7 @@ export class WebhookController {
         };
         const jobId = `${subscription.mailboxId}_${messageId}`;
 
-        await this.newMessageQueue.add('process', payload, { jobId });
+        await this.newMessageQueue.add("process", payload, { jobId });
       } catch (err) {
         this.logger.error(
           `Failed to enqueue new-message job: ${(err as Error).message}`,
@@ -154,9 +154,9 @@ export class WebhookController {
   private handleValidationToken(
     validationToken: string,
     res: Response,
-    method: 'GET' | 'POST',
+    method: "GET" | "POST",
   ): void {
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.status(200).send(validationToken);
     this.logger.log(
       `Webhook validation successful (${method}). Returned token: ${validationToken.substring(0, 10)}...`,

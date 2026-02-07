@@ -1,12 +1,8 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import {
-  NotFoundException,
-  ConflictException,
-  BadRequestException,
-} from '@nestjs/common';
-import type { IMailboxRepository } from '../../domain/interfaces/mailbox.repository.interface';
-import { GraphService } from '../services/graph.service';
-import { Mailbox } from '../../domain/entities/mailbox.entity';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { NotFoundException, ConflictException } from "@nestjs/common";
+import type { IMailboxRepository } from "../../domain/interfaces/mailbox.repository.interface";
+import { GraphService } from "../services/graph.service";
+import { Mailbox } from "../../domain/entities/mailbox.entity";
 
 /**
  * Command to update a mailbox
@@ -22,7 +18,7 @@ export class UpdateMailboxCommand {
   private readonly logger = new Logger(UpdateMailboxCommand.name);
 
   constructor(
-    @Inject('IMailboxRepository')
+    @Inject("IMailboxRepository")
     private readonly mailboxRepository: IMailboxRepository,
     private readonly graphService: GraphService,
   ) {}

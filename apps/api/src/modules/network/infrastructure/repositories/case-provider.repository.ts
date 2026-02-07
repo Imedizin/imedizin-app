@@ -1,13 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, ilike, or, sql } from 'drizzle-orm';
-import { DRIZZLE } from '../../../../shared/common/database/database.module';
-import type { Database } from '../../../../shared/common/database/database.module';
-import { caseProviders } from '../schema';
-import { CaseProvider } from '../../domain/entities/case-provider.entity';
+import { Inject, Injectable } from "@nestjs/common";
+import { and, eq, ilike, or, sql } from "drizzle-orm";
+import { DRIZZLE } from "../../../../shared/common/database/database.module";
+import type { Database } from "../../../../shared/common/database/database.module";
+import { caseProviders } from "../schema";
+import {
+  CaseProvider,
+  type CaseProviderType,
+  type ProviderStatus,
+} from "../../domain/entities/case-provider.entity";
 import type {
   ICaseProviderRepository,
   FindAllCaseProvidersFilters,
-} from '../../domain/interfaces/case-provider.repository.interface';
+} from "../../domain/interfaces/case-provider.repository.interface";
 
 @Injectable()
 export class CaseProviderRepository implements ICaseProviderRepository {
@@ -45,12 +49,8 @@ export class CaseProviderRepository implements ICaseProviderRepository {
       conditions.push(eq(caseProviders.status, filters.status.trim()));
     }
 
-    const whereClause =
-      conditions.length > 0 ? and(...conditions) : undefined;
-    const rows = await this.db
-      .select()
-      .from(caseProviders)
-      .where(whereClause);
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    const rows = await this.db.select().from(caseProviders).where(whereClause);
     return rows.map((r) => this.toDomainEntity(r));
   }
 
@@ -84,7 +84,7 @@ export class CaseProviderRepository implements ICaseProviderRepository {
         operatingRegions: data.operatingRegions ?? [],
         primaryEmail: data.primaryEmail,
         primaryPhone: data.primaryPhone,
-        status: data.status ?? 'active',
+        status: data.status ?? "active",
         contractStartDate: data.contractStartDate ?? null,
         contractEndDate: data.contractEndDate ?? null,
         pricingModel: data.pricingModel ?? null,
@@ -113,24 +113,29 @@ export class CaseProviderRepository implements ICaseProviderRepository {
       tags: string[];
     }>,
   ): Promise<CaseProvider> {
-    const updateData: Partial<(typeof caseProviders)['$inferInsert']> & {
+    const updateData: Partial<(typeof caseProviders)["$inferInsert"]> & {
       updatedAt: Date;
     } = {
       updatedAt: new Date(),
     };
 
-    if (data.companyName !== undefined) updateData.companyName = data.companyName;
-    if (data.providerType !== undefined) updateData.providerType = data.providerType;
+    if (data.companyName !== undefined)
+      updateData.companyName = data.companyName;
+    if (data.providerType !== undefined)
+      updateData.providerType = data.providerType;
     if (data.operatingRegions !== undefined)
       updateData.operatingRegions = data.operatingRegions;
-    if (data.primaryEmail !== undefined) updateData.primaryEmail = data.primaryEmail;
-    if (data.primaryPhone !== undefined) updateData.primaryPhone = data.primaryPhone;
+    if (data.primaryEmail !== undefined)
+      updateData.primaryEmail = data.primaryEmail;
+    if (data.primaryPhone !== undefined)
+      updateData.primaryPhone = data.primaryPhone;
     if (data.status !== undefined) updateData.status = data.status;
     if (data.contractStartDate !== undefined)
       updateData.contractStartDate = data.contractStartDate;
     if (data.contractEndDate !== undefined)
       updateData.contractEndDate = data.contractEndDate;
-    if (data.pricingModel !== undefined) updateData.pricingModel = data.pricingModel;
+    if (data.pricingModel !== undefined)
+      updateData.pricingModel = data.pricingModel;
     if (data.slaTier !== undefined) updateData.slaTier = data.slaTier;
     if (data.tags !== undefined) updateData.tags = data.tags;
 
@@ -151,15 +156,17 @@ export class CaseProviderRepository implements ICaseProviderRepository {
     await this.db.delete(caseProviders).where(eq(caseProviders.id, id));
   }
 
-  private toDomainEntity(row: (typeof caseProviders)['$inferSelect']): CaseProvider {
+  private toDomainEntity(
+    row: (typeof caseProviders)["$inferSelect"],
+  ): CaseProvider {
     return new CaseProvider(
       row.id,
       row.companyName,
-      row.providerType as any,
+      row.providerType as CaseProviderType,
       row.operatingRegions ?? [],
       row.primaryEmail,
       row.primaryPhone,
-      row.status as any,
+      row.status as ProviderStatus,
       row.contractStartDate ?? null,
       row.contractEndDate ?? null,
       row.pricingModel ?? null,
@@ -170,4 +177,3 @@ export class CaseProviderRepository implements ICaseProviderRepository {
     );
   }
 }
-
