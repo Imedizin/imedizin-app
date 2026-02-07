@@ -50,6 +50,7 @@ export interface RealtimeEvent<T = Record<string, unknown>> {
 /** email.received payload (from backend realtime module). */
 export interface EmailReceivedPayload {
   emailId: string;
+  threadId: string | null;
   subject: string;
   from: { emailAddress: string; displayName: string | null };
   receivedAt: string | null;
@@ -130,6 +131,7 @@ export function useRealtimeSocket(
         timestamp: payload.receivedAt ?? new Date().toISOString(),
         metadata: {
           emailId: payload.emailId,
+          threadId: payload.threadId ?? null,
           subject: payload.subject,
           mailboxId: mailboxIdFromScope,
         },
@@ -153,6 +155,7 @@ export function useRealtimeSocket(
             tag: `email-${payload.emailId}`,
             data: {
               emailId: payload.emailId,
+              threadId: payload.threadId ?? null,
               mailboxId: mailboxIdFromScope,
             },
           });

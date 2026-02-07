@@ -21,6 +21,7 @@ export class RealtimeTestController {
   ): { ok: boolean; message: string } {
     const payload = {
       emailId: `test-${Date.now()}`,
+      threadId: `test-thread-${Date.now()}`,
       subject: subject ?? "Test email (curl)",
       from: {
         emailAddress: fromEmail ?? "test@example.com",

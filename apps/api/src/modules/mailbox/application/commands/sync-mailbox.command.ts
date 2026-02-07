@@ -135,6 +135,8 @@ export class SyncMailboxCommand {
                   processResult.subject || '(No Subject)',
                   processResult.from,
                   processResult.receivedAt || null,
+                  mailbox.address,
+                  processResult.threadId ?? null,
                 ),
               );
             }
@@ -335,6 +337,7 @@ export class SyncMailboxCommand {
     return {
       created: true,
       emailId: savedEmail.id,
+      threadId: savedEmail.threadId,
       subject: savedEmail.subject,
       from: fromParticipant,
       receivedAt: messageForContent.receivedDateTime || null,

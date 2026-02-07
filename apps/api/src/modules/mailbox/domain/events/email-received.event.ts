@@ -9,6 +9,8 @@ export interface EmailReceivedEventPayload {
   /** Email address of the mailbox (e.g. support@example.com) for admin display */
   mailboxAddress?: string;
   emailId: string;
+  /** Thread ID for direct navigation to thread view */
+  threadId: string | null;
   subject: string;
   from: {
     emailAddress: string;
@@ -28,5 +30,6 @@ export class EmailReceivedEvent implements EmailReceivedEventPayload {
     },
     public readonly receivedAt: string | null,
     public readonly mailboxAddress?: string,
+    public readonly threadId: string | null = null,
   ) {}
 }

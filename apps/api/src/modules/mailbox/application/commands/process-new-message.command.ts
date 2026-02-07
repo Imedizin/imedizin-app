@@ -162,6 +162,7 @@ export class ProcessNewMessageCommand {
         from,
         message.receivedDateTime ?? null,
         mailbox.address,
+        savedEmail.threadId,
       ),
     );
   }

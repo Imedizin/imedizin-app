@@ -35,6 +35,7 @@ export class EmailReceivedNotificationHandler {
       topic: "email.received",
       payload: {
         emailId: event.emailId,
+        threadId: event.threadId,
         subject: event.subject,
         from: event.from,
         receivedAt: event.receivedAt,
@@ -54,6 +55,7 @@ export class EmailReceivedNotificationHandler {
       body: `From: ${fromLabel}`,
       data: {
         emailId: event.emailId,
+        threadId: event.threadId,
         subject: event.subject,
         from: event.from,
         receivedAt: event.receivedAt,

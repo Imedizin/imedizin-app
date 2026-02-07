@@ -21,3 +21,29 @@ self.addEventListener("message", (event) => {
     });
   }
 });
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const data = event.notification.data || {};
+  const threadId = data.threadId;
+  const emailId = data.emailId;
+  let path = "/mails";
+  if (threadId) {
+    path = "/mails/" + encodeURIComponent(threadId);
+  } else if (emailId) {
+    path = "/mails?openEmailId=" + encodeURIComponent(emailId);
+  }
+  const targetUrl = new URL(path, self.location.origin).toString();
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      if (clientList.length > 0) {
+        const client = clientList[0];
+        client.navigate(targetUrl);
+        return client.focus();
+      }
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(targetUrl);
+      }
+    })
+  );
+});

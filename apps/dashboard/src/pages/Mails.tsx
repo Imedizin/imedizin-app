@@ -30,7 +30,7 @@ import {
   ShrinkOutlined,
   PaperClipOutlined,
 } from "@ant-design/icons";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useTheme } from "@/hooks/useTheme";
 import {
   useGetThreadsQuery,
@@ -46,6 +46,7 @@ import type {
 } from "@/types/email";
 import MailSidebar from "@/components/emails/MailSidebar";
 import ComposeModal from "@/components/emails/ComposeModal";
+import { apiClient } from "@/api/client";
 
 const { Text, Paragraph, Title } = Typography;
 
@@ -92,9 +93,44 @@ const Mails: React.FC = () => {
   const { isDark } = useTheme();
   const { threadId } = useParams<{ threadId?: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { selectedMailboxId, setSelectedMailboxId, setLastUpdateAt } =
     useMailboxStore();
   const [searchText, setSearchText] = useState("");
+
+  // When opened from browser notification with only emailId (no threadId): fetch email and go to thread
+  const openEmailId = searchParams.get("openEmailId");
+  React.useEffect(() => {
+    if (!openEmailId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const email = await apiClient
+          .get(`emails/${openEmailId}`)
+          .json<EmailDetail>();
+        if (cancelled) return;
+        setSearchParams((prev) => {
+          const next = new URLSearchParams(prev);
+          next.delete("openEmailId");
+          return next;
+        }, { replace: true });
+        if (email.threadId) {
+          navigate(`/mails/${email.threadId}`, { replace: true });
+        }
+      } catch {
+        if (!cancelled) {
+          setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.delete("openEmailId");
+            return next;
+          }, { replace: true });
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [openEmailId, setSearchParams, navigate]);
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [starredThreads, setStarredThreads] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
