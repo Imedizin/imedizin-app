@@ -42,6 +42,7 @@ services:
       - app
     # Links ensure /etc/hosts entry for "postgres" (fixes ENOTFOUND on some Docker setups)
     image: ${DOCKER_USERNAME}/imedizin-api:latest
+    env_file: "api.env"
     links:
       - postgres
       - redis
@@ -72,6 +73,7 @@ services:
     networks:
       - app
     image: ${DOCKER_USERNAME}/imedizin-dashboard:latest
+    env_file: "dashboard.env"
     # build:
     #   context: .
     #   dockerfile: apps/dashboard/Dockerfile
