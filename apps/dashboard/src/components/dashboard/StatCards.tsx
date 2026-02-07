@@ -3,10 +3,10 @@ import { Card, Row, Col, Statistic } from 'antd';
 import {
   ArrowUpOutlined,
   ArrowDownOutlined,
-  UserOutlined,
-  ShoppingCartOutlined,
-  DollarOutlined,
-  EyeOutlined,
+  MedicineBoxOutlined,
+  CarOutlined,
+  MailOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 
 // BIA Theme Colors
@@ -15,36 +15,35 @@ const accentColor = '#b5892e'; // Gold
 
 const stats = [
   {
-    title: 'Total Revenue',
-    value: 126560,
-    prefix: '$',
+    title: 'Active Cases',
+    value: 24,
     trend: 12.5,
     trendUp: true,
-    icon: <DollarOutlined />,
+    icon: <MedicineBoxOutlined />,
     color: primaryColor,
   },
   {
-    title: 'Total Orders',
-    value: 8846,
-    trend: 8.2,
-    trendUp: true,
-    icon: <ShoppingCartOutlined />,
+    title: 'Pending Transport',
+    value: 8,
+    trend: 5.2,
+    trendUp: false,
+    icon: <CarOutlined />,
     color: '#10a37f',
   },
   {
-    title: 'Total Customers',
-    value: 5423,
+    title: 'Unread Mails',
+    value: 12,
     trend: 3.1,
     trendUp: false,
-    icon: <UserOutlined />,
+    icon: <MailOutlined />,
     color: accentColor,
   },
   {
-    title: 'Page Views',
-    value: 234500,
-    trend: 15.3,
+    title: 'Medical Providers',
+    value: 15,
+    trend: 8.0,
     trendUp: true,
-    icon: <EyeOutlined />,
+    icon: <TeamOutlined />,
     color: '#6366f1',
   },
 ];
@@ -68,7 +67,6 @@ const StatCards: React.FC = () => {
                 </div>
                 <Statistic
                   value={stat.value}
-                  prefix={stat.prefix}
                   valueStyle={{ fontSize: 28, fontWeight: 600 }}
                 />
                 <div

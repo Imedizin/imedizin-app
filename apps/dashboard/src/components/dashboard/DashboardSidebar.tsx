@@ -2,6 +2,7 @@ import React from "react";
 import { Layout, Menu } from "antd";
 import type { MenuProps } from "antd";
 import {
+  DashboardOutlined,
   MailOutlined,
   GlobalOutlined,
   InboxOutlined,
@@ -42,6 +43,7 @@ function getItem(
 }
 
 const menuItems: MenuItem[] = [
+  getItem("Dashboard", "/", <DashboardOutlined />, undefined, "/"),
   getItem("Mails", "/mails", <InboxOutlined />, undefined, "/mails"),
   getItem(
     "Assistance Requests",

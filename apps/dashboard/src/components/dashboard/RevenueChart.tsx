@@ -7,30 +7,30 @@ const primaryColor = '#0d7377'; // Teal
 const accentColor = '#b5892e'; // Gold
 
 const data = [
-  { month: 'Jan', value: 3200, category: 'Revenue' },
-  { month: 'Feb', value: 4100, category: 'Revenue' },
-  { month: 'Mar', value: 3800, category: 'Revenue' },
-  { month: 'Apr', value: 5200, category: 'Revenue' },
-  { month: 'May', value: 4800, category: 'Revenue' },
-  { month: 'Jun', value: 6100, category: 'Revenue' },
-  { month: 'Jul', value: 5600, category: 'Revenue' },
-  { month: 'Aug', value: 7200, category: 'Revenue' },
-  { month: 'Sep', value: 6800, category: 'Revenue' },
-  { month: 'Oct', value: 8100, category: 'Revenue' },
-  { month: 'Nov', value: 7500, category: 'Revenue' },
-  { month: 'Dec', value: 9200, category: 'Revenue' },
-  { month: 'Jan', value: 2100, category: 'Expenses' },
-  { month: 'Feb', value: 2400, category: 'Expenses' },
-  { month: 'Mar', value: 2200, category: 'Expenses' },
-  { month: 'Apr', value: 2800, category: 'Expenses' },
-  { month: 'May', value: 2600, category: 'Expenses' },
-  { month: 'Jun', value: 3100, category: 'Expenses' },
-  { month: 'Jul', value: 2900, category: 'Expenses' },
-  { month: 'Aug', value: 3500, category: 'Expenses' },
-  { month: 'Sep', value: 3200, category: 'Expenses' },
-  { month: 'Oct', value: 3800, category: 'Expenses' },
-  { month: 'Nov', value: 3500, category: 'Expenses' },
-  { month: 'Dec', value: 4200, category: 'Expenses' },
+  { month: 'Jan', value: 18, category: 'Cases Opened' },
+  { month: 'Feb', value: 22, category: 'Cases Opened' },
+  { month: 'Mar', value: 19, category: 'Cases Opened' },
+  { month: 'Apr', value: 28, category: 'Cases Opened' },
+  { month: 'May', value: 25, category: 'Cases Opened' },
+  { month: 'Jun', value: 31, category: 'Cases Opened' },
+  { month: 'Jul', value: 27, category: 'Cases Opened' },
+  { month: 'Aug', value: 35, category: 'Cases Opened' },
+  { month: 'Sep', value: 32, category: 'Cases Opened' },
+  { month: 'Oct', value: 38, category: 'Cases Opened' },
+  { month: 'Nov', value: 34, category: 'Cases Opened' },
+  { month: 'Dec', value: 42, category: 'Cases Opened' },
+  { month: 'Jan', value: 145, category: 'Mails Received' },
+  { month: 'Feb', value: 168, category: 'Mails Received' },
+  { month: 'Mar', value: 152, category: 'Mails Received' },
+  { month: 'Apr', value: 198, category: 'Mails Received' },
+  { month: 'May', value: 182, category: 'Mails Received' },
+  { month: 'Jun', value: 215, category: 'Mails Received' },
+  { month: 'Jul', value: 203, category: 'Mails Received' },
+  { month: 'Aug', value: 241, category: 'Mails Received' },
+  { month: 'Sep', value: 228, category: 'Mails Received' },
+  { month: 'Oct', value: 267, category: 'Mails Received' },
+  { month: 'Nov', value: 252, category: 'Mails Received' },
+  { month: 'Dec', value: 289, category: 'Mails Received' },
 ];
 
 const RevenueChart: React.FC = () => {
@@ -49,14 +49,14 @@ const RevenueChart: React.FC = () => {
     color: [primaryColor, accentColor],
     areaStyle: (datum: { category: string }) => {
       return {
-        fill: datum.category === 'Revenue' 
-          ? `l(270) 0:#ffffff 0.5:${primaryColor}40 1:${primaryColor}` 
+        fill: datum.category === 'Cases Opened'
+          ? `l(270) 0:#ffffff 0.5:${primaryColor}40 1:${primaryColor}`
           : `l(270) 0:#ffffff 0.5:${accentColor}40 1:${accentColor}`,
       };
     },
     yAxis: {
       label: {
-        formatter: (v: string) => `$${Number(v) / 1000}k`,
+        formatter: (v: string) => v,
       },
       grid: {
         line: {
@@ -76,14 +76,14 @@ const RevenueChart: React.FC = () => {
     },
     tooltip: {
       formatter: (datum: { category: string; value: number }) => {
-        return { name: datum.category, value: `$${datum.value.toLocaleString()}` };
+        return { name: datum.category, value: datum.value.toLocaleString() };
       },
     },
   };
 
   return (
     <Card
-      title="Revenue Overview"
+      title="Activity Overview"
       bordered={false}
       style={{ borderRadius: 12, boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03)' }}
       extra={

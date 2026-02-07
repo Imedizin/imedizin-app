@@ -39,7 +39,7 @@ const Index: React.FC = () => {
               Dashboard
             </Title>
             <Text type="secondary">
-              Welcome back! Here's what's happening today.
+              Overview of your cases, mails, and assistance requests.
             </Text>
           </div>
         </div>

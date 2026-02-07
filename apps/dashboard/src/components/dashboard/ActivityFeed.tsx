@@ -1,10 +1,10 @@
 import React from 'react';
 import { Card, Timeline, Avatar, Typography } from 'antd';
 import {
-  ShoppingCartOutlined,
-  UserAddOutlined,
-  MessageOutlined,
-  DollarOutlined,
+  SolutionOutlined,
+  MailOutlined,
+  CarOutlined,
+  MedicineBoxOutlined,
   CheckCircleOutlined,
 } from '@ant-design/icons';
 
@@ -16,7 +16,7 @@ const accentColor = '#b5892e'; // Gold
 
 interface Activity {
   id: string;
-  type: 'order' | 'user' | 'message' | 'payment' | 'complete';
+  type: 'case' | 'mail' | 'transport' | 'medical' | 'complete';
   title: string;
   description: string;
   time: string;
@@ -26,51 +26,51 @@ interface Activity {
 const activities: Activity[] = [
   {
     id: '1',
-    type: 'order',
-    title: 'New order received',
-    description: 'Sarah Johnson placed an order for MacBook Pro',
+    type: 'case',
+    title: 'New assistance request',
+    description: 'AR-2024-0842 – Follow-up documentation request',
     time: '2 min ago',
     color: primaryColor,
   },
   {
     id: '2',
-    type: 'user',
-    title: 'New user registered',
-    description: 'Michael Chen created a new account',
+    type: 'mail',
+    title: 'New mail in thread',
+    description: 'Re: Lab results – Dr. Müller',
     time: '15 min ago',
     color: '#10a37f',
   },
   {
     id: '3',
-    type: 'payment',
-    title: 'Payment received',
-    description: 'Payment of $2,499 received from Emily Davis',
+    type: 'transport',
+    title: 'Transport request updated',
+    description: 'AR-2024-0841 – Pickup time confirmed',
     time: '1 hour ago',
     color: accentColor,
   },
   {
     id: '4',
     type: 'complete',
-    title: 'Order completed',
-    description: 'Order #ORD-098 has been delivered',
+    title: 'Case closed',
+    description: 'AR-2024-0839 – Ambulance booking completed',
     time: '2 hours ago',
     color: '#6366f1',
   },
   {
     id: '5',
-    type: 'message',
-    title: 'New support ticket',
-    description: 'James Wilson opened a support ticket',
+    type: 'medical',
+    title: 'Medical report received',
+    description: 'AR-2024-0838 – Lab results attached',
     time: '3 hours ago',
     color: '#ec4899',
   },
 ];
 
 const iconMap = {
-  order: <ShoppingCartOutlined />,
-  user: <UserAddOutlined />,
-  message: <MessageOutlined />,
-  payment: <DollarOutlined />,
+  case: <SolutionOutlined />,
+  mail: <MailOutlined />,
+  transport: <CarOutlined />,
+  medical: <MedicineBoxOutlined />,
   complete: <CheckCircleOutlined />,
 };
 
