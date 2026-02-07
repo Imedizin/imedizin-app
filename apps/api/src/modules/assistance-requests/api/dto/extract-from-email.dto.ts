@@ -1,9 +1,14 @@
-import { IsNotEmpty, IsUUID } from "class-validator";
+import { IsIn, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
 
 export class ExtractFromEmailRequestDto {
   @IsUUID()
   @IsNotEmpty()
   emailId: string;
+
+  /** When set, extraction uses a type-specific prompt (transport or medical_case). */
+  @IsOptional()
+  @IsIn(["transport", "medical_case"])
+  type?: "transport" | "medical_case";
 }
 
 /**
@@ -32,4 +37,13 @@ export class ExtractFromEmailResponseDto {
   modeOfTransport?: "lemozen" | "als" | "bls";
   medicalCrewRequired?: boolean;
   hasCompanion?: boolean;
+
+  /** Medical case details (for medical_case requests) */
+  caseProviderReferenceNumber?: string;
+  admissionDate?: string;
+  dischargeDate?: string;
+  country?: string;
+  city?: string;
+  medicalProviderName?: string;
+  motherInsuranceCompany?: string;
 }

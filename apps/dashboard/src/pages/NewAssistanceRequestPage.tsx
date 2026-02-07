@@ -29,6 +29,7 @@ import {
   useAddMedicalCaseRequestCommand,
   useExtractFromEmailCommand,
 } from "@/services/assistance-requests";
+import type { ExtractFromEmailResponse } from "@/services/assistance-requests/commands/extract-from-email.command";
 import SharedAssistanceRequestFields, {
   type SharedAssistanceRequestFormValues,
   TRANSPORT_ONLY_FIELD_NAMES,
@@ -89,12 +90,21 @@ const NewAssistanceRequestPage: React.FC = () => {
 
   useEffect(() => {
     if (!emailId) return;
-    extractMutation.mutate(emailId);
-  }, [emailId]);
+    const typeFromUrl = searchParams.get("type");
+    const type =
+      typeFromUrl === "transport" || typeFromUrl === "medical_case"
+        ? typeFromUrl
+        : undefined;
+    extractMutation.mutate({ emailId, type });
+  }, [emailId, searchParams]);
 
   useEffect(() => {
     if (!extractMutation.isSuccess || !extractMutation.data) return;
-    const data = extractMutation.data;
+    const { rawAiResponse, ...rest } = extractMutation.data;
+    const data: ExtractFromEmailResponse = rest;
+    if (rawAiResponse != null) {
+      console.debug("[Extract from email] Raw AI response:", rawAiResponse);
+    }
     form.setFieldsValue({
       requestNumber: data.requestNumber,
       receivedAt: data.receivedAt ? dayjs(data.receivedAt) : undefined,
@@ -121,6 +131,18 @@ const NewAssistanceRequestPage: React.FC = () => {
       modeOfTransportation: data.modeOfTransport,
       withEscortingMedicalCrew: data.medicalCrewRequired ?? false,
       hasCompanion: data.hasCompanion ?? false,
+      // Medical case details (when extracted from email)
+      caseProviderReferenceNumber: data.caseProviderReferenceNumber,
+      admissionDate: data.admissionDate
+        ? dayjs(data.admissionDate)
+        : undefined,
+      dischargeDate: data.dischargeDate
+        ? dayjs(data.dischargeDate)
+        : undefined,
+      country: data.country,
+      city: data.city,
+      medicalProviderName: data.medicalProviderName,
+      motherInsuranceCompany: data.motherInsuranceCompany,
     });
     if (
       data.requestType === "transport" ||
