@@ -8,7 +8,7 @@ import { DRIZZLE } from "./shared/common/database/database.module";
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    @Inject(DRIZZLE) private readonly db: Database
+    @Inject(DRIZZLE) private readonly db: Database,
   ) {}
 
   @Get()
@@ -27,7 +27,7 @@ export class AppController {
     try {
       await this.db.execute(sql`SELECT 1`);
       return { status: "ok", database: "connected" };
-    } catch (error) {
+    } catch {
       return { status: "error", database: "disconnected" };
     }
   }

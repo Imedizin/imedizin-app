@@ -37,7 +37,15 @@ export class ExtractAssistanceRequestFromEmailCommand {
 
     const userMessage = `Subject: ${email.subject}\nReceived: ${receivedStr}\n\nBody:\n${bodyText.slice(0, MAX_BODY_LENGTH)}`;
 
-    const raw = await this.aiModelService.complete(
+    // AIModelService.complete returns Promise<string>; type can be unresolved when ai module is not in lint scope
+    const raw: string = await (
+      this.aiModelService as {
+        complete(
+          messages: Array<{ role: string; content: string }>,
+          options?: { maxTokens?: number; temperature?: number },
+        ): Promise<string>;
+      }
+    ).complete(
       [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userMessage },
