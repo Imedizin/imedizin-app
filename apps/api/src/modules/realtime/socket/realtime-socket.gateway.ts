@@ -12,13 +12,19 @@ import { filter } from "rxjs/operators";
 import { RealtimePublisher } from "../realtime.publisher";
 import type { RealtimeEvent } from "../realtime.events";
 
+/** Allowed CORS origins for Socket.IO (same as REST API: FRONTEND_URL, comma-separated). */
+const corsOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
 /**
  * Socket.IO gateway – subscribes to RealtimePublisher and emits email.received
  * to all connected clients.
  */
 @WebSocketGateway({
   namespace: "/realtime",
-  cors: { origin: true },
+  cors: { origin: corsOrigins.length > 0 ? corsOrigins : true },
 })
 export class RealtimeSocketGateway
   implements

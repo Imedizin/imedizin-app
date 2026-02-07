@@ -10,13 +10,16 @@ async function bootstrap() {
 
   app.useWebSocketAdapter(new IoAdapter(app));
 
-  // Enable CORS for frontend(s). Supports comma-separated origins (e.g. for prod + staging).
-  const frontendUrls = (process.env.FRONTEND_URL || "http://localhost:5173")
+  // Enable CORS for frontend(s). FRONTEND_URL can be comma-separated (e.g. prod + staging).
+  const corsOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
     .split(",")
-    .map((u) => u.trim())
+    .map((s) => s.trim())
     .filter(Boolean);
   app.enableCors({
-    origin: frontendUrls.length > 0 ? frontendUrls : "http://localhost:5173",
+    origin:
+      corsOrigins.length > 1
+        ? corsOrigins
+        : (corsOrigins[0] ?? "http://localhost:5173"),
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

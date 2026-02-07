@@ -74,6 +74,7 @@ The dashboard build uses `VITE_API_BASE_URL=http://localhost:3000` by default so
 | Topic                     | Recommendation                                                                                                                 |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | **API URL for dashboard** | Build with `--build-arg VITE_API_BASE_URL=https://api.yourdomain.com` (or set in compose `build.args`).                        |
+| **CORS (production)**     | In `api.env`, set `FRONTEND_URL` to the dashboard origin exactly (e.g. `https://assistance.imedizin.com`). No trailing slash. Comma-separate for multiple origins. |
 | **Secrets**               | Use Docker secrets, or env from your orchestrator (e.g. Kubernetes secrets, ECS task env), not plain env in committed compose. |
 | **Migrations**            | Optionally run in CI or a one-off job instead of in the API entrypoint.                                                        |
 | **Logs**                  | Stdout/stderr; configure your platform to collect them (e.g. CloudWatch, Datadog).                                             |
