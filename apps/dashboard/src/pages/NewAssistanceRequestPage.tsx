@@ -100,11 +100,7 @@ const NewAssistanceRequestPage: React.FC = () => {
 
   useEffect(() => {
     if (!extractMutation.isSuccess || !extractMutation.data) return;
-    const { rawAiResponse, ...rest } = extractMutation.data;
-    const data: ExtractFromEmailResponse = rest;
-    if (rawAiResponse != null) {
-      console.debug("[Extract from email] Raw AI response:", rawAiResponse);
-    }
+    const data = extractMutation.data;
     form.setFieldsValue({
       requestNumber: data.requestNumber,
       receivedAt: data.receivedAt ? dayjs(data.receivedAt) : undefined,

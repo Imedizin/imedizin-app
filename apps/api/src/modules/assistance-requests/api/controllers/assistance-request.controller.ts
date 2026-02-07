@@ -50,16 +50,12 @@ export class AssistanceRequestController {
   @Post("extract-from-email")
   async extractFromEmail(
     @Body() dto: ExtractFromEmailRequestDto
-  ): Promise<{
-    data: ExtractFromEmailResponseDto & { rawAiResponse: string };
-  }> {
+  ): Promise<{ data: ExtractFromEmailResponseDto }> {
     const result = await this.extractFromEmailCommand.execute(
       dto.emailId,
       dto.type,
     );
-    return {
-      data: { ...result.data, rawAiResponse: result.rawAiResponse },
-    };
+    return { data: result.data };
   }
 
   @Get()

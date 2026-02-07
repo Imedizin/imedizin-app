@@ -37,24 +37,18 @@ export interface ExtractFromEmailParams {
   type?: "transport" | "medical_case";
 }
 
-/** API response: extracted data plus raw AI output for debugging. */
-export type ExtractFromEmailApiResponse = ExtractFromEmailResponse & {
-  /** Raw string returned by the AI model (for debugging). */
-  rawAiResponse?: string;
-};
-
 export function useExtractFromEmailCommand() {
   const mutation = useMutation({
     mutationFn: async (
       params: ExtractFromEmailParams | string
-    ): Promise<ExtractFromEmailApiResponse> => {
+    ): Promise<ExtractFromEmailResponse> => {
       const { emailId, type } =
         typeof params === "string" ? { emailId: params, type: undefined } : params;
       const result = await apiClient
         .post("assistance-requests/extract-from-email", {
           json: { emailId, ...(type && { type }) },
         })
-        .json<ApiResponse<ExtractFromEmailApiResponse>>();
+        .json<ApiResponse<ExtractFromEmailResponse>>();
       return result.data;
     },
     onError: (error: Error) => {

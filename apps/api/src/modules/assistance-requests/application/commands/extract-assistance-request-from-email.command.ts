@@ -93,7 +93,7 @@ export class ExtractAssistanceRequestFromEmailCommand {
   async execute(
     emailId: string,
     type?: "transport" | "medical_case",
-  ): Promise<{ data: ExtractFromEmailResponseDto; rawAiResponse: string }> {
+  ): Promise<{ data: ExtractFromEmailResponseDto }> {
     const email = await this.emailRepository.findById(emailId);
     if (!email) {
       throw new NotFoundException(`Email with ID ${emailId} not found`);
@@ -137,7 +137,7 @@ export class ExtractAssistanceRequestFromEmailCommand {
       );
     }
     const data = this.normalizeResponse(parsed, email.receivedAt, type);
-    return { data, rawAiResponse: raw };
+    return { data };
   }
 
   private getBodyText(
