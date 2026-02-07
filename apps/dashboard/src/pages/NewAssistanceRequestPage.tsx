@@ -106,6 +106,21 @@ const NewAssistanceRequestPage: React.FC = () => {
       patientNationality: data.patientNationality,
       diagnosis: data.diagnosis,
       notes: data.notes,
+      // Transportation details (when extracted from email)
+      pickupPoint: data.pickupPoint,
+      dropOffPoint: data.dropoffPoint,
+      dateOfRequestedTransportation: data.dateOfRequestedTransportation
+        ? dayjs(data.dateOfRequestedTransportation)
+        : undefined,
+      estimatedPickupTime: data.estimatedPickupTime
+        ? dayjs(data.estimatedPickupTime)
+        : undefined,
+      estimatedDropOffTime: data.estimatedDropoffTime
+        ? dayjs(data.estimatedDropoffTime)
+        : undefined,
+      modeOfTransportation: data.modeOfTransport,
+      withEscortingMedicalCrew: data.medicalCrewRequired ?? false,
+      hasCompanion: data.hasCompanion ?? false,
     });
     if (
       data.requestType === "transport" ||

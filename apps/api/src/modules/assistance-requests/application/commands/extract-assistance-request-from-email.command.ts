@@ -7,6 +7,8 @@ const MAX_BODY_LENGTH = 6000;
 
 const SYSTEM_PROMPT = `You extract structured assistance request data from emails (medical transport or medical case requests).
 Return ONLY valid JSON, no markdown and no explanation, with these keys (omit if not found):
+
+Shared:
 - requestNumber (string): e.g. IM-TR-2025-0123 or IM-MD-2025-0132
 - insuranceCompanyReferenceNumber (string, optional)
 - patientName (string)
@@ -14,7 +16,17 @@ Return ONLY valid JSON, no markdown and no explanation, with these keys (omit if
 - patientNationality (string, optional)
 - diagnosis (string, optional)
 - notes (string, optional)
-- requestType (string, optional): "transport" or "medical_case" if clear from content`;
+- requestType (string, optional): "transport" or "medical_case" if clear from content
+
+Transportation (only for transport requests; omit if not in email):
+- pickupPoint (string, optional): full pickup address
+- dropoffPoint (string, optional): full drop-off address
+- dateOfRequestedTransportation (string, optional): YYYY-MM-DD
+- estimatedPickupTime (string, optional): ISO 8601 date-time
+- estimatedDropoffTime (string, optional): ISO 8601 date-time
+- modeOfTransport (string, optional): one of "lemozen", "als", "bls"
+- medicalCrewRequired (boolean, optional): true if escorting medical crew is mentioned
+- hasCompanion (boolean, optional): true if companion is mentioned`;
 
 @Injectable()
 export class ExtractAssistanceRequestFromEmailCommand {
@@ -103,6 +115,14 @@ export class ExtractAssistanceRequestFromEmailCommand {
       ? emailReceivedAt.toISOString()
       : undefined;
 
+    const modeOfTransport = parsed.modeOfTransport as string | undefined;
+    const validMode =
+      modeOfTransport === "lemozen" ||
+      modeOfTransport === "als" ||
+      modeOfTransport === "bls"
+        ? modeOfTransport
+        : undefined;
+
     return {
       requestNumber:
         typeof parsed.requestNumber === "string"
@@ -127,6 +147,33 @@ export class ExtractAssistanceRequestFromEmailCommand {
         typeof parsed.diagnosis === "string" ? parsed.diagnosis : undefined,
       notes: typeof parsed.notes === "string" ? parsed.notes : undefined,
       requestType: validType,
+      pickupPoint:
+        typeof parsed.pickupPoint === "string" ? parsed.pickupPoint : undefined,
+      dropoffPoint:
+        typeof parsed.dropoffPoint === "string"
+          ? parsed.dropoffPoint
+          : undefined,
+      dateOfRequestedTransportation:
+        typeof parsed.dateOfRequestedTransportation === "string"
+          ? parsed.dateOfRequestedTransportation
+          : undefined,
+      estimatedPickupTime:
+        typeof parsed.estimatedPickupTime === "string"
+          ? parsed.estimatedPickupTime
+          : undefined,
+      estimatedDropoffTime:
+        typeof parsed.estimatedDropoffTime === "string"
+          ? parsed.estimatedDropoffTime
+          : undefined,
+      modeOfTransport: validMode,
+      medicalCrewRequired:
+        typeof parsed.medicalCrewRequired === "boolean"
+          ? parsed.medicalCrewRequired
+          : undefined,
+      hasCompanion:
+        typeof parsed.hasCompanion === "boolean"
+          ? parsed.hasCompanion
+          : undefined,
     };
   }
 }

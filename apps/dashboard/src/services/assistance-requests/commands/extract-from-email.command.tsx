@@ -13,6 +13,15 @@ export interface ExtractFromEmailResponse {
   diagnosis?: string;
   notes?: string;
   requestType?: "transport" | "medical_case";
+  /** Transportation details (when requestType is transport) */
+  pickupPoint?: string;
+  dropoffPoint?: string;
+  dateOfRequestedTransportation?: string;
+  estimatedPickupTime?: string;
+  estimatedDropoffTime?: string;
+  modeOfTransport?: "lemozen" | "als" | "bls";
+  medicalCrewRequired?: boolean;
+  hasCompanion?: boolean;
 }
 
 export function useExtractFromEmailCommand() {
