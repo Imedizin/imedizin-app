@@ -41,6 +41,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   return (
     <ThemeContext.Provider value={contextValue}>
       <ConfigProvider
+        // componentSize="large"
         theme={{
           algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
           token: {
@@ -50,8 +51,24 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
             borderRadius: 8,
             fontFamily:
               '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+            // Light mode: clearer input borders and placeholder contrast
+            ...(isDark
+              ? {}
+              : {
+                  colorBorder: "#c2cfcf",
+                  colorBorderSecondary: "#d4dddd",
+                  colorTextPlaceholder: "rgba(0, 0, 0, 0.5)",
+                  colorTextQuaternary: "rgba(0, 0, 0, 0.45)",
+                }),
           },
           components: {
+            ...(isDark
+              ? {}
+              : {
+                  Input: { colorBgContainer: "#f5fafa" },
+                  Select: { colorBgContainer: "#f5fafa" },
+                  DatePicker: { colorBgContainer: "#f5fafa" },
+                }),
             Menu: {
               itemBorderRadius: 8,
               itemMarginInline: 8,

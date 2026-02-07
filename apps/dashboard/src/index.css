@@ -71,7 +71,10 @@
   cursor: pointer;
   margin-top: 0.2em;
 }
-.email-editor-content.ProseMirror ul[data-type="taskList"] li[data-checked="true"] > div {
+.email-editor-content.ProseMirror
+  ul[data-type="taskList"]
+  li[data-checked="true"]
+  > div {
   text-decoration: line-through;
   opacity: 0.7;
 }
@@ -82,7 +85,9 @@
   height: 0;
   pointer-events: none;
 }
-[data-dark="true"] .email-editor-content.ProseMirror p.is-editor-empty:first-child::before {
+[data-dark="true"]
+  .email-editor-content.ProseMirror
+  p.is-editor-empty:first-child::before {
   color: rgba(255, 255, 255, 0.4);
 }
 
@@ -104,16 +109,31 @@
   padding-left: 1em;
   color: rgba(128, 128, 128, 0.9);
 }
-.email-preview-body h1 { font-size: 1.5em; font-weight: 600; margin: 0.5em 0; }
-.email-preview-body h2 { font-size: 1.25em; font-weight: 600; margin: 0.5em 0; }
-.email-preview-body h3 { font-size: 1.1em; font-weight: 600; margin: 0.5em 0; }
+.email-preview-body h1 {
+  font-size: 1.5em;
+  font-weight: 600;
+  margin: 0.5em 0;
+}
+.email-preview-body h2 {
+  font-size: 1.25em;
+  font-weight: 600;
+  margin: 0.5em 0;
+}
+.email-preview-body h3 {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin: 0.5em 0;
+}
 .email-preview-body code {
   background: rgba(0, 0, 0, 0.06);
   padding: 0.15em 0.35em;
   border-radius: 4px;
   font-size: 0.9em;
 }
-.email-preview-body a { color: #0d7377; text-decoration: underline; }
+.email-preview-body a {
+  color: #0d7377;
+  text-decoration: underline;
+}
 .email-preview-body mark {
   background: rgba(250, 204, 21, 0.5);
   padding: 0.1em 0.2em;
@@ -137,7 +157,8 @@
 /* BIA Assistance Dashboard Theme - Teal & Gold */
 @layer base {
   :root {
-    --background: 180 10% 97%;
+    /* Slightly toned so white cards/inputs stand out */
+    --background: 180 8% 95%;
     --foreground: 180 20% 15%;
 
     --card: 0 0% 100%;
@@ -169,8 +190,9 @@
     --warning: 43 96% 56%;
     --warning-foreground: 0 0% 15%;
 
-    --border: 180 13% 91%;
-    --input: 180 13% 91%;
+    /* Clear borders in light mode: darker than background so inputs are visible */
+    --border: 180 10% 82%;
+    --input: 180 10% 82%;
     --ring: 176 85% 30%;
 
     --radius: 0.5rem;
@@ -181,7 +203,7 @@
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 176 85% 95%;
     --sidebar-accent-foreground: 176 85% 30%;
-    --sidebar-border: 180 13% 91%;
+    --sidebar-border: 180 10% 82%;
     --sidebar-ring: 176 85% 30%;
   }
 
