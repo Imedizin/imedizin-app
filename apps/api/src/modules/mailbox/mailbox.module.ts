@@ -37,6 +37,7 @@ import { UpdateDomainCommand } from './application/commands/update-domain.comman
 import { DeleteDomainCommand } from './application/commands/delete-domain.command';
 import { FindAllDomainsQuery } from './application/queries/find-all-domains.query';
 import { FindDomainByIdQuery } from './application/queries/find-domain-by-id.query';
+import { GetThreadSummariesByIdsQuery } from './application/queries/get-thread-summaries-by-ids.query';
 import { EmailReceivedNotificationHandler } from './application/handlers/email-received-notification.handler';
 
 @Module({
@@ -74,6 +75,7 @@ import { EmailReceivedNotificationHandler } from './application/handlers/email-r
     DeleteDomainCommand,
     FindAllDomainsQuery,
     FindDomainByIdQuery,
+    GetThreadSummariesByIdsQuery,
     GraphService,
     ThreadingService,
     MailboxCron,
@@ -106,6 +108,7 @@ import { EmailReceivedNotificationHandler } from './application/handlers/email-r
     'IMailboxRepository',
     'IDomainRepository',
     'IEmailRepository',
+    GetThreadSummariesByIdsQuery,
     GraphService,
   ],
 })

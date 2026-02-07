@@ -59,6 +59,15 @@ export interface ThreadSummary {
 }
 
 /**
+ * Minimal thread info for external modules (e.g. assistance-requests linked threads)
+ */
+export interface ThreadSummaryByIdsItem {
+  threadId: string;
+  subject: string;
+  latestDate: Date | null;
+}
+
+/**
  * Thread search options
  */
 export interface ThreadSearchOptions extends PaginationOptions {
@@ -131,6 +140,13 @@ export interface IEmailRepository {
   getThreads(
     options: ThreadSearchOptions,
   ): Promise<PaginatedResult<ThreadSummary>>;
+
+  /**
+   * Get minimal thread summaries for a list of thread IDs (for enrichment in other modules)
+   */
+  getThreadSummariesByThreadIds(
+    threadIds: string[],
+  ): Promise<ThreadSummaryByIdsItem[]>;
 
   /**
    * Update thread ID for an email (used when merging threads)

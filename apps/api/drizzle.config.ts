@@ -5,8 +5,8 @@ export default {
     // Module schemas - each module owns its database schema
     "./src/modules/mailbox/infrastructure/schema.ts",
     "./src/modules/notifications/infrastructure/schema.ts",
-    "./src/modules/operations/ambulance-transportation/infrastructure/schema.ts",
     "./src/modules/network/infrastructure/schema.ts",
+    "./src/modules/assistance-requests/infrastructure/schema.ts",
   ],
   out: "./drizzle",
   dialect: "postgresql",

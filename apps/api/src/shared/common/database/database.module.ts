@@ -4,16 +4,16 @@ import { Pool } from "pg";
 import { drizzle, NodePgDatabase } from "drizzle-orm/node-postgres";
 // Import all module schemas
 import * as mailboxSchema from "../../../modules/mailbox/infrastructure/schema";
-import * as ambulanceTransportationSchema from "../../../modules/operations/ambulance-transportation/infrastructure/schema";
 import * as notificationsSchema from "../../../modules/notifications/infrastructure/schema";
 import * as networkSchema from "../../../modules/network/infrastructure/schema";
+import * as assistanceRequestsSchema from "../../../modules/assistance-requests/infrastructure/schema";
 
 // Combine all schemas into one object for Drizzle
 const schema = {
   ...mailboxSchema,
-  ...ambulanceTransportationSchema,
   ...notificationsSchema,
   ...networkSchema,
+  ...assistanceRequestsSchema,
 };
 
 export const DRIZZLE = "DRIZZLE" as const;

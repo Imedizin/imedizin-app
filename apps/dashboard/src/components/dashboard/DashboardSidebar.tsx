@@ -5,10 +5,10 @@ import {
   MailOutlined,
   GlobalOutlined,
   InboxOutlined,
-  CarOutlined,
   TeamOutlined,
   MedicineBoxOutlined,
   ApartmentOutlined,
+  SolutionOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "@/hooks/useTheme";
@@ -44,11 +44,11 @@ function getItem(
 const menuItems: MenuItem[] = [
   getItem("Mails", "/mails", <InboxOutlined />, undefined, "/mails"),
   getItem(
-    "Transportation Requests",
-    "/transportation-requests",
-    <CarOutlined />,
+    "Assistance Requests",
+    "/assistance-requests",
+    <SolutionOutlined />,
     undefined,
-    "/transportation-requests"
+    "/assistance-requests"
   ),
   getItem("Our Network", "our-network", <ApartmentOutlined />, [
     getItem(

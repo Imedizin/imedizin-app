@@ -38,6 +38,15 @@ export type {
 // Notification types
 export type { ApiNotification } from "./notification";
 
+// Assistance requests (unified: transport + medical case)
+export type {
+  AssistanceRequestType,
+  AssistanceRequestBase,
+  TransportAssistanceRequest,
+  MedicalCaseAssistanceRequest,
+  AssistanceRequest,
+} from "./assistance-request";
+
 // Network / providers
 export type {
   CaseProvider,

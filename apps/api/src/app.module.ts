@@ -15,8 +15,8 @@ import { HttpModule } from "./shared/common/http/http.module";
 import { RealtimeModule } from "./modules/realtime/realtime.module";
 import { MailboxModule } from "./modules/mailbox/mailbox.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
-import { AmbulanceTransportationModule } from "./modules/operations/ambulance-transportation/ambulance-transportation.module";
 import { NetworkModule } from "./modules/network/network.module";
+import { AssistanceRequestsModule } from "./modules/assistance-requests/assistance-requests.module";
 
 /**
  * Root application module
@@ -79,8 +79,8 @@ import { NetworkModule } from "./modules/network/network.module";
     RealtimeModule,
     NotificationsModule,
     MailboxModule,
-    AmbulanceTransportationModule,
     NetworkModule,
+    AssistanceRequestsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

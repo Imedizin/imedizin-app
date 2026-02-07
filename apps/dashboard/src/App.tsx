@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { NuqsAdapter } from "nuqs/adapters/react";
 import { ThemeProvider } from "@/theme/ThemeProvider";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
@@ -14,8 +14,9 @@ import Mailboxes from "./pages/Mailboxes";
 import Domains from "./pages/Domains";
 import Mails from "./pages/Mails";
 import MailsOldArchitecture from "./pages/MailsOldArchitecture";
-import TransportationRequests from "./pages/TransportationRequests";
-import TransportationRequestView from "./pages/TransportationRequestView";
+import AssistanceRequests from "./pages/AssistanceRequests";
+import MedicalCaseDetailPage from "./pages/MedicalCaseDetailPage";
+import TransportAssistanceDetailPage from "./pages/TransportAssistanceDetailPage";
 import MedicalProviderView from "./pages/MedicalProviderView";
 import CaseProviderView from "./pages/CaseProviderView";
 
@@ -55,12 +56,26 @@ const App = () => (
                     element={<MailsOldArchitecture />}
                   />
                   <Route
-                    path="/transportation-requests"
-                    element={<TransportationRequests />}
+                    path="/assistance-requests"
+                    element={
+                      <Navigate to="/assistance-requests/transportation" replace />
+                    }
                   />
                   <Route
-                    path="/transportation-requests/:id"
-                    element={<TransportationRequestView />}
+                    path="/assistance-requests/medical-cases"
+                    element={<AssistanceRequests />}
+                  />
+                  <Route
+                    path="/assistance-requests/medical-cases/:id"
+                    element={<MedicalCaseDetailPage />}
+                  />
+                  <Route
+                    path="/assistance-requests/transportation"
+                    element={<AssistanceRequests />}
+                  />
+                  <Route
+                    path="/assistance-requests/transportation/:id"
+                    element={<TransportAssistanceDetailPage />}
                   />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

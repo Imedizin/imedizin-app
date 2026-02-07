@@ -14,6 +14,12 @@ import {
   caseProviders,
   medicalProviders,
 } from '../src/modules/network/infrastructure/schema';
+import {
+  assistanceRequestThreads,
+  assistanceRequests,
+  medicalRequests,
+  transportRequests,
+} from '../src/modules/assistance-requests/infrastructure/schema';
 
 const schema = {
   domains,
@@ -24,6 +30,10 @@ const schema = {
   mailboxSubscriptions,
   caseProviders,
   medicalProviders,
+  transportRequests,
+  medicalRequests,
+  assistanceRequestThreads,
+  assistanceRequests,
 };
 
 async function main() {
@@ -353,6 +363,205 @@ async function main() {
     await db.insert(caseProviders).values(caseProviderData);
     const seededCaseProviders = await db.select().from(caseProviders);
 
+    console.log('🚐 Seeding assistance requests (transport + medical)...');
+    const now = new Date();
+    const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+    const fiveDaysAgo = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
+    const tenDaysAgo = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000);
+
+    const allianz = seededCaseProviders.find((c) =>
+      c.companyName.toLowerCase().includes('allianz'),
+    );
+    const metlife = seededCaseProviders.find((c) =>
+      c.companyName.toLowerCase().includes('metlife'),
+    );
+    const cairoUni = seededMedicalProviders.find((c) =>
+      c.legalName.toLowerCase().includes('cairo university'),
+    );
+    const saudiGerman = seededMedicalProviders.find((c) =>
+      c.legalName.toLowerCase().includes('saudi german'),
+    );
+    const alexHospital = seededMedicalProviders.find((c) =>
+      c.legalName.toLowerCase().includes('andalusia'),
+    );
+
+    const assistanceParentData = [
+      {
+        requestNumber: 'TR-2025-001',
+        serviceType: 'TRANSPORT' as const,
+        status: 'CONFIRMED',
+        priority: 'NORMAL',
+        providerReferenceNumber: 'INS-REF-4401',
+        receivedAt: twoDaysAgo,
+        caseProviderId: allianz?.id ?? null,
+        patientFullName: 'Ahmed Hassan',
+        patientBirthDate: '1985-03-12',
+        patientNationalityCode: 'EG',
+      },
+      {
+        requestNumber: 'TR-2025-002',
+        serviceType: 'TRANSPORT' as const,
+        status: 'PENDING',
+        priority: 'NORMAL',
+        providerReferenceNumber: 'INS-REF-4402',
+        receivedAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000),
+        caseProviderId: metlife?.id ?? null,
+        patientFullName: 'Sara Mohamed',
+        patientBirthDate: '1992-07-08',
+        patientNationalityCode: 'EG',
+      },
+      {
+        requestNumber: 'TR-2025-003',
+        serviceType: 'TRANSPORT' as const,
+        status: 'COMPLETED',
+        providerReferenceNumber: 'INS-REF-4398',
+        receivedAt: fiveDaysAgo,
+        caseProviderId: allianz?.id ?? null,
+        patientFullName: 'Omar Khalil',
+        patientBirthDate: '1978-11-20',
+        patientNationalityCode: 'JO',
+      },
+      {
+        requestNumber: 'MC-2025-001',
+        serviceType: 'MEDICAL' as const,
+        status: 'IN_REVIEW',
+        providerReferenceNumber: 'BIA-2025-001',
+        receivedAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000),
+        caseProviderId: allianz?.id ?? null,
+        patientFullName: 'Fatma Ibrahim',
+        patientBirthDate: '1990-01-15',
+        patientNationalityCode: 'EG',
+      },
+      {
+        requestNumber: 'MC-2025-002',
+        serviceType: 'MEDICAL' as const,
+        status: 'NEW',
+        providerReferenceNumber: 'BIA-2025-002',
+        receivedAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000),
+        caseProviderId: metlife?.id ?? null,
+        patientFullName: 'Youssef Ali',
+        patientBirthDate: '1982-09-22',
+        patientNationalityCode: 'EG',
+      },
+      {
+        requestNumber: 'MC-2025-003',
+        serviceType: 'MEDICAL' as const,
+        status: 'COMPLETED',
+        providerReferenceNumber: 'BIA-2024-089',
+        receivedAt: tenDaysAgo,
+        caseProviderId: allianz?.id ?? null,
+        patientFullName: 'Layla Mahmoud',
+        patientBirthDate: '1975-04-05',
+        patientNationalityCode: 'EG',
+      },
+    ];
+
+    const insertedParents = await db
+      .insert(assistanceRequests)
+      .values(assistanceParentData)
+      .returning({ id: assistanceRequests.id, serviceType: assistanceRequests.serviceType, requestNumber: assistanceRequests.requestNumber });
+
+    const transportParents = insertedParents.filter((p) => p.serviceType === 'TRANSPORT');
+    const medicalParents = insertedParents.filter((p) => p.serviceType === 'MEDICAL');
+
+    if (transportParents.length > 0) {
+      await db.insert(transportRequests).values([
+        {
+          requestId: transportParents[0].id,
+          pickupPoint: 'Cairo University Hospital, Main Entrance',
+          dropoffPoint: '15 El Nasr St., Maadi, Cairo',
+          requestedTransportAt: twoDaysAgo,
+          modeOfTransport: 'als',
+          medicalCrewRequired: true,
+          hasCompanion: true,
+          estimatedPickupTime: twoDaysAgo,
+          estimatedDropoffTime: twoDaysAgo,
+          diagnosis: 'Post-surgery transfer',
+        },
+        {
+          requestId: transportParents[1].id,
+          pickupPoint: 'Home - 22 Mokattam Hills, Cairo',
+          dropoffPoint: 'Dar Al Fouad Hospital, 6th October',
+          requestedTransportAt: now,
+          modeOfTransport: 'bls',
+          medicalCrewRequired: false,
+          hasCompanion: false,
+          diagnosis: 'Routine dialysis',
+        },
+        {
+          requestId: transportParents[2].id,
+          pickupPoint: 'Saudi German Hospital, Cairo',
+          dropoffPoint: 'Heliopolis, 12 Baghdad St.',
+          requestedTransportAt: fiveDaysAgo,
+          modeOfTransport: 'lemozen',
+          medicalCrewRequired: true,
+          hasCompanion: true,
+          diagnosis: 'Discharge to residence',
+        },
+      ]);
+    }
+
+    if (medicalParents.length > 0 && cairoUni && saudiGerman && alexHospital) {
+      await db.insert(medicalRequests).values([
+        {
+          requestId: medicalParents[0].id,
+          caseProviderReferenceNumber: 'CP-REF-3301',
+          admissionDate: '2025-02-01',
+          dischargeDate: '2025-02-05',
+          country: 'Egypt',
+          city: 'Cairo',
+          medicalProviderId: saudiGerman.id,
+          diagnosis: 'Appendectomy - uncomplicated',
+        },
+        {
+          requestId: medicalParents[1].id,
+          caseProviderReferenceNumber: null,
+          admissionDate: '2025-02-06',
+          dischargeDate: null,
+          country: 'Egypt',
+          city: 'Giza',
+          medicalProviderId: cairoUni.id,
+          diagnosis: 'Cardiac catheterization - pending review',
+        },
+        {
+          requestId: medicalParents[2].id,
+          caseProviderReferenceNumber: 'CP-REF-3280',
+          admissionDate: '2025-01-25',
+          dischargeDate: '2025-01-29',
+          country: 'Egypt',
+          city: 'Cairo',
+          medicalProviderId: alexHospital.id,
+          diagnosis: 'Knee replacement - completed',
+        },
+      ]);
+    }
+
+    // Link some assistance requests to mail threads (use thread IDs from seeded emails)
+    const distinctThreadIds = [
+      ...new Set(
+        seededEmails
+          .map((e) => e.threadId)
+          .filter((id): id is string => id != null),
+      ),
+    ];
+    let threadLinksCount = 0;
+    if (
+      distinctThreadIds.length >= 5 &&
+      transportParents.length >= 2 &&
+      medicalParents.length >= 2
+    ) {
+      await db.insert(assistanceRequestThreads).values([
+        { assistanceRequestId: transportParents[0].id, threadId: distinctThreadIds[0] },
+        { assistanceRequestId: transportParents[0].id, threadId: distinctThreadIds[1] },
+        { assistanceRequestId: transportParents[1].id, threadId: distinctThreadIds[2] },
+        { assistanceRequestId: medicalParents[0].id, threadId: distinctThreadIds[3] },
+        { assistanceRequestId: medicalParents[1].id, threadId: distinctThreadIds[4] },
+      ]);
+      threadLinksCount = 5;
+    }
+
+    const seededAssistanceRequests = await db.select().from(assistanceRequests);
+
     console.log('✅ Seeding completed successfully!');
     console.log(`📊 Seeded:`);
     console.log(`   - ${seededDomains.length} domains`);
@@ -362,6 +571,10 @@ async function main() {
     console.log(`   - ${seededAttachments.length} email attachments`);
     console.log(`   - ${seededMedicalProviders.length} medical providers`);
     console.log(`   - ${seededCaseProviders.length} case providers`);
+    console.log(`   - ${seededAssistanceRequests.length} assistance requests (transport + medical)`);
+    if (threadLinksCount > 0) {
+      console.log(`   - ${threadLinksCount} assistance request ↔ thread links`);
+    }
   } catch (error) {
     console.error('❌ Seeding failed:', error);
     throw error;

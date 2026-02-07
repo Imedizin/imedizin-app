@@ -10,6 +10,7 @@ import type {
   PaginatedResult,
   EmailSearchOptions,
   ThreadSummary,
+  ThreadSummaryByIdsItem,
   ThreadSearchOptions,
 } from '../../domain/interfaces/email.repository.interface';
 import type { EmailAttachmentRecord } from '../../domain/interfaces/email-attachment.repository.interface';
@@ -528,6 +529,44 @@ export class EmailRepository implements IEmailRepository {
       page,
       limit,
     };
+  }
+
+  /**
+   * Get minimal thread summaries for a list of thread IDs (for enrichment in other modules)
+   */
+  async getThreadSummariesByThreadIds(
+    threadIds: string[],
+  ): Promise<ThreadSummaryByIdsItem[]> {
+    if (threadIds.length === 0) {
+      return [];
+    }
+    const rows = await this.db
+      .select({
+        threadId: emails.threadId,
+        subject: emails.subject,
+        receivedAt: emails.receivedAt,
+      })
+      .from(emails)
+      .where(inArray(emails.threadId, threadIds))
+      .orderBy(desc(emails.receivedAt));
+
+    const byThread = new Map<
+      string,
+      { subject: string; latestDate: Date | null }
+    >();
+    for (const row of rows) {
+      if (row.threadId && !byThread.has(row.threadId)) {
+        byThread.set(row.threadId, {
+          subject: row.subject,
+          latestDate: row.receivedAt,
+        });
+      }
+    }
+    return Array.from(byThread.entries()).map(([threadId, v]) => ({
+      threadId,
+      subject: v.subject,
+      latestDate: v.latestDate,
+    }));
   }
 
   /**
