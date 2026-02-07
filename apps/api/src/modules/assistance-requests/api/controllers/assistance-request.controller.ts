@@ -26,6 +26,11 @@ import { UpdateMedicalRequestDto } from "../dto/update-medical-request.dto";
 import { LinkThreadDto } from "../dto/link-thread.dto";
 import { AssistanceRequestResponseDto } from "../dto/assistance-request-response.dto";
 import { GetThreadSummariesByIdsQuery } from "../../../mailbox/application/queries/get-thread-summaries-by-ids.query";
+import { ExtractAssistanceRequestFromEmailCommand } from "../../application/commands/extract-assistance-request-from-email.command";
+import {
+  ExtractFromEmailRequestDto,
+  ExtractFromEmailResponseDto,
+} from "../dto/extract-from-email.dto";
 
 @Controller("api/assistance-requests")
 export class AssistanceRequestController {
@@ -36,15 +41,24 @@ export class AssistanceRequestController {
     private readonly updateMedicalCommand: UpdateMedicalRequestCommand,
     private readonly linkThreadCommand: LinkThreadCommand,
     private readonly unlinkThreadCommand: UnlinkThreadCommand,
+    private readonly extractFromEmailCommand: ExtractAssistanceRequestFromEmailCommand,
     private readonly findAllQuery: FindAllAssistanceRequestsQuery,
     private readonly findByIdQuery: FindAssistanceRequestByIdQuery,
-    private readonly getThreadSummariesByIdsQuery: GetThreadSummariesByIdsQuery,
+    private readonly getThreadSummariesByIdsQuery: GetThreadSummariesByIdsQuery
   ) {}
+
+  @Post("extract-from-email")
+  async extractFromEmail(
+    @Body() dto: ExtractFromEmailRequestDto
+  ): Promise<{ data: ExtractFromEmailResponseDto }> {
+    const data = await this.extractFromEmailCommand.execute(dto.emailId);
+    return { data };
+  }
 
   @Get()
   async findAll(
     @Query("serviceType") serviceType?: "TRANSPORT" | "MEDICAL",
-    @Query("status") status?: string,
+    @Query("status") status?: string
   ): Promise<{ data: AssistanceRequestResponseDto[] }> {
     const list = await this.findAllQuery.execute({
       serviceType: serviceType ?? undefined,
@@ -56,11 +70,11 @@ export class AssistanceRequestController {
   @Post(":id/threads")
   async linkThread(
     @Param("id") id: string,
-    @Body() dto: LinkThreadDto,
+    @Body() dto: LinkThreadDto
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.linkThreadCommand.execute(id, dto.threadId.trim());
     const summaries = await this.getThreadSummariesByIdsQuery.execute(
-      req.threadIds,
+      req.threadIds
     );
     return { data: new AssistanceRequestResponseDto(req, summaries) };
   }
@@ -68,25 +82,25 @@ export class AssistanceRequestController {
   @Delete(":id/threads/:threadId")
   async unlinkThread(
     @Param("id") id: string,
-    @Param("threadId") threadId: string,
+    @Param("threadId") threadId: string
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.unlinkThreadCommand.execute(id, threadId);
     const summaries = await this.getThreadSummariesByIdsQuery.execute(
-      req.threadIds,
+      req.threadIds
     );
     return { data: new AssistanceRequestResponseDto(req, summaries) };
   }
 
   @Get(":id")
   async findOne(
-    @Param("id") id: string,
+    @Param("id") id: string
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.findByIdQuery.execute(id);
     if (!req) {
       throw new NotFoundException("Assistance request not found");
     }
     const summaries = await this.getThreadSummariesByIdsQuery.execute(
-      req.threadIds,
+      req.threadIds
     );
     return { data: new AssistanceRequestResponseDto(req, summaries) };
   }
@@ -94,7 +108,7 @@ export class AssistanceRequestController {
   @Post("transport")
   @HttpCode(HttpStatus.CREATED)
   async createTransport(
-    @Body() dto: CreateTransportRequestDto,
+    @Body() dto: CreateTransportRequestDto
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.createTransportCommand.execute({
       requestNumber: dto.requestNumber,
@@ -128,7 +142,7 @@ export class AssistanceRequestController {
   @Patch("transport/:id")
   async updateTransport(
     @Param("id") id: string,
-    @Body() dto: UpdateTransportRequestDto,
+    @Body() dto: UpdateTransportRequestDto
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.updateTransportCommand.execute(id, {
       requestNumber: dto.requestNumber,
@@ -157,7 +171,7 @@ export class AssistanceRequestController {
       diagnosis: dto.diagnosis ?? null,
     });
     const summaries = await this.getThreadSummariesByIdsQuery.execute(
-      req.threadIds,
+      req.threadIds
     );
     return { data: new AssistanceRequestResponseDto(req, summaries) };
   }
@@ -165,7 +179,7 @@ export class AssistanceRequestController {
   @Patch("medical/:id")
   async updateMedical(
     @Param("id") id: string,
-    @Body() dto: UpdateMedicalRequestDto,
+    @Body() dto: UpdateMedicalRequestDto
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.updateMedicalCommand.execute(id, {
       requestNumber: dto.requestNumber,
@@ -186,7 +200,7 @@ export class AssistanceRequestController {
       diagnosis: dto.diagnosis ?? null,
     });
     const summaries = await this.getThreadSummariesByIdsQuery.execute(
-      req.threadIds,
+      req.threadIds
     );
     return { data: new AssistanceRequestResponseDto(req, summaries) };
   }
@@ -194,7 +208,7 @@ export class AssistanceRequestController {
   @Post("medical")
   @HttpCode(HttpStatus.CREATED)
   async createMedical(
-    @Body() dto: CreateMedicalRequestDto,
+    @Body() dto: CreateMedicalRequestDto
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.createMedicalCommand.execute({
       requestNumber: dto.requestNumber,

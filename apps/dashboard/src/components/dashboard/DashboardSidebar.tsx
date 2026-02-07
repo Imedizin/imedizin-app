@@ -10,6 +10,7 @@ import {
   MedicineBoxOutlined,
   ApartmentOutlined,
   SolutionOutlined,
+  CarOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "@/hooks/useTheme";
@@ -45,13 +46,22 @@ function getItem(
 const menuItems: MenuItem[] = [
   getItem("Dashboard", "/", <DashboardOutlined />, undefined, "/"),
   getItem("Mails", "/mails", <InboxOutlined />, undefined, "/mails"),
-  getItem(
-    "Assistance Requests",
-    "/assistance-requests",
-    <SolutionOutlined />,
-    undefined,
-    "/assistance-requests"
-  ),
+  getItem("Assistance Requests", "assistance-requests", <SolutionOutlined />, [
+    getItem(
+      "Medical cases",
+      "/assistance-requests/medical-cases",
+      <MedicineBoxOutlined />,
+      undefined,
+      "/assistance-requests/medical-cases"
+    ),
+    getItem(
+      "Transportation",
+      "/assistance-requests/transportation",
+      <CarOutlined />,
+      undefined,
+      "/assistance-requests/transportation"
+    ),
+  ], "/assistance-requests"),
   getItem("Our Network", "our-network", <ApartmentOutlined />, [
     getItem(
       "Case Providers (Insurers)",
@@ -165,7 +175,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ collapsed }) => {
       <Menu
         mode="inline"
         selectedKeys={[selectedKey]}
-        defaultOpenKeys={["our-network", "mailbox-management"]}
+        defaultOpenKeys={["our-network", "mailbox-management", "assistance-requests"]}
         style={{ border: "none", padding: "8px 0" }}
         items={menuItems}
       />

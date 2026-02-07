@@ -29,8 +29,14 @@ import {
   FullscreenOutlined,
   ShrinkOutlined,
   PaperClipOutlined,
+  SolutionOutlined,
 } from "@ant-design/icons";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  useSearchParams,
+  Link,
+} from "react-router-dom";
 import { useTheme } from "@/hooks/useTheme";
 import {
   useGetThreadsQuery,
@@ -57,17 +63,17 @@ type RecipientInput = { email: string; name?: string };
 
 function buildReplyAllRecipients(
   message: EmailDetail,
-  excludeAddress: string,
+  excludeAddress: string
 ): { to: RecipientInput[]; cc: RecipientInput[] } {
   const exclude = excludeAddress.trim().toLowerCase();
   const toParticipants = message.participants.filter(
     (p: EmailParticipant) =>
       (p.type === "from" || p.type === "to") &&
-      p.emailAddress.trim().toLowerCase() !== exclude,
+      p.emailAddress.trim().toLowerCase() !== exclude
   );
   const ccParticipants = message.participants.filter(
     (p: EmailParticipant) =>
-      p.type === "cc" && p.emailAddress.trim().toLowerCase() !== exclude,
+      p.type === "cc" && p.emailAddress.trim().toLowerCase() !== exclude
   );
   const dedupe = (list: EmailParticipant[]): RecipientInput[] => {
     const seen = new Set<string>();
@@ -109,21 +115,27 @@ const Mails: React.FC = () => {
           .get(`emails/${openEmailId}`)
           .json<EmailDetail>();
         if (cancelled) return;
-        setSearchParams((prev) => {
-          const next = new URLSearchParams(prev);
-          next.delete("openEmailId");
-          return next;
-        }, { replace: true });
+        setSearchParams(
+          (prev) => {
+            const next = new URLSearchParams(prev);
+            next.delete("openEmailId");
+            return next;
+          },
+          { replace: true }
+        );
         if (email.threadId) {
           navigate(`/mails/${email.threadId}`, { replace: true });
         }
       } catch {
         if (!cancelled) {
-          setSearchParams((prev) => {
-            const next = new URLSearchParams(prev);
-            next.delete("openEmailId");
-            return next;
-          }, { replace: true });
+          setSearchParams(
+            (prev) => {
+              const next = new URLSearchParams(prev);
+              next.delete("openEmailId");
+              return next;
+            },
+            { replace: true }
+          );
         }
       }
     })();
@@ -135,11 +147,11 @@ const Mails: React.FC = () => {
   const [starredThreads, setStarredThreads] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedMessages, setExpandedMessages] = useState<Set<string>>(
-    new Set(),
+    new Set()
   );
   const [composeOpen, setComposeOpen] = useState(false);
   const [replyToMessage, setReplyToMessage] = useState<EmailDetail | null>(
-    null,
+    null
   );
   const [composeInitialToRecipients, setComposeInitialToRecipients] = useState<
     RecipientInput[] | undefined
@@ -292,7 +304,7 @@ const Mails: React.FC = () => {
     root.innerHTML = html;
 
     const quote = root.querySelector(
-      ".gmail_quote, .gmail_quote_container, blockquote, .AppleMailQuote, .yahoo_quoted",
+      ".gmail_quote, .gmail_quote_container, blockquote, .AppleMailQuote, .yahoo_quoted"
     );
 
     if (quote) {
@@ -310,7 +322,7 @@ const Mails: React.FC = () => {
 
   const getParticipantsByType = (
     participants: EmailDetail["participants"],
-    type: string,
+    type: string
   ) => {
     return participants
       .filter((p) => p.type === type)
@@ -320,7 +332,7 @@ const Mails: React.FC = () => {
 
   const getParticipantEmailsByType = (
     participants: EmailDetail["participants"],
-    type: string,
+    type: string
   ) => {
     return participants
       .filter((p) => p.type === type)
@@ -475,7 +487,7 @@ const Mails: React.FC = () => {
                       size={42}
                       style={{
                         backgroundColor: getAvatarColor(
-                          thread.participants[0] || "U",
+                          thread.participants[0] || "U"
                         ),
                       }}
                     >
@@ -685,7 +697,7 @@ const Mails: React.FC = () => {
                         onClick={() => {
                           if (selectedThread) {
                             navigator.clipboard.writeText(
-                              selectedThread.threadId,
+                              selectedThread.threadId
                             );
                             message.success("Thread ID copied to clipboard");
                           }
@@ -782,11 +794,11 @@ const Mails: React.FC = () => {
                   const isExpanded = expandedMessages.has(email.id);
                   const fromName = getParticipantsByType(
                     email.participants,
-                    "from",
+                    "from"
                   );
                   const fromEmail = getParticipantEmailsByType(
                     email.participants,
-                    "from",
+                    "from"
                   );
                   const isLatest = index === selectedThread.messages.length - 1;
 
@@ -904,7 +916,7 @@ const Mails: React.FC = () => {
                             </Text>
                             {getParticipantsByType(
                               email.participants,
-                              "cc",
+                              "cc"
                             ) && (
                               <>
                                 <br />
@@ -914,7 +926,7 @@ const Mails: React.FC = () => {
                                   Cc:{" "}
                                   {getParticipantsByType(
                                     email.participants,
-                                    "cc",
+                                    "cc"
                                   )}
                                 </Text>
                               </>
@@ -1068,7 +1080,7 @@ const Mails: React.FC = () => {
                         ?.address ?? "";
                     const { to, cc } = buildReplyAllRecipients(
                       latest,
-                      mailboxAddress,
+                      mailboxAddress
                     );
                     setReplyToMessage(latest);
                     setComposeInitialToRecipients(to);
@@ -1077,6 +1089,13 @@ const Mails: React.FC = () => {
                   }}
                 >
                   Reply All
+                </Button>
+                <Button
+                  icon={<SolutionOutlined />}
+                  href={`/assistance-requests/new?emailId=${encodeURIComponent(selectedThread.messages[selectedThread.messages.length - 1].id)}`}
+                  style={{ marginLeft: "auto" }}
+                >
+                  Create assistance request from email
                 </Button>
                 {/* <Button>Forward</Button> */}
               </div>
