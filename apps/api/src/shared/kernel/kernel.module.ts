@@ -1,4 +1,4 @@
-import { Module, Global } from '@nestjs/common';
+import { Module, Global } from "@nestjs/common";
 
 /**
  * Global kernel module providing base classes, exceptions, and interfaces

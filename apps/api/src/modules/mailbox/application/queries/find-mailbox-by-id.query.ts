@@ -1,7 +1,7 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { NotFoundException } from '@nestjs/common';
-import type { IMailboxRepository } from '../../domain/interfaces/mailbox.repository.interface';
-import { Mailbox } from '../../domain/entities/mailbox.entity';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { NotFoundException } from "@nestjs/common";
+import type { IMailboxRepository } from "../../domain/interfaces/mailbox.repository.interface";
+import { Mailbox } from "../../domain/entities/mailbox.entity";
 
 /**
  * Query to find a mailbox by ID
@@ -15,7 +15,7 @@ export class FindMailboxByIdQuery {
   private readonly logger = new Logger(FindMailboxByIdQuery.name);
 
   constructor(
-    @Inject('IMailboxRepository')
+    @Inject("IMailboxRepository")
     private readonly mailboxRepository: IMailboxRepository,
   ) {}
 

@@ -1,10 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { DRIZZLE } from '../../../../shared/common/database/database.module';
-import type { Database } from '../../../../shared/common/database/database.module';
-import { mailboxes } from '../schema';
-import { Mailbox } from '../../domain/entities/mailbox.entity';
-import { IMailboxRepository } from '../../domain/interfaces/mailbox.repository.interface';
-import { eq } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DRIZZLE } from "../../../../shared/common/database/database.module";
+import type { Database } from "../../../../shared/common/database/database.module";
+import { mailboxes } from "../schema";
+import { Mailbox } from "../../domain/entities/mailbox.entity";
+import { IMailboxRepository } from "../../domain/interfaces/mailbox.repository.interface";
+import { eq } from "drizzle-orm";
 
 /**
  * Mailbox repository implementation

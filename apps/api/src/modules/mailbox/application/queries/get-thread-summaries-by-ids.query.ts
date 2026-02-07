@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
-import type { IEmailRepository } from '../../domain/interfaces/email.repository.interface';
-import type { ThreadSummaryByIdsItem } from '../../domain/interfaces/email.repository.interface';
+import { Inject, Injectable } from "@nestjs/common";
+import type { IEmailRepository } from "../../domain/interfaces/email.repository.interface";
+import type { ThreadSummaryByIdsItem } from "../../domain/interfaces/email.repository.interface";
 
 /**
  * Returns minimal thread info (subject, latestDate) for the given thread IDs.
@@ -9,7 +9,7 @@ import type { ThreadSummaryByIdsItem } from '../../domain/interfaces/email.repos
 @Injectable()
 export class GetThreadSummariesByIdsQuery {
   constructor(
-    @Inject('IEmailRepository')
+    @Inject("IEmailRepository")
     private readonly emailRepository: IEmailRepository,
   ) {}
 

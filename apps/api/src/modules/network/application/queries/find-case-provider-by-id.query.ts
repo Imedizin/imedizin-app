@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
-import type { CaseProvider } from '../../domain/entities/case-provider.entity';
-import type { ICaseProviderRepository } from '../../domain/interfaces/case-provider.repository.interface';
+import { Inject, Injectable } from "@nestjs/common";
+import type { CaseProvider } from "../../domain/entities/case-provider.entity";
+import type { ICaseProviderRepository } from "../../domain/interfaces/case-provider.repository.interface";
 
 export interface FindCaseProviderByIdQueryPayload {
   id: string;
@@ -9,7 +9,7 @@ export interface FindCaseProviderByIdQueryPayload {
 @Injectable()
 export class FindCaseProviderByIdQuery {
   constructor(
-    @Inject('ICaseProviderRepository')
+    @Inject("ICaseProviderRepository")
     private readonly caseProviderRepository: ICaseProviderRepository,
   ) {}
 
@@ -23,4 +23,3 @@ export class FindCaseProviderByIdQuery {
     return provider;
   }
 }
-

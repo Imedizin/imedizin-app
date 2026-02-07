@@ -11,7 +11,7 @@ export class MailboxSubscription {
     public notificationUrl: string,
     public expirationDateTime: Date,
     public clientState?: string,
-    public changeType: string = 'created,updated,deleted',
+    public changeType: string = "created,updated,deleted",
     public createdAt?: Date,
     public updatedAt?: Date,
   ) {}

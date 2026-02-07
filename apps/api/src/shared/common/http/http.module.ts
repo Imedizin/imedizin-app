@@ -1,5 +1,5 @@
-import { Module, Global } from '@nestjs/common';
-import { HttpModule as AxiosHttpModule } from '@nestjs/axios';
+import { Module, Global } from "@nestjs/common";
+import { HttpModule as AxiosHttpModule } from "@nestjs/axios";
 
 /**
  * Global HTTP module

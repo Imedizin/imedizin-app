@@ -8,21 +8,21 @@ import {
   Param,
   HttpCode,
   HttpStatus,
-} from '@nestjs/common';
-import { CreateDomainDto } from '../dto/create-domain.dto';
-import { UpdateDomainDto } from '../dto/update-domain.dto';
-import { DomainResponseDto } from '../dto/domain-response.dto';
-import { CreateDomainCommand } from '../../application/commands/create-domain.command';
-import { UpdateDomainCommand } from '../../application/commands/update-domain.command';
-import { DeleteDomainCommand } from '../../application/commands/delete-domain.command';
-import { FindAllDomainsQuery } from '../../application/queries/find-all-domains.query';
-import { FindDomainByIdQuery } from '../../application/queries/find-domain-by-id.query';
+} from "@nestjs/common";
+import { CreateDomainDto } from "../dto/create-domain.dto";
+import { UpdateDomainDto } from "../dto/update-domain.dto";
+import { DomainResponseDto } from "../dto/domain-response.dto";
+import { CreateDomainCommand } from "../../application/commands/create-domain.command";
+import { UpdateDomainCommand } from "../../application/commands/update-domain.command";
+import { DeleteDomainCommand } from "../../application/commands/delete-domain.command";
+import { FindAllDomainsQuery } from "../../application/queries/find-all-domains.query";
+import { FindDomainByIdQuery } from "../../application/queries/find-domain-by-id.query";
 
 /**
  * Domain controller
  * Handles HTTP requests for domain management
  */
-@Controller('api/domains')
+@Controller("api/domains")
 export class DomainController {
   constructor(
     private readonly createDomainCommand: CreateDomainCommand,
@@ -48,8 +48,8 @@ export class DomainController {
    * Get domain by ID
    * GET /api/domains/:id
    */
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<{ data: DomainResponseDto }> {
+  @Get(":id")
+  async findOne(@Param("id") id: string): Promise<{ data: DomainResponseDto }> {
     const domain = await this.findDomainByIdQuery.execute({ id });
     return {
       data: new DomainResponseDto(domain),
@@ -79,9 +79,9 @@ export class DomainController {
    * Update a domain
    * PATCH /api/domains/:id
    */
-  @Patch(':id')
+  @Patch(":id")
   async update(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() updateDomainDto: UpdateDomainDto,
   ): Promise<{ data: DomainResponseDto }> {
     const domain = await this.updateDomainCommand.execute({
@@ -99,9 +99,9 @@ export class DomainController {
    * Delete a domain
    * DELETE /api/domains/:id
    */
-  @Delete(':id')
+  @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: string): Promise<void> {
+  async remove(@Param("id") id: string): Promise<void> {
     await this.deleteDomainCommand.execute({ id });
   }
 }

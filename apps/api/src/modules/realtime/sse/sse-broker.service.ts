@@ -34,7 +34,7 @@ export class SseBrokerService implements OnModuleInit, OnModuleDestroy {
 
   onModuleInit(): void {
     this.subscription = this.publisher.stream.subscribe((event) =>
-      this.broadcast(event)
+      this.broadcast(event),
     );
   }
 
@@ -49,18 +49,18 @@ export class SseBrokerService implements OnModuleInit, OnModuleDestroy {
   addClient(
     clientId: string,
     response: Response,
-    filter: SSEClientFilter = {}
+    filter: SSEClientFilter = {},
   ): void {
     this.clients.set(clientId, { response, filter });
     this.logger.log(
-      `SSE client connected: ${clientId} (${this.clients.size} total)`
+      `SSE client connected: ${clientId} (${this.clients.size} total)`,
     );
   }
 
   removeClient(clientId: string): void {
     this.clients.delete(clientId);
     this.logger.log(
-      `SSE client disconnected: ${clientId} (${this.clients.size} total)`
+      `SSE client disconnected: ${clientId} (${this.clients.size} total)`,
     );
   }
 
@@ -70,14 +70,14 @@ export class SseBrokerService implements OnModuleInit, OnModuleDestroy {
 
   private matchesFilter(
     event: RealtimeEvent,
-    filter: SSEClientFilter
+    filter: SSEClientFilter,
   ): boolean {
     if (filter.topics?.length && !filter.topics.includes(event.topic)) {
       return false;
     }
     if (filter.scope && event.scope) {
       for (const [key, value] of Object.entries(filter.scope)) {
-        if (event.scope![key] !== value) return false;
+        if (event.scope[key] !== value) return false;
       }
     }
     return true;

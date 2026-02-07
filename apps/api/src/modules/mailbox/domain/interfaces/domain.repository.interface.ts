@@ -1,4 +1,4 @@
-import { Domain } from '../entities/domain.entity';
+import { Domain } from "../entities/domain.entity";
 
 /**
  * Domain repository interface

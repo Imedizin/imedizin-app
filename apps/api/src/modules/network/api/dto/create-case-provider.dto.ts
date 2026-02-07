@@ -6,8 +6,8 @@ import {
   IsOptional,
   IsString,
   MaxLength,
-} from 'class-validator';
-import { OPERATING_REGIONS } from '../../constants/operating-regions';
+} from "class-validator";
+import { OPERATING_REGIONS } from "../../constants/operating-regions";
 
 export class CreateCaseProviderDto {
   @IsString()
@@ -59,4 +59,3 @@ export class CreateCaseProviderDto {
   @IsString({ each: true })
   tags?: string[];
 }
-

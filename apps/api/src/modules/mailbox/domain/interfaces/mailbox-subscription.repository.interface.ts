@@ -1,4 +1,4 @@
-import { MailboxSubscription } from '../entities/mailbox-subscription.entity';
+import { MailboxSubscription } from "../entities/mailbox-subscription.entity";
 
 /**
  * MailboxSubscription repository interface

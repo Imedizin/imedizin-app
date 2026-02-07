@@ -54,7 +54,7 @@ export const domains = pgTable(
   },
   (t) => ({
     domainIdx: index("idx_domains_domain").on(t.domain),
-  })
+  }),
 );
 
 /**
@@ -85,16 +85,16 @@ export const mailboxSubscriptions = pgTable(
   },
   (t) => ({
     subscriptionIdIdx: index("idx_mailbox_subscriptions_subscription_id").on(
-      t.subscriptionId
+      t.subscriptionId,
     ),
     mailboxIdIdx: index("idx_mailbox_subscriptions_mailbox_id").on(t.mailboxId),
     expirationIdx: index("idx_mailbox_subscriptions_expiration").on(
-      t.expirationDateTime
+      t.expirationDateTime,
     ),
     mailboxResourceUq: uniqueIndex(
-      "uq_mailbox_subscriptions_mailbox_resource"
+      "uq_mailbox_subscriptions_mailbox_resource",
     ).on(t.mailboxId, t.resource),
-  })
+  }),
 );
 
 /**
@@ -120,7 +120,7 @@ export const mailboxes = pgTable(
   },
   (t) => ({
     addressIdx: index("idx_mailboxes_address").on(t.address),
-  })
+  }),
 );
 
 /**
@@ -162,7 +162,7 @@ export const emails = pgTable(
     directionIdx: index("idx_emails_direction").on(t.direction),
     sentAtIdx: index("idx_emails_sent_at").on(t.sentAt),
     receivedAtIdx: index("idx_emails_received_at").on(t.receivedAt),
-  })
+  }),
 );
 
 /**
@@ -187,10 +187,10 @@ export const emailParticipants = pgTable(
   (t) => ({
     emailIdIdx: index("idx_email_participants_email_id").on(t.emailId),
     emailAddressIdx: index("idx_email_participants_email_address").on(
-      t.emailAddress
+      t.emailAddress,
     ),
     typeIdx: index("idx_email_participants_type").on(t.type),
-  })
+  }),
 );
 
 /**
@@ -218,5 +218,5 @@ export const emailAttachments = pgTable(
   (t) => ({
     emailIdIdx: index("idx_email_attachments_email_id").on(t.emailId),
     fileUrlIdx: index("idx_email_attachments_file_url").on(t.fileUrl),
-  })
+  }),
 );

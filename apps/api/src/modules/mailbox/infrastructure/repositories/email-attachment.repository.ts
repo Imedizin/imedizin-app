@@ -1,13 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { DRIZZLE } from '../../../../shared/common/database/database.module';
-import type { Database } from '../../../../shared/common/database/database.module';
-import { emailAttachments } from '../schema';
-import { eq } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DRIZZLE } from "../../../../shared/common/database/database.module";
+import type { Database } from "../../../../shared/common/database/database.module";
+import { emailAttachments } from "../schema";
+import { eq } from "drizzle-orm";
 import type {
   IEmailAttachmentRepository,
   CreateAttachmentData,
   EmailAttachmentRecord,
-} from '../../domain/interfaces/email-attachment.repository.interface';
+} from "../../domain/interfaces/email-attachment.repository.interface";
 
 @Injectable()
 export class EmailAttachmentRepository implements IEmailAttachmentRepository {

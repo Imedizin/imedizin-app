@@ -1,4 +1,4 @@
-import type { CaseProvider } from '../../domain/entities/case-provider.entity';
+import type { CaseProvider } from "../../domain/entities/case-provider.entity";
 
 export class CaseProviderResponseDto {
   id: string;
@@ -33,4 +33,3 @@ export class CaseProviderResponseDto {
     this.updatedAt = provider.updatedAt || new Date();
   }
 }
-

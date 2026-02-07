@@ -1,4 +1,4 @@
-import type { AssistanceRequest } from '../../domain/entities/assistance-request.entity';
+import type { AssistanceRequest } from "../../domain/entities/assistance-request.entity";
 
 export interface LinkedThreadDto {
   threadId: string;
@@ -10,7 +10,7 @@ export interface LinkedThreadDto {
 export class AssistanceRequestResponseDto {
   id: string;
   requestNumber: string;
-  serviceType: 'TRANSPORT' | 'MEDICAL';
+  serviceType: "TRANSPORT" | "MEDICAL";
   status: string;
   priority: string | null;
   providerReferenceNumber: string | null;
@@ -47,7 +47,11 @@ export class AssistanceRequestResponseDto {
 
   constructor(
     req: AssistanceRequest,
-    linkedThreadsInput?: Array<{ threadId: string; subject: string; latestDate: Date | null }>,
+    linkedThreadsInput?: Array<{
+      threadId: string;
+      subject: string;
+      latestDate: Date | null;
+    }>,
   ) {
     this.id = req.id;
     this.requestNumber = req.requestNumber;
@@ -62,7 +66,10 @@ export class AssistanceRequestResponseDto {
     this.patientNationalityCode = req.patientNationalityCode;
     this.createdAt = req.createdAt.toISOString();
     this.updatedAt = req.updatedAt.toISOString();
-    this.linkedThreads = this.buildLinkedThreads(req.threadIds ?? [], linkedThreadsInput);
+    this.linkedThreads = this.buildLinkedThreads(
+      req.threadIds ?? [],
+      linkedThreadsInput,
+    );
 
     if (req.transportDetails) {
       this.transport = {
@@ -100,7 +107,11 @@ export class AssistanceRequestResponseDto {
 
   private buildLinkedThreads(
     threadIds: string[],
-    summaries?: Array<{ threadId: string; subject: string; latestDate: Date | null }>,
+    summaries?: Array<{
+      threadId: string;
+      subject: string;
+      latestDate: Date | null;
+    }>,
   ): LinkedThreadDto[] {
     const map = new Map(
       (summaries ?? []).map((s) => [

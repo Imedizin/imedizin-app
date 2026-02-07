@@ -1,4 +1,4 @@
-import { Mailbox } from '../entities/mailbox.entity';
+import { Mailbox } from "../entities/mailbox.entity";
 
 /**
  * Mailbox repository interface

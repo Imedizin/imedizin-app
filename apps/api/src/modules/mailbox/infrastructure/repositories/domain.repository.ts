@@ -1,10 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { DRIZZLE } from '../../../../shared/common/database/database.module';
-import type { Database } from '../../../../shared/common/database/database.module';
-import { domains } from '../schema';
-import { Domain } from '../../domain/entities/domain.entity';
-import { IDomainRepository } from '../../domain/interfaces/domain.repository.interface';
-import { eq } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DRIZZLE } from "../../../../shared/common/database/database.module";
+import type { Database } from "../../../../shared/common/database/database.module";
+import { domains } from "../schema";
+import { Domain } from "../../domain/entities/domain.entity";
+import { IDomainRepository } from "../../domain/interfaces/domain.repository.interface";
+import { eq } from "drizzle-orm";
 
 /**
  * Domain repository implementation

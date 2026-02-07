@@ -6,8 +6,8 @@ import {
   IsOptional,
   IsString,
   MaxLength,
-} from 'class-validator';
-import { ALL_MEDICAL_SPECIALTIES } from '../../constants/medical-specialties';
+} from "class-validator";
+import { ALL_MEDICAL_SPECIALTIES } from "../../constants/medical-specialties";
 
 export class CreateMedicalProviderDto {
   @IsString()
@@ -66,4 +66,3 @@ export class CreateMedicalProviderDto {
   @IsString()
   onboardedAt?: string;
 }
-

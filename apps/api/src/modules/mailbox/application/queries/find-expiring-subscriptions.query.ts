@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
-import type { IMailboxSubscriptionRepository } from '../../domain/interfaces/mailbox-subscription.repository.interface';
-import { MailboxSubscription } from '../../domain/entities/mailbox-subscription.entity';
+import { Inject, Injectable } from "@nestjs/common";
+import type { IMailboxSubscriptionRepository } from "../../domain/interfaces/mailbox-subscription.repository.interface";
+import { MailboxSubscription } from "../../domain/entities/mailbox-subscription.entity";
 
 /**
  * Query to find expiring subscriptions
@@ -8,7 +8,7 @@ import { MailboxSubscription } from '../../domain/entities/mailbox-subscription.
 @Injectable()
 export class FindExpiringSubscriptionsQuery {
   constructor(
-    @Inject('IMailboxSubscriptionRepository')
+    @Inject("IMailboxSubscriptionRepository")
     private readonly subscriptionRepository: IMailboxSubscriptionRepository,
   ) {}
 

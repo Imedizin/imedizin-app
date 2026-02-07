@@ -18,14 +18,14 @@ function notificationChange(
     messageId?: string;
     clientState?: string;
     resourceData?: { id: string };
-  } = {}
+  } = {},
 ) {
   const subscriptionId = overrides.subscriptionId ?? "sub-e2e-123";
   const messageId = overrides.messageId ?? "msg-e2e-456";
   return {
     subscriptionId,
     subscriptionExpirationDateTime: new Date(
-      Date.now() + 3600_000
+      Date.now() + 3600_000,
     ).toISOString(),
     changeType: "created" as const,
     resource: "users('user')/mailFolders('Inbox')/messages",
@@ -149,7 +149,7 @@ describe("WebhookController (e2e)", () => {
     it("enqueues new-message job when subscription exists (requires Redis)", async () => {
       const mailboxRepo = app.get<IMailboxRepository>("IMailboxRepository");
       const subscriptionRepo = app.get<IMailboxSubscriptionRepository>(
-        "IMailboxSubscriptionRepository"
+        "IMailboxSubscriptionRepository",
       );
       const queue = app.get<Queue>(getQueueToken(NEW_MESSAGE_QUEUE));
 
@@ -172,7 +172,7 @@ describe("WebhookController (e2e)", () => {
         "users('user')/mailFolders('Inbox')/messages",
         "https://example.com/webhook",
         new Date(Date.now() + 3600_000),
-        DEFAULT_CLIENT_STATE
+        DEFAULT_CLIENT_STATE,
       );
       await subscriptionRepo.save(subscription);
 
@@ -213,7 +213,7 @@ async function pollForJob(
   mailboxId: string,
   messageId: string,
   attempts: number,
-  delayMs: number
+  delayMs: number,
 ): Promise<{ id?: string; data: unknown; name: string } | undefined> {
   for (let i = 0; i < attempts; i++) {
     await new Promise((r) => setTimeout(r, delayMs));

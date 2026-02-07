@@ -1,4 +1,4 @@
-import type { MedicalProvider } from '../../domain/entities/medical-provider.entity';
+import type { MedicalProvider } from "../../domain/entities/medical-provider.entity";
 
 export class MedicalProviderResponseDto {
   id: string;
@@ -35,4 +35,3 @@ export class MedicalProviderResponseDto {
     this.updatedAt = provider.updatedAt || new Date();
   }
 }
-

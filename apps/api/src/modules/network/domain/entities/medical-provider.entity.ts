@@ -1,11 +1,11 @@
 export type MedicalProviderType =
-  | 'hospital'
-  | 'clinic'
-  | 'lab'
-  | 'pharmacy'
-  | 'doctor';
+  | "hospital"
+  | "clinic"
+  | "lab"
+  | "pharmacy"
+  | "doctor";
 
-export type ProviderStatus = 'active' | 'inactive';
+export type ProviderStatus = "active" | "inactive";
 
 export class MedicalProvider {
   constructor(
@@ -15,7 +15,7 @@ export class MedicalProvider {
     public country: string,
     public primaryEmail: string,
     public primaryPhone: string,
-    public status: ProviderStatus = 'active',
+    public status: ProviderStatus = "active",
     public specialties: string[] = [],
     public services: string[] = [],
     public businessHours?: string | null,
@@ -26,4 +26,3 @@ export class MedicalProvider {
     public updatedAt?: Date,
   ) {}
 }
-

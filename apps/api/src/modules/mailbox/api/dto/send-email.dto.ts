@@ -4,7 +4,7 @@ import {
   IsOptional,
   IsString,
   IsArray,
-} from 'class-validator';
+} from "class-validator";
 
 /**
  * Email recipient DTO
@@ -70,5 +70,5 @@ export class SendEmailResponseDto {
   threadId: string | null;
   subject: string;
   sentAt: Date;
-  direction: 'outgoing';
+  direction: "outgoing";
 }

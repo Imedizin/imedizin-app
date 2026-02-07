@@ -10,24 +10,24 @@ import {
   Patch,
   Post,
   Query,
-} from '@nestjs/common';
-import { CreateTransportRequestCommand } from '../../application/commands/create-transport-request.command';
-import { CreateMedicalRequestCommand } from '../../application/commands/create-medical-request.command';
-import { UpdateTransportRequestCommand } from '../../application/commands/update-transport-request.command';
-import { UpdateMedicalRequestCommand } from '../../application/commands/update-medical-request.command';
-import { LinkThreadCommand } from '../../application/commands/link-thread.command';
-import { UnlinkThreadCommand } from '../../application/commands/unlink-thread.command';
-import { FindAllAssistanceRequestsQuery } from '../../application/queries/find-all-assistance-requests.query';
-import { FindAssistanceRequestByIdQuery } from '../../application/queries/find-assistance-request-by-id.query';
-import { CreateTransportRequestDto } from '../dto/create-transport-request.dto';
-import { CreateMedicalRequestDto } from '../dto/create-medical-request.dto';
-import { UpdateTransportRequestDto } from '../dto/update-transport-request.dto';
-import { UpdateMedicalRequestDto } from '../dto/update-medical-request.dto';
-import { LinkThreadDto } from '../dto/link-thread.dto';
-import { AssistanceRequestResponseDto } from '../dto/assistance-request-response.dto';
-import { GetThreadSummariesByIdsQuery } from '../../../mailbox/application/queries/get-thread-summaries-by-ids.query';
+} from "@nestjs/common";
+import { CreateTransportRequestCommand } from "../../application/commands/create-transport-request.command";
+import { CreateMedicalRequestCommand } from "../../application/commands/create-medical-request.command";
+import { UpdateTransportRequestCommand } from "../../application/commands/update-transport-request.command";
+import { UpdateMedicalRequestCommand } from "../../application/commands/update-medical-request.command";
+import { LinkThreadCommand } from "../../application/commands/link-thread.command";
+import { UnlinkThreadCommand } from "../../application/commands/unlink-thread.command";
+import { FindAllAssistanceRequestsQuery } from "../../application/queries/find-all-assistance-requests.query";
+import { FindAssistanceRequestByIdQuery } from "../../application/queries/find-assistance-request-by-id.query";
+import { CreateTransportRequestDto } from "../dto/create-transport-request.dto";
+import { CreateMedicalRequestDto } from "../dto/create-medical-request.dto";
+import { UpdateTransportRequestDto } from "../dto/update-transport-request.dto";
+import { UpdateMedicalRequestDto } from "../dto/update-medical-request.dto";
+import { LinkThreadDto } from "../dto/link-thread.dto";
+import { AssistanceRequestResponseDto } from "../dto/assistance-request-response.dto";
+import { GetThreadSummariesByIdsQuery } from "../../../mailbox/application/queries/get-thread-summaries-by-ids.query";
 
-@Controller('api/assistance-requests')
+@Controller("api/assistance-requests")
 export class AssistanceRequestController {
   constructor(
     private readonly createTransportCommand: CreateTransportRequestCommand,
@@ -43,8 +43,8 @@ export class AssistanceRequestController {
 
   @Get()
   async findAll(
-    @Query('serviceType') serviceType?: 'TRANSPORT' | 'MEDICAL',
-    @Query('status') status?: string,
+    @Query("serviceType") serviceType?: "TRANSPORT" | "MEDICAL",
+    @Query("status") status?: string,
   ): Promise<{ data: AssistanceRequestResponseDto[] }> {
     const list = await this.findAllQuery.execute({
       serviceType: serviceType ?? undefined,
@@ -53,46 +53,52 @@ export class AssistanceRequestController {
     return { data: list.map((r) => new AssistanceRequestResponseDto(r)) };
   }
 
-  @Post(':id/threads')
+  @Post(":id/threads")
   async linkThread(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() dto: LinkThreadDto,
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.linkThreadCommand.execute(id, dto.threadId.trim());
-    const summaries = await this.getThreadSummariesByIdsQuery.execute(req.threadIds);
+    const summaries = await this.getThreadSummariesByIdsQuery.execute(
+      req.threadIds,
+    );
     return { data: new AssistanceRequestResponseDto(req, summaries) };
   }
 
-  @Delete(':id/threads/:threadId')
+  @Delete(":id/threads/:threadId")
   async unlinkThread(
-    @Param('id') id: string,
-    @Param('threadId') threadId: string,
+    @Param("id") id: string,
+    @Param("threadId") threadId: string,
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.unlinkThreadCommand.execute(id, threadId);
-    const summaries = await this.getThreadSummariesByIdsQuery.execute(req.threadIds);
+    const summaries = await this.getThreadSummariesByIdsQuery.execute(
+      req.threadIds,
+    );
     return { data: new AssistanceRequestResponseDto(req, summaries) };
   }
 
-  @Get(':id')
+  @Get(":id")
   async findOne(
-    @Param('id') id: string,
+    @Param("id") id: string,
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.findByIdQuery.execute(id);
     if (!req) {
-      throw new NotFoundException('Assistance request not found');
+      throw new NotFoundException("Assistance request not found");
     }
-    const summaries = await this.getThreadSummariesByIdsQuery.execute(req.threadIds);
+    const summaries = await this.getThreadSummariesByIdsQuery.execute(
+      req.threadIds,
+    );
     return { data: new AssistanceRequestResponseDto(req, summaries) };
   }
 
-  @Post('transport')
+  @Post("transport")
   @HttpCode(HttpStatus.CREATED)
   async createTransport(
     @Body() dto: CreateTransportRequestDto,
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.createTransportCommand.execute({
       requestNumber: dto.requestNumber,
-      status: dto.status ?? 'NEW',
+      status: dto.status ?? "NEW",
       priority: dto.priority ?? null,
       providerReferenceNumber: dto.providerReferenceNumber ?? null,
       receivedAt: new Date(dto.receivedAt),
@@ -119,9 +125,9 @@ export class AssistanceRequestController {
     return { data: new AssistanceRequestResponseDto(req) };
   }
 
-  @Patch('transport/:id')
+  @Patch("transport/:id")
   async updateTransport(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() dto: UpdateTransportRequestDto,
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.updateTransportCommand.execute(id, {
@@ -150,13 +156,15 @@ export class AssistanceRequestController {
         : undefined,
       diagnosis: dto.diagnosis ?? null,
     });
-    const summaries = await this.getThreadSummariesByIdsQuery.execute(req.threadIds);
+    const summaries = await this.getThreadSummariesByIdsQuery.execute(
+      req.threadIds,
+    );
     return { data: new AssistanceRequestResponseDto(req, summaries) };
   }
 
-  @Patch('medical/:id')
+  @Patch("medical/:id")
   async updateMedical(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() dto: UpdateMedicalRequestDto,
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.updateMedicalCommand.execute(id, {
@@ -177,18 +185,20 @@ export class AssistanceRequestController {
       medicalProviderId: dto.medicalProviderId ?? null,
       diagnosis: dto.diagnosis ?? null,
     });
-    const summaries = await this.getThreadSummariesByIdsQuery.execute(req.threadIds);
+    const summaries = await this.getThreadSummariesByIdsQuery.execute(
+      req.threadIds,
+    );
     return { data: new AssistanceRequestResponseDto(req, summaries) };
   }
 
-  @Post('medical')
+  @Post("medical")
   @HttpCode(HttpStatus.CREATED)
   async createMedical(
     @Body() dto: CreateMedicalRequestDto,
   ): Promise<{ data: AssistanceRequestResponseDto }> {
     const req = await this.createMedicalCommand.execute({
       requestNumber: dto.requestNumber,
-      status: dto.status ?? 'NEW',
+      status: dto.status ?? "NEW",
       priority: dto.priority ?? null,
       providerReferenceNumber: dto.providerReferenceNumber ?? null,
       receivedAt: new Date(dto.receivedAt),

@@ -1,5 +1,5 @@
-export type ServiceType = 'TRANSPORT' | 'MEDICAL';
-export type ModeOfTransport = 'lemozen' | 'als' | 'bls';
+export type ServiceType = "TRANSPORT" | "MEDICAL";
+export type ModeOfTransport = "lemozen" | "als" | "bls";
 
 /** Transport-specific data (child) */
 export interface TransportDetails {

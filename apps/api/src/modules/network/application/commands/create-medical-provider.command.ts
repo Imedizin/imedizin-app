@@ -1,6 +1,6 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import type { MedicalProvider } from '../../domain/entities/medical-provider.entity';
-import type { IMedicalProviderRepository } from '../../domain/interfaces/medical-provider.repository.interface';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import type { MedicalProvider } from "../../domain/entities/medical-provider.entity";
+import type { IMedicalProviderRepository } from "../../domain/interfaces/medical-provider.repository.interface";
 
 export interface CreateMedicalProviderCommandPayload {
   legalName: string;
@@ -22,7 +22,7 @@ export class CreateMedicalProviderCommand {
   private readonly logger = new Logger(CreateMedicalProviderCommand.name);
 
   constructor(
-    @Inject('IMedicalProviderRepository')
+    @Inject("IMedicalProviderRepository")
     private readonly medicalProviderRepository: IMedicalProviderRepository,
   ) {}
 
@@ -33,4 +33,3 @@ export class CreateMedicalProviderCommand {
     return this.medicalProviderRepository.create(payload);
   }
 }
-

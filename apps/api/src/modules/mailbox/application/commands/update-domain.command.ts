@@ -1,8 +1,8 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { NotFoundException, ConflictException } from '@nestjs/common';
-import type { IDomainRepository } from '../../domain/interfaces/domain.repository.interface';
-import { Domain } from '../../domain/entities/domain.entity';
-import { GraphService } from '../services/graph.service';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { NotFoundException, ConflictException } from "@nestjs/common";
+import type { IDomainRepository } from "../../domain/interfaces/domain.repository.interface";
+import { Domain } from "../../domain/entities/domain.entity";
+import { GraphService } from "../services/graph.service";
 
 /**
  * Command to update a domain
@@ -17,7 +17,7 @@ export class UpdateDomainCommand {
   private readonly logger = new Logger(UpdateDomainCommand.name);
 
   constructor(
-    @Inject('IDomainRepository')
+    @Inject("IDomainRepository")
     private readonly domainRepository: IDomainRepository,
     private readonly graphService: GraphService,
   ) {}

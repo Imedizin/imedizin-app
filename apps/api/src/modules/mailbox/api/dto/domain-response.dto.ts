@@ -1,4 +1,4 @@
-import { Domain } from '../../domain/entities/domain.entity';
+import { Domain } from "../../domain/entities/domain.entity";
 
 /**
  * DTO for domain response

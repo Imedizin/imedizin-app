@@ -30,11 +30,11 @@ type MedicalRow = typeof medicalRequests.$inferSelect;
 export class AssistanceRequestRepository implements IAssistanceRequestRepository {
   constructor(
     @Inject(DRIZZLE)
-    private readonly db: Database
+    private readonly db: Database,
   ) {}
 
   async findAll(
-    filters?: FindAllAssistanceRequestsFilters
+    filters?: FindAllAssistanceRequestsFilters,
   ): Promise<AssistanceRequest[]> {
     const conditions: ReturnType<typeof sql>[] = [];
     if (filters?.serviceType) {
@@ -58,7 +58,7 @@ export class AssistanceRequestRepository implements IAssistanceRequestRepository
             .select()
             .from(assistanceRequestThreads)
             .where(
-              inArray(assistanceRequestThreads.assistanceRequestId, requestIds)
+              inArray(assistanceRequestThreads.assistanceRequestId, requestIds),
             )
         : [];
     const threadIdsByRequestId = new Map<string, string[]>();
@@ -88,7 +88,7 @@ export class AssistanceRequestRepository implements IAssistanceRequestRepository
           : [];
       const threadIds = threadIdsByRequestId.get(row.id) ?? [];
       result.push(
-        this.toDomain(row, transport[0] ?? null, medical[0] ?? null, threadIds)
+        this.toDomain(row, transport[0] ?? null, medical[0] ?? null, threadIds),
       );
     }
     return result;
@@ -117,7 +117,7 @@ export class AssistanceRequestRepository implements IAssistanceRequestRepository
       row,
       transport[0] ?? null,
       medical[0] ?? null,
-      threadIds
+      threadIds,
     );
   }
 
@@ -150,13 +150,13 @@ export class AssistanceRequestRepository implements IAssistanceRequestRepository
       .where(
         and(
           eq(assistanceRequestThreads.assistanceRequestId, requestId),
-          eq(assistanceRequestThreads.threadId, threadId)
-        )
+          eq(assistanceRequestThreads.threadId, threadId),
+        ),
       );
   }
 
   async createTransport(
-    data: CreateTransportPayload
+    data: CreateTransportPayload,
   ): Promise<AssistanceRequest> {
     const now = new Date();
     const [parent] = await this.db
@@ -231,7 +231,7 @@ export class AssistanceRequestRepository implements IAssistanceRequestRepository
 
   async updateTransport(
     id: string,
-    data: UpdateTransportPayload
+    data: UpdateTransportPayload,
   ): Promise<AssistanceRequest> {
     const existing = await this.findById(id);
     if (!existing || existing.serviceType !== "TRANSPORT")
@@ -240,44 +240,54 @@ export class AssistanceRequestRepository implements IAssistanceRequestRepository
     const parentPayload: Record<string, unknown> = {
       updatedAt: now,
     };
-    if (data.requestNumber !== undefined) parentPayload.requestNumber = data.requestNumber;
+    if (data.requestNumber !== undefined)
+      parentPayload.requestNumber = data.requestNumber;
     if (data.status !== undefined) parentPayload.status = data.status;
     if (data.priority !== undefined) parentPayload.priority = data.priority;
     if (data.providerReferenceNumber !== undefined)
       parentPayload.providerReferenceNumber = data.providerReferenceNumber;
-    if (data.receivedAt !== undefined) parentPayload.receivedAt = data.receivedAt;
-    if (data.caseProviderId !== undefined) parentPayload.caseProviderId = data.caseProviderId;
-    if (data.patientFullName !== undefined) parentPayload.patientFullName = data.patientFullName;
-    if (data.patientBirthDate !== undefined) parentPayload.patientBirthDate = data.patientBirthDate;
+    if (data.receivedAt !== undefined)
+      parentPayload.receivedAt = data.receivedAt;
+    if (data.caseProviderId !== undefined)
+      parentPayload.caseProviderId = data.caseProviderId;
+    if (data.patientFullName !== undefined)
+      parentPayload.patientFullName = data.patientFullName;
+    if (data.patientBirthDate !== undefined)
+      parentPayload.patientBirthDate = data.patientBirthDate;
     if (data.patientNationalityCode !== undefined)
       parentPayload.patientNationalityCode = data.patientNationalityCode;
 
     if (Object.keys(parentPayload).length > 1) {
       await this.db
         .update(assistanceRequests)
-        .set(parentPayload as Record<string, unknown>)
+        .set(parentPayload)
         .where(eq(assistanceRequests.id, id));
     }
 
     const transportPayload: Record<string, unknown> = {};
-    if (data.pickupPoint !== undefined) transportPayload.pickupPoint = data.pickupPoint;
-    if (data.dropoffPoint !== undefined) transportPayload.dropoffPoint = data.dropoffPoint;
+    if (data.pickupPoint !== undefined)
+      transportPayload.pickupPoint = data.pickupPoint;
+    if (data.dropoffPoint !== undefined)
+      transportPayload.dropoffPoint = data.dropoffPoint;
     if (data.requestedTransportAt !== undefined)
       transportPayload.requestedTransportAt = data.requestedTransportAt;
-    if (data.modeOfTransport !== undefined) transportPayload.modeOfTransport = data.modeOfTransport;
+    if (data.modeOfTransport !== undefined)
+      transportPayload.modeOfTransport = data.modeOfTransport;
     if (data.medicalCrewRequired !== undefined)
       transportPayload.medicalCrewRequired = data.medicalCrewRequired;
-    if (data.hasCompanion !== undefined) transportPayload.hasCompanion = data.hasCompanion;
+    if (data.hasCompanion !== undefined)
+      transportPayload.hasCompanion = data.hasCompanion;
     if (data.estimatedPickupTime !== undefined)
       transportPayload.estimatedPickupTime = data.estimatedPickupTime;
     if (data.estimatedDropoffTime !== undefined)
       transportPayload.estimatedDropoffTime = data.estimatedDropoffTime;
-    if (data.diagnosis !== undefined) transportPayload.diagnosis = data.diagnosis;
+    if (data.diagnosis !== undefined)
+      transportPayload.diagnosis = data.diagnosis;
 
     if (Object.keys(transportPayload).length > 0) {
       await this.db
         .update(transportRequests)
-        .set(transportPayload as Record<string, unknown>)
+        .set(transportPayload)
         .where(eq(transportRequests.requestId, id));
     }
 
@@ -288,7 +298,7 @@ export class AssistanceRequestRepository implements IAssistanceRequestRepository
 
   async updateMedical(
     id: string,
-    data: UpdateMedicalPayload
+    data: UpdateMedicalPayload,
   ): Promise<AssistanceRequest> {
     const existing = await this.findById(id);
     if (!existing || existing.serviceType !== "MEDICAL")
@@ -297,30 +307,38 @@ export class AssistanceRequestRepository implements IAssistanceRequestRepository
     const parentPayload: Record<string, unknown> = {
       updatedAt: now,
     };
-    if (data.requestNumber !== undefined) parentPayload.requestNumber = data.requestNumber;
+    if (data.requestNumber !== undefined)
+      parentPayload.requestNumber = data.requestNumber;
     if (data.status !== undefined) parentPayload.status = data.status;
     if (data.priority !== undefined) parentPayload.priority = data.priority;
     if (data.providerReferenceNumber !== undefined)
       parentPayload.providerReferenceNumber = data.providerReferenceNumber;
-    if (data.receivedAt !== undefined) parentPayload.receivedAt = data.receivedAt;
-    if (data.caseProviderId !== undefined) parentPayload.caseProviderId = data.caseProviderId;
-    if (data.patientFullName !== undefined) parentPayload.patientFullName = data.patientFullName;
-    if (data.patientBirthDate !== undefined) parentPayload.patientBirthDate = data.patientBirthDate;
+    if (data.receivedAt !== undefined)
+      parentPayload.receivedAt = data.receivedAt;
+    if (data.caseProviderId !== undefined)
+      parentPayload.caseProviderId = data.caseProviderId;
+    if (data.patientFullName !== undefined)
+      parentPayload.patientFullName = data.patientFullName;
+    if (data.patientBirthDate !== undefined)
+      parentPayload.patientBirthDate = data.patientBirthDate;
     if (data.patientNationalityCode !== undefined)
       parentPayload.patientNationalityCode = data.patientNationalityCode;
 
     if (Object.keys(parentPayload).length > 1) {
       await this.db
         .update(assistanceRequests)
-        .set(parentPayload as Record<string, unknown>)
+        .set(parentPayload)
         .where(eq(assistanceRequests.id, id));
     }
 
     const medicalPayload: Record<string, unknown> = {};
     if (data.caseProviderReferenceNumber !== undefined)
-      medicalPayload.caseProviderReferenceNumber = data.caseProviderReferenceNumber;
-    if (data.admissionDate !== undefined) medicalPayload.admissionDate = data.admissionDate;
-    if (data.dischargeDate !== undefined) medicalPayload.dischargeDate = data.dischargeDate;
+      medicalPayload.caseProviderReferenceNumber =
+        data.caseProviderReferenceNumber;
+    if (data.admissionDate !== undefined)
+      medicalPayload.admissionDate = data.admissionDate;
+    if (data.dischargeDate !== undefined)
+      medicalPayload.dischargeDate = data.dischargeDate;
     if (data.country !== undefined) medicalPayload.country = data.country;
     if (data.city !== undefined) medicalPayload.city = data.city;
     if (data.medicalProviderId !== undefined)
@@ -330,7 +348,7 @@ export class AssistanceRequestRepository implements IAssistanceRequestRepository
     if (Object.keys(medicalPayload).length > 0) {
       await this.db
         .update(medicalRequests)
-        .set(medicalPayload as Record<string, unknown>)
+        .set(medicalPayload)
         .where(eq(medicalRequests.requestId, id));
     }
 
@@ -343,7 +361,7 @@ export class AssistanceRequestRepository implements IAssistanceRequestRepository
     row: AssistanceRequestRow,
     transport: TransportRow | null,
     medical: MedicalRow | null,
-    threadIds: string[] = []
+    threadIds: string[] = [],
   ): AssistanceRequest {
     const transportDetails: TransportDetails | null = transport
       ? {
@@ -375,7 +393,7 @@ export class AssistanceRequestRepository implements IAssistanceRequestRepository
     return new AssistanceRequest(
       row.id,
       row.requestNumber,
-      row.serviceType as "TRANSPORT" | "MEDICAL",
+      row.serviceType,
       row.status,
       row.priority ?? null,
       row.providerReferenceNumber ?? null,
@@ -388,7 +406,7 @@ export class AssistanceRequestRepository implements IAssistanceRequestRepository
       row.updatedAt,
       transportDetails,
       medicalDetails,
-      threadIds
+      threadIds,
     );
   }
 }

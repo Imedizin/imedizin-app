@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
-import type { MedicalProvider } from '../../domain/entities/medical-provider.entity';
-import type { IMedicalProviderRepository } from '../../domain/interfaces/medical-provider.repository.interface';
+import { Inject, Injectable } from "@nestjs/common";
+import type { MedicalProvider } from "../../domain/entities/medical-provider.entity";
+import type { IMedicalProviderRepository } from "../../domain/interfaces/medical-provider.repository.interface";
 
 export interface FindMedicalProviderByIdQueryPayload {
   id: string;
@@ -9,7 +9,7 @@ export interface FindMedicalProviderByIdQueryPayload {
 @Injectable()
 export class FindMedicalProviderByIdQuery {
   constructor(
-    @Inject('IMedicalProviderRepository')
+    @Inject("IMedicalProviderRepository")
     private readonly medicalProviderRepository: IMedicalProviderRepository,
   ) {}
 
@@ -23,4 +23,3 @@ export class FindMedicalProviderByIdQuery {
     return provider;
   }
 }
-

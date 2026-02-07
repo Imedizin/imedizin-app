@@ -14,7 +14,7 @@ import {
 export class NotificationRepository implements INotificationRepository {
   constructor(
     @Inject(DRIZZLE)
-    private readonly db: Database
+    private readonly db: Database,
   ) {}
 
   async create(input: CreateNotificationInput): Promise<Notification> {
@@ -39,7 +39,7 @@ export class NotificationRepository implements INotificationRepository {
     if (recipientType != null && recipientId != null) {
       whereClause = and(
         eq(notifications.recipientType, recipientType),
-        eq(notifications.recipientId, recipientId)
+        eq(notifications.recipientId, recipientId),
       );
     } else if (recipientType != null) {
       whereClause = eq(notifications.recipientType, recipientType);
@@ -66,7 +66,7 @@ export class NotificationRepository implements INotificationRepository {
       row.body,
       row.data as Record<string, unknown> | null,
       row.readAt,
-      row.createdAt
+      row.createdAt,
     );
   }
 }

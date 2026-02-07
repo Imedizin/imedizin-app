@@ -7,8 +7,8 @@ import {
   IsUUID,
   MaxLength,
   MinLength,
-} from 'class-validator';
-import { ModeOfTransportDto } from './create-transport-request.dto';
+} from "class-validator";
+import { ModeOfTransportDto } from "./create-transport-request.dto";
 
 export class UpdateTransportRequestDto {
   @IsOptional()

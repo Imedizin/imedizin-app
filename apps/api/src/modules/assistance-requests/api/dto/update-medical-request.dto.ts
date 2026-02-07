@@ -5,7 +5,7 @@ import {
   IsUUID,
   MaxLength,
   MinLength,
-} from 'class-validator';
+} from "class-validator";
 
 export class UpdateMedicalRequestDto {
   @IsOptional()

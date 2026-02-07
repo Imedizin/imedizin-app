@@ -42,9 +42,14 @@ export class RealtimeSocketGateway
         const server = this.server;
         if (!server) return;
         server.emit("email.received", event);
-        const ns = server.sockets as { sockets?: Map<unknown, unknown>; size?: number };
+        const ns = server.sockets as {
+          sockets?: Map<unknown, unknown>;
+          size?: number;
+        };
         const count = ns.sockets?.size ?? ns.size ?? 0;
-        this.logger.debug(`Socket.IO emit email.received to ${count} client(s)`);
+        this.logger.debug(
+          `Socket.IO emit email.received to ${count} client(s)`,
+        );
       });
   }
 

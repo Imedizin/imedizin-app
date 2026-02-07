@@ -41,7 +41,7 @@ export class RealtimeSseController implements OnModuleDestroy {
   stream(
     @Query("topics") topicsParam: string | undefined,
     @Query() query: Record<string, string>,
-    @Res() res: Response
+    @Res() res: Response,
   ): void {
     const clientId = randomUUID();
 
@@ -62,7 +62,7 @@ export class RealtimeSseController implements OnModuleDestroy {
     }
 
     this.logger.log(
-      `SSE client connecting: ${clientId}, filter: ${JSON.stringify(filter)}`
+      `SSE client connecting: ${clientId}, filter: ${JSON.stringify(filter)}`,
     );
 
     res.setHeader("Content-Type", "text/event-stream");
@@ -76,7 +76,7 @@ export class RealtimeSseController implements OnModuleDestroy {
         type: "connected",
         clientId,
         timestamp: new Date().toISOString(),
-      })}\n\n`
+      })}\n\n`,
     );
 
     this.sseBroker.addClient(clientId, res, filter);

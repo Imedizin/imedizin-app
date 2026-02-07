@@ -12,6 +12,6 @@ export class Notification {
     public body: string | null,
     public data: Record<string, unknown> | null,
     public readAt: Date | null,
-    public createdAt: Date
+    public createdAt: Date,
   ) {}
 }

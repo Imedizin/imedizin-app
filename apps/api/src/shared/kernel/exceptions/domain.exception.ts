@@ -20,7 +20,7 @@ export class NotFoundException extends DomainException {
     const message = identifier
       ? `${resource} with identifier ${identifier} not found`
       : `${resource} not found`;
-    super(message, 'NOT_FOUND');
+    super(message, "NOT_FOUND");
   }
 }
 
@@ -32,7 +32,7 @@ export class ValidationException extends DomainException {
     message: string,
     public readonly errors?: Record<string, string[]>,
   ) {
-    super(message, 'VALIDATION_ERROR');
+    super(message, "VALIDATION_ERROR");
   }
 }
 
@@ -41,6 +41,6 @@ export class ValidationException extends DomainException {
  */
 export class BusinessRuleException extends DomainException {
   constructor(message: string) {
-    super(message, 'BUSINESS_RULE_VIOLATION');
+    super(message, "BUSINESS_RULE_VIOLATION");
   }
 }

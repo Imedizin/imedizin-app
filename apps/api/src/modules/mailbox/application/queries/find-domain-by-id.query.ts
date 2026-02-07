@@ -1,7 +1,7 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { NotFoundException } from '@nestjs/common';
-import type { IDomainRepository } from '../../domain/interfaces/domain.repository.interface';
-import { Domain } from '../../domain/entities/domain.entity';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { NotFoundException } from "@nestjs/common";
+import type { IDomainRepository } from "../../domain/interfaces/domain.repository.interface";
+import { Domain } from "../../domain/entities/domain.entity";
 
 /**
  * Query to find a domain by ID
@@ -15,7 +15,7 @@ export class FindDomainByIdQuery {
   private readonly logger = new Logger(FindDomainByIdQuery.name);
 
   constructor(
-    @Inject('IDomainRepository')
+    @Inject("IDomainRepository")
     private readonly domainRepository: IDomainRepository,
   ) {}
 

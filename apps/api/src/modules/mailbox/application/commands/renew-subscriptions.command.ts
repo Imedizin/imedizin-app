@@ -1,6 +1,6 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import type { IMailboxSubscriptionRepository } from '../../domain/interfaces/mailbox-subscription.repository.interface';
-import { MailboxSubscription } from '../../domain/entities/mailbox-subscription.entity';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import type { IMailboxSubscriptionRepository } from "../../domain/interfaces/mailbox-subscription.repository.interface";
+import { MailboxSubscription } from "../../domain/entities/mailbox-subscription.entity";
 
 /**
  * Command to renew subscriptions
@@ -10,7 +10,7 @@ export class RenewSubscriptionsCommand {
   private readonly logger = new Logger(RenewSubscriptionsCommand.name);
 
   constructor(
-    @Inject('IMailboxSubscriptionRepository')
+    @Inject("IMailboxSubscriptionRepository")
     private readonly subscriptionRepository: IMailboxSubscriptionRepository,
   ) {}
 
@@ -21,7 +21,7 @@ export class RenewSubscriptionsCommand {
    * checking 24 hours ahead ensures we renew before expiration
    */
   async execute(): Promise<void> {
-    this.logger.log('Starting mailbox subscription renewal check...');
+    this.logger.log("Starting mailbox subscription renewal check...");
 
     try {
       // Find subscriptions expiring in the next 24 hours (1440 minutes)
@@ -29,7 +29,7 @@ export class RenewSubscriptionsCommand {
         await this.subscriptionRepository.findExpiringSoon(1440);
 
       if (expiringSubscriptions.length === 0) {
-        this.logger.log('No subscriptions expiring soon');
+        this.logger.log("No subscriptions expiring soon");
         return;
       }
 
@@ -41,10 +41,10 @@ export class RenewSubscriptionsCommand {
         await this.renewSubscription(subscription);
       }
 
-      this.logger.log('Mailbox subscription renewal check completed');
+      this.logger.log("Mailbox subscription renewal check completed");
     } catch (error) {
       this.logger.error(
-        'Error during subscription renewal check',
+        "Error during subscription renewal check",
         (error as Error).stack,
       );
       throw error;

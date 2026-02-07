@@ -1,4 +1,4 @@
-import type { MedicalProvider } from '../entities/medical-provider.entity';
+import type { MedicalProvider } from "../entities/medical-provider.entity";
 
 export interface FindAllMedicalProvidersFilters {
   search?: string;
@@ -44,4 +44,3 @@ export interface IMedicalProviderRepository {
   ): Promise<MedicalProvider>;
   delete(id: string): Promise<void>;
 }
-

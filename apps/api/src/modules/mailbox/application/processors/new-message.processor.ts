@@ -1,10 +1,10 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { Logger } from '@nestjs/common';
-import type { Job } from 'bullmq';
-import { ProcessNewMessageCommand } from '../commands/process-new-message.command';
-import type { NewMessageJobPayload } from '../commands/process-new-message.command';
+import { Processor, WorkerHost } from "@nestjs/bullmq";
+import { Logger } from "@nestjs/common";
+import type { Job } from "bullmq";
+import { ProcessNewMessageCommand } from "../commands/process-new-message.command";
+import type { NewMessageJobPayload } from "../commands/process-new-message.command";
 
-export const NEW_MESSAGE_QUEUE = 'new-message';
+export const NEW_MESSAGE_QUEUE = "new-message";
 
 @Processor(NEW_MESSAGE_QUEUE)
 export class NewMessageProcessor extends WorkerHost {

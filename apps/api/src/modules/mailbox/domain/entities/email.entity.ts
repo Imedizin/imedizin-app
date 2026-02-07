@@ -4,7 +4,7 @@
 export interface EmailParticipant {
   emailAddress: string;
   displayName: string | null;
-  type: 'from' | 'to' | 'cc' | 'bcc' | 'reply_to';
+  type: "from" | "to" | "cc" | "bcc" | "reply_to";
 }
 
 /**
@@ -23,7 +23,7 @@ export class Email {
     public bodyText: string | null,
     public bodyHtml: string | null,
     public rawSource: string,
-    public direction: 'incoming' | 'outgoing',
+    public direction: "incoming" | "outgoing",
     public sentAt: Date | null,
     public receivedAt: Date | null,
     public createdAt: Date,
@@ -34,27 +34,27 @@ export class Email {
    * Get the sender (from participant)
    */
   getFrom(): EmailParticipant | undefined {
-    return this.participants.find((p) => p.type === 'from');
+    return this.participants.find((p) => p.type === "from");
   }
 
   /**
    * Get all recipients (to participants)
    */
   getTo(): EmailParticipant[] {
-    return this.participants.filter((p) => p.type === 'to');
+    return this.participants.filter((p) => p.type === "to");
   }
 
   /**
    * Get CC recipients
    */
   getCc(): EmailParticipant[] {
-    return this.participants.filter((p) => p.type === 'cc');
+    return this.participants.filter((p) => p.type === "cc");
   }
 
   /**
    * Get BCC recipients
    */
   getBcc(): EmailParticipant[] {
-    return this.participants.filter((p) => p.type === 'bcc');
+    return this.participants.filter((p) => p.type === "bcc");
   }
 }

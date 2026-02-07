@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { RenewSubscriptionsCommand } from './application/commands/renew-subscriptions.command';
+import { Injectable } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { RenewSubscriptionsCommand } from "./application/commands/renew-subscriptions.command";
 
 @Injectable()
 export class MailboxCron {

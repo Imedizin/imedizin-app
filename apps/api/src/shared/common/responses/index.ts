@@ -4,4 +4,4 @@ export {
   type ListResponse,
   type PaginatedResponse,
   type PaginationMeta,
-} from './api-response';
+} from "./api-response";

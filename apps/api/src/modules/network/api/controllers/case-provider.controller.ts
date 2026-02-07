@@ -24,7 +24,7 @@ export class CaseProviderController {
     private readonly createCaseProviderCommand: CreateCaseProviderCommand,
     private readonly updateCaseProviderCommand: UpdateCaseProviderCommand,
     private readonly findAllCaseProvidersQuery: FindAllCaseProvidersQuery,
-    private readonly findCaseProviderByIdQuery: FindCaseProviderByIdQuery
+    private readonly findCaseProviderByIdQuery: FindCaseProviderByIdQuery,
   ) {}
 
   @Get()
@@ -32,11 +32,11 @@ export class CaseProviderController {
     @Query("search") search?: string,
     @Query("providerType") providerType?: string,
     @Query("operatingRegion") operatingRegion?: string,
-    @Query("status") status?: string
+    @Query("status") status?: string,
   ): Promise<{ data: CaseProviderResponseDto[] }> {
     const allowedRegion =
       operatingRegion?.trim() &&
-      (OPERATING_REGIONS as readonly string[]).includes(operatingRegion.trim())
+      OPERATING_REGIONS.includes(operatingRegion.trim())
         ? operatingRegion.trim()
         : undefined;
     const providers = await this.findAllCaseProvidersQuery.execute({
@@ -52,7 +52,7 @@ export class CaseProviderController {
 
   @Get(":id")
   async findOne(
-    @Param("id") id: string
+    @Param("id") id: string,
   ): Promise<{ data: CaseProviderResponseDto }> {
     const provider = await this.findCaseProviderByIdQuery.execute({ id });
     return { data: new CaseProviderResponseDto(provider) };
@@ -61,7 +61,7 @@ export class CaseProviderController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(
-    @Body() dto: CreateCaseProviderDto
+    @Body() dto: CreateCaseProviderDto,
   ): Promise<{ data: CaseProviderResponseDto }> {
     const provider = await this.createCaseProviderCommand.execute({
       companyName: dto.companyName,
@@ -87,7 +87,7 @@ export class CaseProviderController {
   @Patch(":id")
   async update(
     @Param("id") id: string,
-    @Body() dto: UpdateCaseProviderDto
+    @Body() dto: UpdateCaseProviderDto,
   ): Promise<{ data: CaseProviderResponseDto }> {
     const provider = await this.updateCaseProviderCommand.execute({
       id,

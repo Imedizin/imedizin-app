@@ -69,7 +69,7 @@ import { AssistanceRequestsModule } from "./modules/assistance-requests/assistan
         {
           rootPath: join(
             process.cwd(),
-            config.get<string>("ATTACHMENTS_PATH", "./data/attachments")
+            config.get<string>("ATTACHMENTS_PATH", "./data/attachments"),
           ),
           serveRoot: "/attachments",
         },

@@ -1,10 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { DRIZZLE } from '../../../../shared/common/database/database.module';
-import type { Database } from '../../../../shared/common/database/database.module';
-import { mailboxSubscriptions } from '../schema';
-import { MailboxSubscription } from '../../domain/entities/mailbox-subscription.entity';
-import { IMailboxSubscriptionRepository } from '../../domain/interfaces/mailbox-subscription.repository.interface';
-import { eq, and, lte } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DRIZZLE } from "../../../../shared/common/database/database.module";
+import type { Database } from "../../../../shared/common/database/database.module";
+import { mailboxSubscriptions } from "../schema";
+import { MailboxSubscription } from "../../domain/entities/mailbox-subscription.entity";
+import { IMailboxSubscriptionRepository } from "../../domain/interfaces/mailbox-subscription.repository.interface";
+import { eq, and, lte } from "drizzle-orm";
 
 /**
  * MailboxSubscription repository implementation

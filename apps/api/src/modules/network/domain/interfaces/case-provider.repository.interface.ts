@@ -1,4 +1,4 @@
-import type { CaseProvider } from '../entities/case-provider.entity';
+import type { CaseProvider } from "../entities/case-provider.entity";
 
 export interface FindAllCaseProvidersFilters {
   search?: string;
@@ -41,4 +41,3 @@ export interface ICaseProviderRepository {
   ): Promise<CaseProvider>;
   delete(id: string): Promise<void>;
 }
-

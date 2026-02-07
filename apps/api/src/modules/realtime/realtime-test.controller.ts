@@ -17,7 +17,7 @@ export class RealtimeTestController {
   emitTestEmailReceived(
     @Query("subject") subject?: string,
     @Query("from") fromEmail?: string,
-    @Query("mailboxId") mailboxId?: string
+    @Query("mailboxId") mailboxId?: string,
   ): { ok: boolean; message: string } {
     const payload = {
       emailId: `test-${Date.now()}`,

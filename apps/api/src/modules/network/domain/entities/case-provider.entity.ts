@@ -1,5 +1,5 @@
-export type CaseProviderType = 'internal' | 'external' | 'TPA';
-export type ProviderStatus = 'active' | 'inactive';
+export type CaseProviderType = "internal" | "external" | "TPA";
+export type ProviderStatus = "active" | "inactive";
 
 export class CaseProvider {
   constructor(
@@ -9,7 +9,7 @@ export class CaseProvider {
     public operatingRegions: string[],
     public primaryEmail: string,
     public primaryPhone: string,
-    public status: ProviderStatus = 'active',
+    public status: ProviderStatus = "active",
     public contractStartDate?: Date | null,
     public contractEndDate?: Date | null,
     public pricingModel?: string | null,
@@ -19,4 +19,3 @@ export class CaseProvider {
     public updatedAt?: Date,
   ) {}
 }
-

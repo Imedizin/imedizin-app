@@ -1,11 +1,11 @@
 export class WebhookNotificationChangeDto {
   subscriptionId: string;
-  changeType: 'created' | 'updated' | 'deleted';
+  changeType: "created" | "updated" | "deleted";
   resource: string;
   resourceData?: {
     id: string;
-    '@odata.type': string;
-    '@odata.id': string;
+    "@odata.type": string;
+    "@odata.id": string;
   };
   clientState?: string;
   subscriptionExpirationDateTime: string;

@@ -1,8 +1,8 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { ConflictException } from '@nestjs/common';
-import type { IDomainRepository } from '../../domain/interfaces/domain.repository.interface';
-import { Domain } from '../../domain/entities/domain.entity';
-import { GraphService } from '../services/graph.service';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { ConflictException } from "@nestjs/common";
+import type { IDomainRepository } from "../../domain/interfaces/domain.repository.interface";
+import { Domain } from "../../domain/entities/domain.entity";
+import { GraphService } from "../services/graph.service";
 
 /**
  * Command to create a new domain
@@ -17,7 +17,7 @@ export class CreateDomainCommand {
   private readonly logger = new Logger(CreateDomainCommand.name);
 
   constructor(
-    @Inject('IDomainRepository')
+    @Inject("IDomainRepository")
     private readonly domainRepository: IDomainRepository,
     private readonly graphService: GraphService,
   ) {}

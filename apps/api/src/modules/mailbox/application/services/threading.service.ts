@@ -1,5 +1,5 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import type { IEmailRepository } from '../../domain/interfaces/email.repository.interface';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import type { IEmailRepository } from "../../domain/interfaces/email.repository.interface";
 
 /**
  * Parsed threading headers from raw email source
@@ -36,7 +36,7 @@ export class ThreadingService {
   private readonly logger = new Logger(ThreadingService.name);
 
   constructor(
-    @Inject('IEmailRepository')
+    @Inject("IEmailRepository")
     private readonly emailRepository: IEmailRepository,
   ) {}
 
@@ -50,14 +50,14 @@ export class ThreadingService {
     }
 
     // Split headers from body (headers end at first empty line)
-    const headerSection = rawSource.split(/\r?\n\r?\n/)[0] || '';
+    const headerSection = rawSource.split(/\r?\n\r?\n/)[0] || "";
 
     // Unfold headers (RFC 5322: long headers can be folded with CRLF + whitespace)
-    const unfoldedHeaders = headerSection.replace(/\r?\n[ \t]+/g, ' ');
+    const unfoldedHeaders = headerSection.replace(/\r?\n[ \t]+/g, " ");
 
     return {
-      messageId: this.extractHeader(unfoldedHeaders, 'Message-ID'),
-      inReplyTo: this.extractHeader(unfoldedHeaders, 'In-Reply-To'),
+      messageId: this.extractHeader(unfoldedHeaders, "Message-ID"),
+      inReplyTo: this.extractHeader(unfoldedHeaders, "In-Reply-To"),
       references: this.extractReferences(unfoldedHeaders),
     };
   }
@@ -68,12 +68,12 @@ export class ThreadingService {
    */
   private extractHeader(headers: string, name: string): string | null {
     // Case-insensitive header matching
-    const regex = new RegExp(`^${name}:\\s*<?([^>\\r\\n]+)>?`, 'mi');
+    const regex = new RegExp(`^${name}:\\s*<?([^>\\r\\n]+)>?`, "mi");
     const match = headers.match(regex);
 
     if (match && match[1]) {
       // Clean up the value - remove any angle brackets and trim
-      return match[1].trim().replace(/^<|>$/g, '');
+      return match[1].trim().replace(/^<|>$/g, "");
     }
 
     return null;
@@ -92,7 +92,7 @@ export class ThreadingService {
       // Extract all of them and return as space-separated string
       const messageIds = match[1].match(/<[^>]+>/g);
       if (messageIds) {
-        return messageIds.map((id) => id.replace(/^<|>$/g, '')).join(' ');
+        return messageIds.map((id) => id.replace(/^<|>$/g, "")).join(" ");
       }
       // If no angle brackets, just return cleaned value
       return match[1].trim();
@@ -159,7 +159,7 @@ export class ThreadingService {
         }
       }
 
-      this.logger.debug('No ancestors found via References');
+      this.logger.debug("No ancestors found via References");
     }
 
     // Strategy 3: Fallback to Microsoft conversationId
@@ -192,7 +192,7 @@ export class ThreadingService {
    * Normalize a Message-ID by removing angle brackets and whitespace
    */
   normalizeMessageId(messageId: string): string {
-    return messageId.trim().replace(/^<|>$/g, '');
+    return messageId.trim().replace(/^<|>$/g, "");
   }
 
   /**

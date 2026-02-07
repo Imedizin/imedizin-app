@@ -10,7 +10,7 @@ import { NOTIFICATION_REPOSITORY } from "../../../notifications/notifications.mo
 export class NotificationController {
   constructor(
     @Inject(NOTIFICATION_REPOSITORY)
-    private readonly notificationRepository: INotificationRepository
+    private readonly notificationRepository: INotificationRepository,
   ) {}
 
   /**
@@ -23,7 +23,7 @@ export class NotificationController {
     @Query("recipientType") recipientType?: string,
     @Query("recipientId") recipientId?: string,
     @Query("limit") limitParam?: string,
-    @Query("offset") offsetParam?: string
+    @Query("offset") offsetParam?: string,
   ) {
     const limit = limitParam != null ? parseInt(limitParam, 10) : 50;
     const offset = offsetParam != null ? parseInt(offsetParam, 10) : 0;

@@ -1,14 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
-import type { AssistanceRequest } from '../../domain/entities/assistance-request.entity';
+import { Inject, Injectable } from "@nestjs/common";
+import type { AssistanceRequest } from "../../domain/entities/assistance-request.entity";
 import type {
   IAssistanceRequestRepository,
   CreateMedicalPayload,
-} from '../../domain/interfaces/assistance-request.repository.interface';
+} from "../../domain/interfaces/assistance-request.repository.interface";
 
 @Injectable()
 export class CreateMedicalRequestCommand {
   constructor(
-    @Inject('IAssistanceRequestRepository')
+    @Inject("IAssistanceRequestRepository")
     private readonly repo: IAssistanceRequestRepository,
   ) {}
 

@@ -1,8 +1,8 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { NotFoundException } from '@nestjs/common';
-import type { IMailboxRepository } from '../../domain/interfaces/mailbox.repository.interface';
-import type { IMailboxSubscriptionRepository } from '../../domain/interfaces/mailbox-subscription.repository.interface';
-import { GraphService } from '../services/graph.service';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { NotFoundException } from "@nestjs/common";
+import type { IMailboxRepository } from "../../domain/interfaces/mailbox.repository.interface";
+import type { IMailboxSubscriptionRepository } from "../../domain/interfaces/mailbox-subscription.repository.interface";
+import { GraphService } from "../services/graph.service";
 
 /**
  * Command to delete a mailbox
@@ -16,9 +16,9 @@ export class DeleteMailboxCommand {
   private readonly logger = new Logger(DeleteMailboxCommand.name);
 
   constructor(
-    @Inject('IMailboxRepository')
+    @Inject("IMailboxRepository")
     private readonly mailboxRepository: IMailboxRepository,
-    @Inject('IMailboxSubscriptionRepository')
+    @Inject("IMailboxSubscriptionRepository")
     private readonly subscriptionRepository: IMailboxSubscriptionRepository,
     private readonly graphService: GraphService,
   ) {}
@@ -51,7 +51,7 @@ export class DeleteMailboxCommand {
       } catch (error) {
         // Log error but continue with deletion
         const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error';
+          error instanceof Error ? error.message : "Unknown error";
         this.logger.error(
           `Failed to delete subscription ${subscription.subscriptionId}: ${errorMessage}`,
         );
@@ -60,7 +60,7 @@ export class DeleteMailboxCommand {
           await this.subscriptionRepository.delete(subscription.subscriptionId);
         } catch (dbError) {
           this.logger.error(
-            `Failed to delete subscription ${subscription.subscriptionId} from database: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`,
+            `Failed to delete subscription ${subscription.subscriptionId} from database: ${dbError instanceof Error ? dbError.message : "Unknown error"}`,
           );
         }
       }

@@ -4,7 +4,7 @@
 export class EmailParticipantResponseDto {
   emailAddress: string;
   displayName: string | null;
-  type: 'from' | 'to' | 'cc' | 'bcc' | 'reply_to';
+  type: "from" | "to" | "cc" | "bcc" | "reply_to";
 }
 
 /**
@@ -18,7 +18,7 @@ export class EmailListItemDto {
   from: EmailParticipantResponseDto | null;
   receivedAt: Date | null;
   sentAt: Date | null;
-  direction: 'incoming' | 'outgoing';
+  direction: "incoming" | "outgoing";
   hasBody: boolean;
 }
 
@@ -47,7 +47,7 @@ export class EmailDetailDto {
   subject: string;
   bodyText: string | null;
   bodyHtml: string | null;
-  direction: 'incoming' | 'outgoing';
+  direction: "incoming" | "outgoing";
   sentAt: Date | null;
   receivedAt: Date | null;
   createdAt: Date;

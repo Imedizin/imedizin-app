@@ -1,5 +1,5 @@
-import { Email, EmailParticipant } from '../entities/email.entity';
-import type { EmailAttachmentRecord } from './email-attachment.repository.interface';
+import { Email, EmailParticipant } from "../entities/email.entity";
+import type { EmailAttachmentRecord } from "./email-attachment.repository.interface";
 
 /**
  * Data required to create a new email
@@ -14,7 +14,7 @@ export interface CreateEmailData {
   bodyText: string | null;
   bodyHtml: string | null;
   rawSource: string;
-  direction: 'incoming' | 'outgoing';
+  direction: "incoming" | "outgoing";
   sentAt: Date | null;
   receivedAt: Date | null;
 }
