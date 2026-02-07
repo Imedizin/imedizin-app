@@ -9,7 +9,8 @@ RUN corepack enable pnpm
 # COPY apps/api/package.json ./apps/api/
 COPY apps/api/package.json ./
 # COPY apps/dashboard/package.json ./apps/dashboard/
-RUN pnpm install --frozen-lockfile
+# RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 # Copy app and build
 COPY . .
