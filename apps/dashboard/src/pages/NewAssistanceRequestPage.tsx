@@ -13,7 +13,9 @@ import {
   Row,
   Col,
   Divider,
+  message,
 } from "antd";
+import { apiClient } from "@/api/client";
 import {
   HomeOutlined,
   SolutionOutlined,
@@ -207,7 +209,19 @@ const NewAssistanceRequestPage: React.FC = () => {
           hasCompanion: Boolean(values.hasCompanion),
         },
         {
-          onSuccess: (created) => {
+          onSuccess: async (created) => {
+            const threadId = extractMutation.data?.threadId;
+            if (threadId) {
+              try {
+                await apiClient.post(`assistance-requests/${created.id}/threads`, {
+                  json: { threadId },
+                });
+              } catch {
+                message.warning(
+                  "Request created but could not link to email thread"
+                );
+              }
+            }
             navigate(`/assistance-requests/transportation/${created.id}`, {
               state: { request: created },
             });
@@ -238,7 +252,19 @@ const NewAssistanceRequestPage: React.FC = () => {
             | undefined,
         },
         {
-          onSuccess: (created) => {
+          onSuccess: async (created) => {
+            const threadId = extractMutation.data?.threadId;
+            if (threadId) {
+              try {
+                await apiClient.post(`assistance-requests/${created.id}/threads`, {
+                  json: { threadId },
+                });
+              } catch {
+                message.warning(
+                  "Request created but could not link to email thread"
+                );
+              }
+            }
             navigate(`/assistance-requests/medical-cases/${created.id}`, {
               state: { request: created },
             });

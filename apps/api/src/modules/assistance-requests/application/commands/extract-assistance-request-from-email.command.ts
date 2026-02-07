@@ -9,7 +9,7 @@ const PROMPT_TRANSPORT = `You extract structured data from an email that describ
 
 Rules:
 - Return ONLY a single JSON object. No markdown, no code fence, no explanation.
-- Use exactly these camelCase keys. Omit a key only if the information is not in the email.
+- Use exactly these camelCase keys. Omit a key only if the information is not in the email. Do not use placeholder values (e.g. "unknown", "n/a"); omit the key instead.
 - Dates: always use YYYY-MM-DD (e.g. "10 February 2025" → "2025-02-10", "15 March 1978" → "1978-03-15").
 - Times: use ISO 8601 with date and time (e.g. "10 February 2025 08:00" → "2025-02-10T08:00:00").
 - modeOfTransport: use only "lemozen", "als", or "bls" (e.g. "ALS ambulance" → "als").
@@ -34,7 +34,7 @@ Keys:
 - hasCompanion (boolean)`;
 
 const PROMPT_MEDICAL_CASE = `You extract structured data from an email that describes a MEDICAL CASE request (e.g. treatment, admission, discharge, case management).
-Return ONLY valid JSON, no markdown and no explanation, with these keys (omit if not found):
+Return ONLY valid JSON, no markdown and no explanation, with these keys (omit if not found; do not use "unknown" or "n/a", omit the key instead):
 
 - requestNumber (string): e.g. IM-TR-2025-0123 or IM-MD-2025-0132
 - insuranceCompanyReferenceNumber (string, optional)
@@ -52,7 +52,7 @@ Return ONLY valid JSON, no markdown and no explanation, with these keys (omit if
 - motherInsuranceCompany (string, optional): insurer or mother company name`;
 
 const PROMPT_COMBINED = `You extract structured assistance request data from emails (medical transport or medical case requests).
-Return ONLY valid JSON, no markdown and no explanation, with these keys (omit if not found):
+Return ONLY valid JSON, no markdown and no explanation, with these keys (omit if not found; do not use "unknown" or "n/a", omit the key instead):
 
 - requestNumber (string): e.g. IM-TR-2025-0123 or IM-MD-2025-0132
 - insuranceCompanyReferenceNumber (string, optional)
@@ -137,7 +137,12 @@ export class ExtractAssistanceRequestFromEmailCommand {
       );
     }
     const data = this.normalizeResponse(parsed, email.receivedAt, type);
-    return { data };
+    return {
+      data: {
+        ...data,
+        ...(email.threadId && { threadId: email.threadId }),
+      },
+    };
   }
 
   private getBodyText(
@@ -248,6 +253,28 @@ export class ExtractAssistanceRequestFromEmailCommand {
     return undefined;
   }
 
+  /**
+   * Include in response only if value is a valid date/time string (e.g. ISO 8601).
+   * Omit placeholders ("unknown", "n/a", etc.) and unparseable strings so the API never returns invalid dates.
+   */
+  private toValidDateOrTime(value: unknown): string | undefined {
+    const s = this.toStr(value);
+    if (s == null) return undefined;
+    const lower = s.toLowerCase();
+    if (
+      lower === "unknown" ||
+      lower === "n/a" ||
+      lower === "na" ||
+      lower === "tbd" ||
+      lower === "tba" ||
+      lower === "-"
+    ) {
+      return undefined;
+    }
+    const date = new Date(s);
+    return Number.isNaN(date.getTime()) ? undefined : s;
+  }
+
   private toBool(value: unknown): boolean | undefined {
     if (value === true || value === "true") return true;
     if (value === false || value === "false") return false;
@@ -285,7 +312,7 @@ export class ExtractAssistanceRequestFromEmailCommand {
         parsed.insuranceCompanyReferenceNumber,
       ),
       patientName: this.toStr(parsed.patientName),
-      patientBirthdate: this.toStr(parsed.patientBirthdate),
+      patientBirthdate: this.toValidDateOrTime(parsed.patientBirthdate),
       patientNationality: this.toStr(parsed.patientNationality),
       diagnosis: this.toStr(parsed.diagnosis),
       notes: this.toStr(parsed.notes),
@@ -293,11 +320,13 @@ export class ExtractAssistanceRequestFromEmailCommand {
       ...(includeTransport && {
         pickupPoint: this.toStr(parsed.pickupPoint),
         dropoffPoint: this.toStr(parsed.dropoffPoint),
-        dateOfRequestedTransportation: this.toStr(
+        dateOfRequestedTransportation: this.toValidDateOrTime(
           parsed.dateOfRequestedTransportation,
         ),
-        estimatedPickupTime: this.toStr(parsed.estimatedPickupTime),
-        estimatedDropoffTime: this.toStr(parsed.estimatedDropoffTime),
+        estimatedPickupTime: this.toValidDateOrTime(parsed.estimatedPickupTime),
+        estimatedDropoffTime: this.toValidDateOrTime(
+          parsed.estimatedDropoffTime,
+        ),
         modeOfTransport: validMode,
         medicalCrewRequired: this.toBool(parsed.medicalCrewRequired),
         hasCompanion: this.toBool(parsed.hasCompanion),
@@ -306,8 +335,8 @@ export class ExtractAssistanceRequestFromEmailCommand {
         caseProviderReferenceNumber: this.toStr(
           parsed.caseProviderReferenceNumber,
         ),
-        admissionDate: this.toStr(parsed.admissionDate),
-        dischargeDate: this.toStr(parsed.dischargeDate),
+        admissionDate: this.toValidDateOrTime(parsed.admissionDate),
+        dischargeDate: this.toValidDateOrTime(parsed.dischargeDate),
         country: this.toStr(parsed.country),
         city: this.toStr(parsed.city),
         medicalProviderName: this.toStr(parsed.medicalProviderName),

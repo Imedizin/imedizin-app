@@ -46,4 +46,7 @@ export class ExtractFromEmailResponseDto {
   city?: string;
   medicalProviderName?: string;
   motherInsuranceCompany?: string;
+
+  /** Email thread ID when extraction was from an email (to link request to thread). */
+  threadId?: string;
 }
