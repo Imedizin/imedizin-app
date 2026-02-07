@@ -5,9 +5,10 @@ WORKDIR /app
 RUN corepack enable pnpm
 
 # Install deps (monorepo)
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/api/package.json ./apps/api/
-COPY apps/dashboard/package.json ./apps/dashboard/
+# COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# COPY apps/api/package.json ./apps/api/
+COPY apps/api/package.json ./
+# COPY apps/dashboard/package.json ./apps/dashboard/
 RUN pnpm install --frozen-lockfile
 
 # Copy app and build
