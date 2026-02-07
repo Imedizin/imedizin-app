@@ -40,7 +40,7 @@ jobs:
           push: true
           tags: ${{ env.IMAGE_NAME }}-dashboard:latest
           build-args: |
-            VITE_API_BASE_URL=http://localhost:3000
+            VITE_API_BASE_URL=https://api.imedizin.com
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.2.5
