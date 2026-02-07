@@ -41,12 +41,13 @@ services:
     networks:
       - app
     # Links ensure /etc/hosts entry for "postgres" (fixes ENOTFOUND on some Docker setups)
+    image: ${DOCKER_USERNAME}/imedizin-api:latest
     links:
       - postgres
       - redis
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: apps/api/Dockerfile
     container_name: imedizin-api
     restart: unless-stopped
     depends_on:
@@ -70,14 +71,17 @@ services:
   dashboard:
     networks:
       - app
-    build:
-      context: .
-      dockerfile: apps/dashboard/Dockerfile
-      args:
-        # Set at build time; use your API URL in production
-        VITE_API_BASE_URL: http://localhost:3000
+    image: ${DOCKER_USERNAME}/imedizin-dashboard:latest
+    # build:
+    #   context: .
+    #   dockerfile: apps/dashboard/Dockerfile
+    #   args:
+    #     # Set at build time; use your API URL in production
+    #     VITE_API_BASE_URL: http://localhost:3000
     container_name: imedizin-dashboard
     restart: unless-stopped
+    depends_on:
+      - api
     ports:
       - "8080:80"
 
