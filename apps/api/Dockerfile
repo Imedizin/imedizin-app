@@ -21,7 +21,7 @@ ENV NODE_ENV=production
 
 # Copy app-specific files
 # COPY --from=builder /app/apps/api/package.json ./apps/api/
-COPY --from=builder /app/apps/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/apps/api/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/apps/api/drizzle ./drizzle
