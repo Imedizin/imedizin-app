@@ -223,20 +223,20 @@ const Mails: React.FC = () => {
     });
   };
 
-  const expandAllMessages = () => {
-    if (selectedThread) {
-      setExpandedMessages(new Set(selectedThread.messages.map((m) => m.id)));
-    }
-  };
+  // const expandAllMessages = () => {
+  //   if (selectedThread) {
+  //     setExpandedMessages(new Set(selectedThread.messages.map((m) => m.id)));
+  //   }
+  // };
 
-  const collapseAllMessages = () => {
-    if (selectedThread && selectedThread.messages.length > 0) {
-      // Keep only the latest message expanded
-      const latestMessageId =
-        selectedThread.messages[selectedThread.messages.length - 1].id;
-      setExpandedMessages(new Set([latestMessageId]));
-    }
-  };
+  // const collapseAllMessages = () => {
+  //   if (selectedThread && selectedThread.messages.length > 0) {
+  //     // Keep only the latest message expanded
+  //     const latestMessageId =
+  //       selectedThread.messages[selectedThread.messages.length - 1].id;
+  //     setExpandedMessages(new Set([latestMessageId]));
+  //   }
+  // };
 
   const getAvatarColor = (name: string) => {
     const colors = [
@@ -709,7 +709,7 @@ const Mails: React.FC = () => {
                         margin: "0 4px",
                       }}
                     />
-                    <Tooltip title="Expand all messages in this thread">
+                    {/* <Tooltip title="Expand all messages in this thread">
                       <Button
                         size="small"
                         type={
@@ -764,7 +764,7 @@ const Mails: React.FC = () => {
                       >
                         Collapse
                       </Button>
-                    </Tooltip>
+                    </Tooltip> */}
                   </div>
                 </div>
               </div>
