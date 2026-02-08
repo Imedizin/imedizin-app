@@ -28,6 +28,25 @@ import MedicalProviderFormPage from "./pages/MedicalProviderFormPage";
 
 const queryClient = new QueryClient();
 
+function isSignedIn(): boolean {
+  if (typeof window === "undefined") return false;
+  return sessionStorage.getItem("fake-signed-in") === "true";
+}
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  if (!isSignedIn()) {
+    return <Navigate to="/sign-in" replace />;
+  }
+  return <>{children}</>;
+}
+
+function GuestOnlyRoute({ children }: { children: React.ReactNode }) {
+  if (isSignedIn()) {
+    return <Navigate to="/" replace />;
+  }
+  return <>{children}</>;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
@@ -43,11 +62,12 @@ const App = () => (
         >
           <NuqsAdapter>
             <Routes>
-              <Route path="/sign-in" element={<SignIn />} />
+              <Route path="/sign-in" element={<GuestOnlyRoute><SignIn /></GuestOnlyRoute>} />
               <Route
                 path="*"
                 element={
-                  <DashboardLayout>
+                  <ProtectedRoute>
+                    <DashboardLayout>
                     <Routes>
                       <Route path="/" element={<Index />} />
                       <Route
@@ -122,6 +142,7 @@ const App = () => (
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </DashboardLayout>
+                  </ProtectedRoute>
                 }
               />
             </Routes>
