@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Layout, Avatar, Dropdown, Badge, Button } from "antd";
 import type { MenuProps } from "antd";
 import {
@@ -59,9 +60,18 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   collapsed,
   onToggleCollapsed,
 }) => {
+  const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const notificationCount = useNotificationStore((s) => s.notifications.length);
+
+  const handleUserMenuClick: MenuProps["onClick"] = ({ key }) => {
+    if (key === "logout") {
+      sessionStorage.removeItem("fake-signed-in");
+      sessionStorage.removeItem("fake-user-email");
+      navigate("/sign-in", { replace: true });
+    }
+  };
 
   return (
     <Header
@@ -133,7 +143,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           open={notificationsOpen}
           onOpenChange={setNotificationsOpen}
         />
-        <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+        <Dropdown
+          menu={{ items: userMenuItems, onClick: handleUserMenuClick }}
+          placement="bottomRight"
+        >
           <div
             style={{
               display: "flex",

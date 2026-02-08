@@ -7,6 +7,7 @@ import { NuqsAdapter } from "nuqs/adapters/react";
 import { ThemeProvider } from "@/theme/ThemeProvider";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Index from "./pages/Index";
+import SignIn from "./pages/SignIn";
 import NotFound from "./pages/NotFound";
 import MedicalProviders from "./pages/MedicalProviders";
 import CaseProviders from "./pages/CaseProviders";
@@ -39,78 +40,86 @@ const App = () => (
           }}
         >
           <NuqsAdapter>
-            <DashboardLayout>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route
-                  path="/medical-providers"
-                  element={<MedicalProviders />}
-                />
-                <Route
-                  path="/medical-providers/new"
-                  element={<MedicalProviderFormPage />}
-                />
-                <Route
-                  path="/medical-providers/:id/edit"
-                  element={<MedicalProviderFormPage />}
-                />
-                <Route
-                  path="/medical-providers/:id"
-                  element={<MedicalProviderView />}
-                />
-                <Route path="/case-providers" element={<CaseProviders />} />
-                <Route
-                  path="/case-providers/new"
-                  element={<CaseProviderFormPage />}
-                />
-                <Route
-                  path="/case-providers/:id/edit"
-                  element={<CaseProviderFormPage />}
-                />
-                <Route
-                  path="/case-providers/:id"
-                  element={<CaseProviderView />}
-                />
-                <Route path="/mailboxes" element={<Mailboxes />} />
-                <Route path="/domains" element={<Domains />} />
-                <Route path="/mails/:threadId?" element={<Mails />} />
-                <Route
-                  path="/mails-old-architecture/:emailId?"
-                  element={<MailsOldArchitecture />}
-                />
-                <Route
-                  path="/assistance-requests"
-                  element={
-                    <Navigate
-                      to="/assistance-requests/transportation"
-                      replace
-                    />
-                  }
-                />
-                <Route
-                  path="/assistance-requests/medical-cases"
-                  element={<MedicalCasesPage />}
-                />
-                <Route
-                  path="/assistance-requests/medical-cases/:id"
-                  element={<MedicalCaseDetailPage />}
-                />
-                <Route
-                  path="/assistance-requests/new"
-                  element={<NewAssistanceRequestPage />}
-                />
-                <Route
-                  path="/assistance-requests/transportation"
-                  element={<TransportationPage />}
-                />
-                <Route
-                  path="/assistance-requests/transportation/:id"
-                  element={<TransportAssistanceDetailPage />}
-                />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
+            <Routes>
+              <Route path="/sign-in" element={<SignIn />} />
+              <Route
+                path="*"
+                element={
+                  <DashboardLayout>
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route
+                        path="/medical-providers"
+                        element={<MedicalProviders />}
+                      />
+                      <Route
+                        path="/medical-providers/new"
+                        element={<MedicalProviderFormPage />}
+                      />
+                      <Route
+                        path="/medical-providers/:id/edit"
+                        element={<MedicalProviderFormPage />}
+                      />
+                      <Route
+                        path="/medical-providers/:id"
+                        element={<MedicalProviderView />}
+                      />
+                      <Route path="/case-providers" element={<CaseProviders />} />
+                      <Route
+                        path="/case-providers/new"
+                        element={<CaseProviderFormPage />}
+                      />
+                      <Route
+                        path="/case-providers/:id/edit"
+                        element={<CaseProviderFormPage />}
+                      />
+                      <Route
+                        path="/case-providers/:id"
+                        element={<CaseProviderView />}
+                      />
+                      <Route path="/mailboxes" element={<Mailboxes />} />
+                      <Route path="/domains" element={<Domains />} />
+                      <Route path="/mails/:threadId?" element={<Mails />} />
+                      <Route
+                        path="/mails-old-architecture/:emailId?"
+                        element={<MailsOldArchitecture />}
+                      />
+                      <Route
+                        path="/assistance-requests"
+                        element={
+                          <Navigate
+                            to="/assistance-requests/transportation"
+                            replace
+                          />
+                        }
+                      />
+                      <Route
+                        path="/assistance-requests/medical-cases"
+                        element={<MedicalCasesPage />}
+                      />
+                      <Route
+                        path="/assistance-requests/medical-cases/:id"
+                        element={<MedicalCaseDetailPage />}
+                      />
+                      <Route
+                        path="/assistance-requests/new"
+                        element={<NewAssistanceRequestPage />}
+                      />
+                      <Route
+                        path="/assistance-requests/transportation"
+                        element={<TransportationPage />}
+                      />
+                      <Route
+                        path="/assistance-requests/transportation/:id"
+                        element={<TransportAssistanceDetailPage />}
+                      />
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </DashboardLayout>
+                }
+              />
               </Routes>
-            </DashboardLayout>
           </NuqsAdapter>
         </BrowserRouter>
       </TooltipProvider>
