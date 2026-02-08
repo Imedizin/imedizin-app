@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { NuqsAdapter } from "nuqs/adapters/react";
 import { ThemeProvider } from "@/theme/ThemeProvider";
+import { DesktopOnlyOverlay } from "@/components/DesktopOnlyOverlay";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Index from "./pages/Index";
 import SignIn from "./pages/SignIn";
@@ -30,6 +31,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
+      <DesktopOnlyOverlay />
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -64,7 +66,10 @@ const App = () => (
                         path="/medical-providers/:id"
                         element={<MedicalProviderView />}
                       />
-                      <Route path="/case-providers" element={<CaseProviders />} />
+                      <Route
+                        path="/case-providers"
+                        element={<CaseProviders />}
+                      />
                       <Route
                         path="/case-providers/new"
                         element={<CaseProviderFormPage />}
@@ -119,7 +124,7 @@ const App = () => (
                   </DashboardLayout>
                 }
               />
-              </Routes>
+            </Routes>
           </NuqsAdapter>
         </BrowserRouter>
       </TooltipProvider>
