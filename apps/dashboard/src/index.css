@@ -317,3 +317,22 @@
   border-radius: 0 0 12px 12px;
   box-shadow: 0 -2px 8px hsl(var(--foreground) / 0.04);
 }
+
+/* Sidebar iMedizin wordmark with effects */
+.imedizin-wordmark {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #0d7377 0%, #0a5c5f 40%, #b5892e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 24px rgba(13, 115, 119, 0.25);
+}
+.dark .imedizin-wordmark,
+.ant-layout-sider-dark .imedizin-wordmark {
+  background: linear-gradient(135deg, #14a3a8 0%, #0d7377 50%, #c9a03a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 20px rgba(20, 163, 168, 0.35);
+}

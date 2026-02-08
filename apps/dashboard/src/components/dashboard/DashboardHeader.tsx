@@ -5,7 +5,6 @@ import {
   UserOutlined,
   SettingOutlined,
   BellOutlined,
-  MessageOutlined,
   SunOutlined,
   MoonOutlined,
   MenuFoldOutlined,
@@ -100,6 +99,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           title={isDark ? "Switch to light mode" : "Switch to dark mode"}
         />
         <AllowNotificationsButton />
+        {/* Test notification button – commented out
         {typeof Notification !== "undefined" &&
           Notification.permission === "granted" &&
           "serviceWorker" in navigator && (
@@ -119,6 +119,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               Test notification
             </Button>
           )}
+        */}
         <Badge count={notificationCount} size="small">
           <Button
             type="text"
@@ -132,13 +133,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           open={notificationsOpen}
           onOpenChange={setNotificationsOpen}
         />
-        <Badge count={3} size="small">
-          <Button
-            type="text"
-            icon={<MessageOutlined />}
-            style={{ fontSize: 18 }}
-          />
-        </Badge>
         <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
           <div
             style={{

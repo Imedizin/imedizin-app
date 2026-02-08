@@ -14,7 +14,6 @@ import {
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "@/hooks/useTheme";
-import biaLogo from "@/assets/bia-logo.png";
 
 const { Sider } = Layout;
 
@@ -25,7 +24,7 @@ function getItem(
   key: React.Key,
   icon?: React.ReactNode,
   children?: MenuItem[],
-  path?: string
+  path?: string,
 ): MenuItem {
   const menuLabel = path ? (
     <Link to={path} style={{ textDecoration: "none", color: "inherit" }}>
@@ -46,36 +45,42 @@ function getItem(
 const menuItems: MenuItem[] = [
   getItem("Dashboard", "/", <DashboardOutlined />, undefined, "/"),
   getItem("Mails", "/mails", <InboxOutlined />, undefined, "/mails"),
-  getItem("Assistance Requests", "assistance-requests", <SolutionOutlined />, [
-    getItem(
-      "Medical cases",
-      "/assistance-requests/medical-cases",
-      <MedicineBoxOutlined />,
-      undefined,
-      "/assistance-requests/medical-cases"
-    ),
-    getItem(
-      "Transportation",
-      "/assistance-requests/transportation",
-      <CarOutlined />,
-      undefined,
-      "/assistance-requests/transportation"
-    ),
-  ], "/assistance-requests"),
+  getItem(
+    "Assistance Requests",
+    "assistance-requests",
+    <SolutionOutlined />,
+    [
+      getItem(
+        "Medical cases",
+        "/assistance-requests/medical-cases",
+        <MedicineBoxOutlined />,
+        undefined,
+        "/assistance-requests/medical-cases",
+      ),
+      getItem(
+        "Transportation",
+        "/assistance-requests/transportation",
+        <CarOutlined />,
+        undefined,
+        "/assistance-requests/transportation",
+      ),
+    ],
+    "/assistance-requests",
+  ),
   getItem("Our Network", "our-network", <ApartmentOutlined />, [
     getItem(
       "Case Providers (Insurers)",
       "/case-providers",
       <TeamOutlined />,
       undefined,
-      "/case-providers"
+      "/case-providers",
     ),
     getItem(
       "Medical Providers",
       "/medical-providers",
       <MedicineBoxOutlined />,
       undefined,
-      "/medical-providers"
+      "/medical-providers",
     ),
   ]),
   getItem("Mailbox Management", "mailbox-management", <MailOutlined />, [
@@ -85,7 +90,7 @@ const menuItems: MenuItem[] = [
       "/mailboxes",
       <MailOutlined />,
       undefined,
-      "/mailboxes"
+      "/mailboxes",
     ),
   ]),
 ];
@@ -153,29 +158,34 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ collapsed }) => {
     >
       <div
         style={{
-          height: collapsed ? 32 : 64,
+          minHeight: collapsed ? 43 : 102,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: collapsed ? "0 8px" : "0 16px",
-          marginTop: collapsed ? 20 : 30,
-          marginBottom: collapsed ? 0 : 10,
+          padding: collapsed ? "12px 8px 4px" : "20px 20px 6px",
+          marginTop: collapsed ? 6 : 10,
+          marginBottom: 0,
         }}
       >
-        <img
-          src={biaLogo}
-          alt="BIA Assistance"
+        <span
+          className="imedizin-wordmark"
           style={{
-            height: collapsed ? 32 : 64,
-            objectFit: "contain",
-            transition: "all 0.2s ease",
+            fontSize: collapsed ? 26 : 38,
+            transition: "font-size 0.2s ease",
           }}
-        />
+          aria-label="iMedizin"
+        >
+          iMedizin
+        </span>
       </div>
       <Menu
         mode="inline"
         selectedKeys={[selectedKey]}
-        defaultOpenKeys={["our-network", "mailbox-management", "assistance-requests"]}
+        defaultOpenKeys={[
+          "our-network",
+          "mailbox-management",
+          "assistance-requests",
+        ]}
         style={{ border: "none", padding: "8px 0" }}
         items={menuItems}
       />
