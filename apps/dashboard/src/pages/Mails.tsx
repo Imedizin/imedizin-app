@@ -663,156 +663,90 @@ const Mails: React.FC = () => {
                   }}
                 >
                   <div>
-                    <Title
-                      level={5}
-                      style={{
-                        margin: 0,
-                        color: isDark ? "#fff" : undefined,
-                        marginBottom: 4,
+                      <Title
+                        level={5}
+                        style={{
+                          margin: 0,
+                          color: isDark ? "#fff" : undefined,
+                          marginBottom: 4,
+                        }}
+                      >
+                        {selectedThread.subject || "(No Subject)"}
+                      </Title>
+                      <Text style={{ color: "#8c8c8c", fontSize: 13 }}>
+                        {selectedThread.messageCount} message
+                        {selectedThread.messageCount > 1 ? "s" : ""} in this
+                        conversation
+                      </Text>
+                    </div>
+                    <Dropdown
+                      menu={{
+                        items: [
+                          {
+                            key: "transport",
+                            icon: <CarOutlined />,
+                            label: (
+                              <Link
+                                to={`/assistance-requests/new?emailId=${encodeURIComponent(selectedThread.messages[selectedThread.messages.length - 1].id)}&type=transport`}
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: 8,
+                                }}
+                              >
+                                New Transportation Case
+                              </Link>
+                            ),
+                          },
+                          {
+                            key: "medical_case",
+                            icon: <MedicineBoxOutlined />,
+                            label: (
+                              <Link
+                                to={`/assistance-requests/new?emailId=${encodeURIComponent(selectedThread.messages[selectedThread.messages.length - 1].id)}&type=medical_case`}
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: 8,
+                                }}
+                              >
+                                New Medical Case
+                              </Link>
+                            ),
+                          },
+                          { type: "divider" },
+                          {
+                            key: "copy_thread_id",
+                            label: "Copy Thread ID",
+                            icon: <CopyOutlined />,
+                            onClick: () => {
+                              if (selectedThread) {
+                                navigator.clipboard.writeText(
+                                  selectedThread.threadId,
+                                );
+                                message.success(
+                                  "Thread ID copied to clipboard",
+                                );
+                              }
+                            },
+                          },
+                        ],
                       }}
                     >
-                      {selectedThread.subject || "(No Subject)"}
-                    </Title>
-                    <Text style={{ color: "#8c8c8c", fontSize: 13 }}>
-                      {selectedThread.messageCount} message
-                      {selectedThread.messageCount > 1 ? "s" : ""} in this
-                      conversation
-                    </Text>
-                  </div>
-                  <Dropdown
-                    menu={{
-                      items: [
-                        {
-                          key: "transport",
-                          label: "Transport",
-                          icon: <CarOutlined />,
-                          onClick: () =>
-                            navigate(
-                              `/assistance-requests/new?emailId=${encodeURIComponent(selectedThread.messages[selectedThread.messages.length - 1].id)}&type=transport`,
-                            ),
-                        },
-                        {
-                          key: "medical_case",
-                          label: "Medical case",
-                          icon: <MedicineBoxOutlined />,
-                          onClick: () =>
-                            navigate(
-                              `/assistance-requests/new?emailId=${encodeURIComponent(selectedThread.messages[selectedThread.messages.length - 1].id)}&type=medical_case`,
-                            ),
-                        },
-                      ],
-                    }}
-                  >
-                    <Button
-                      icon={<SolutionOutlined />}
-                      style={{ marginLeft: "auto" }}
-                    >
-                      Create assistance request from email{" "}
-                      <DownOutlined style={{ fontSize: 10, marginLeft: 4 }} />
-                    </Button>
-                  </Dropdown>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 0,
-                      background: isDark
-                        ? "rgba(255,255,255,0.04)"
-                        : "rgba(0,0,0,0.02)",
-                      border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
-                      borderRadius: 8,
-                      padding: 4,
-                    }}
-                  >
-                    <Tooltip title="Copy Thread ID">
                       <Button
-                        size="small"
                         type="text"
-                        icon={<CopyOutlined />}
-                        onClick={() => {
-                          if (selectedThread) {
-                            navigator.clipboard.writeText(
-                              selectedThread.threadId,
-                            );
-                            message.success("Thread ID copied to clipboard");
-                          }
-                        }}
+                        icon={<MoreOutlined style={{ fontSize: 22 }} />}
                         style={{
+                          marginLeft: "auto",
+                          minWidth: 36,
+                          minHeight: 36,
+                          padding: "6px 8px",
                           color: isDark
                             ? "rgba(255,255,255,0.85)"
                             : "rgba(0,0,0,0.88)",
                         }}
-                      >
-                        Copy Thread ID
-                      </Button>
-                    </Tooltip>
-                    <div
-                      style={{
-                        width: 1,
-                        height: 20,
-                        background: isDark
-                          ? "rgba(255,255,255,0.12)"
-                          : "rgba(0,0,0,0.08)",
-                        margin: "0 4px",
-                      }}
-                    />
-                    {/* <Tooltip title="Expand all messages in this thread">
-                      <Button
-                        size="small"
-                        type={
-                          selectedThread &&
-                          selectedThread.messages.length > 0 &&
-                          expandedMessages.size ===
-                            selectedThread.messages.length
-                            ? "primary"
-                            : "text"
-                        }
-                        icon={<FullscreenOutlined />}
-                        onClick={expandAllMessages}
-                        style={
-                          selectedThread &&
-                          selectedThread.messages.length > 0 &&
-                          expandedMessages.size ===
-                            selectedThread.messages.length
-                            ? undefined
-                            : {
-                                color: isDark
-                                  ? "rgba(255,255,255,0.85)"
-                                  : "rgba(0,0,0,0.88)",
-                              }
-                        }
-                      >
-                        Expand All
-                      </Button>
-                    </Tooltip>
-                    <Tooltip title="Collapse all except the latest message">
-                      <Button
-                        size="small"
-                        type={
-                          selectedThread &&
-                          selectedThread.messages.length > 0 &&
-                          expandedMessages.size <= 1
-                            ? "primary"
-                            : "text"
-                        }
-                        icon={<ShrinkOutlined />}
-                        onClick={collapseAllMessages}
-                        style={
-                          selectedThread &&
-                          selectedThread.messages.length > 0 &&
-                          expandedMessages.size <= 1
-                            ? undefined
-                            : {
-                                color: isDark
-                                  ? "rgba(255,255,255,0.85)"
-                                  : "rgba(0,0,0,0.88)",
-                              }
-                        }
-                      >
-                        Collapse
-                      </Button>
-                    </Tooltip> */}
-                  </div>
+                      />
+                    </Dropdown>
                 </div>
               </div>
 
@@ -1125,38 +1059,6 @@ const Mails: React.FC = () => {
                 >
                   Reply All
                 </Button>
-                <Dropdown
-                  menu={{
-                    items: [
-                      {
-                        key: "transport",
-                        label: "Transport",
-                        icon: <CarOutlined />,
-                        onClick: () =>
-                          navigate(
-                            `/assistance-requests/new?emailId=${encodeURIComponent(selectedThread.messages[selectedThread.messages.length - 1].id)}&type=transport`,
-                          ),
-                      },
-                      {
-                        key: "medical_case",
-                        label: "Medical case",
-                        icon: <MedicineBoxOutlined />,
-                        onClick: () =>
-                          navigate(
-                            `/assistance-requests/new?emailId=${encodeURIComponent(selectedThread.messages[selectedThread.messages.length - 1].id)}&type=medical_case`,
-                          ),
-                      },
-                    ],
-                  }}
-                >
-                  <Button
-                    icon={<SolutionOutlined />}
-                    style={{ marginLeft: "auto" }}
-                  >
-                    Create assistance request from email{" "}
-                    <DownOutlined style={{ fontSize: 10, marginLeft: 4 }} />
-                  </Button>
-                </Dropdown>
                 {/* <Button>Forward</Button> */}
               </div>
             </>

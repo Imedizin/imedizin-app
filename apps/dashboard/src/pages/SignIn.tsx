@@ -25,9 +25,11 @@ const SignIn = () => {
 
   return (
     <div
+      className={isDark ? "dark" : undefined}
       style={{
         minHeight: "100vh",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         padding: 24,
@@ -36,6 +38,17 @@ const SignIn = () => {
           : "linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 50%, #cbd5e1 100%)",
       }}
     >
+      <span
+        className="imedizin-wordmark"
+        style={{
+          fontSize: 42,
+          marginBottom: 32,
+          display: "block",
+        }}
+        aria-label="iMedizin"
+      >
+        iMedizin
+      </span>
       <Card
         style={{ width: "100%", maxWidth: 400 }}
         styles={{
