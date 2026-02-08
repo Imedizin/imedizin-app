@@ -158,12 +158,12 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ collapsed }) => {
     >
       <div
         style={{
-          minHeight: collapsed ? 43 : 102,
+          minHeight: collapsed ? 43 : 68,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: collapsed ? "12px 8px 4px" : "20px 20px 6px",
-          marginTop: collapsed ? 6 : 10,
+          padding: collapsed ? "12px 8px 8px" : "16px 20px 12px",
+          marginTop: collapsed ? 6 : 12,
           marginBottom: 0,
         }}
       >
@@ -186,7 +186,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ collapsed }) => {
           "mailbox-management",
           "assistance-requests",
         ]}
-        style={{ border: "none", padding: "8px 0" }}
+        style={{ border: "none", padding: "4px 0 8px" }}
         items={menuItems}
       />
     </Sider>
