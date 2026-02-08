@@ -18,8 +18,8 @@ const SignIn = () => {
       setError("Invalid email or password");
       return;
     }
-    sessionStorage.setItem("fake-signed-in", "true");
-    sessionStorage.setItem("fake-user-email", values.email);
+    localStorage.setItem("fake-signed-in", "true");
+    localStorage.setItem("fake-user-email", values.email);
     navigate("/", { replace: true });
   };
 

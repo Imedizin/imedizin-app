@@ -67,8 +67,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
   const handleUserMenuClick: MenuProps["onClick"] = ({ key }) => {
     if (key === "logout") {
-      sessionStorage.removeItem("fake-signed-in");
-      sessionStorage.removeItem("fake-user-email");
+      localStorage.removeItem("fake-signed-in");
+      localStorage.removeItem("fake-user-email");
       navigate("/sign-in", { replace: true });
     }
   };

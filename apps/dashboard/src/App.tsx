@@ -30,7 +30,7 @@ const queryClient = new QueryClient();
 
 function isSignedIn(): boolean {
   if (typeof window === "undefined") return false;
-  return sessionStorage.getItem("fake-signed-in") === "true";
+  return localStorage.getItem("fake-signed-in") === "true";
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
